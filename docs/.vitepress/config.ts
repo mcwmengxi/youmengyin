@@ -6,6 +6,7 @@ const logo = "https://iconfont.alicdn.com/p/illus/file/WgLsw4nYmfzB/d57e706d-278
 export default defineConfig({
     lang: "zh-CN",
     title: 'ymy-ui',
+    base: '/youmengyin/',
     description: 'Just playing around.',
     appearance: true,
     themeConfig: {
@@ -16,6 +17,14 @@ export default defineConfig({
         // 配置侧边菜单栏
         sidebar,
         // 配置页脚
-        footer
+        footer,
+        algolia: {
+            appId: 'QM8Y7EPOUO',
+            apiKey: 'dca4c36e01076d19747ee4b7a678ecef',
+            indexName: 'youmengyin',
+            searchParameters: {
+                facetFilters: ['language:cn']
+            }
+        },
     }
 })

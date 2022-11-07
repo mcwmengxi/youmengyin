@@ -1,5 +1,13 @@
 ## jenkins
 
+### 全局工具配置
+系统配置ssh 
+![](https://img-blog.csdnimg.cn/6d39bb3bd74d4308b445263031d638ab.png)
+
+全局工具配置 node.js
+
+![](https://img-blog.csdnimg.cn/da190acdf86a457182ab51e7e8db6271.png)
+
 ### github相关配置
 
 生成GitHub的token用于Jenkins
@@ -23,9 +31,22 @@ git仓库管理,ssh方式报错了, 采用https方式, Credentials采用用户�
 
 指定构建触发器: GitHub hook trigger for GITScm polling
 
-指定构建环境: Use secret text(s) or file(s), 绑定选择secret text, 对应凭据选择用户名+私钥模式
+指定构建环境: Use secret text(s) or file(s), 绑定选择secret text, 对应凭据选择用户名+私钥模式; 选择事先在全局工具中配置的node.js
+构建shell,将编译产物打tar包，留作构建后操作使用
+```shell
+node -v &&
+npm -v &&
+pwd &&
+npm install &&
+npm run docs:build &&
+tar -zcvf dist.tar ./dist
+```
+任务配置-构建后操作
+将tar包放到服务器指定目录
+解压tar包，将物料放置在nginx工作目录下
+![](https://img-blog.csdnimg.cn/b4666a414e3141ae8ffeb62e51c7840d.png)
 
-构建shell
+tar xvf youmengyin/dist.tar -C /home/webserver/static/youmengyin/dist/
 
 - Jenkins build时有时候报Error fetching remote repo ‘origin’
 直接清空工作空间, 将缓存清理掉。如果需要每次构建后都删除,可以直接在构建后选择清理工作空间

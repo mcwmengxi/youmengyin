@@ -1,14 +1,23 @@
+const Go = [
+  { text: '介绍', link: '/go/index'},
+  { text: '安装', link: '/go/install'}
+]
+const Guide = [
+  {
+    text: '指南',
+    link: '/guide/install',
+    items: [
+      { text: '安装', link: '/guide/install' },
+      { text: '快速开始', link: '/guide/import' }
+    ]
+  }
+]
+const sidebars = [
+  { text: 'go', items: Go, collapsible: true, collapsed :true},
+  { text: 'Guide', items: Guide}
+]
 export default {
-    '/guide/' : [
-    {
-      text: '指南',
-      link: '/guide/install',
-      items: [
-        { text: '安装', link: '/guide/install' },
-        { text: '快速开始', link: '/guide/import' }
-      ]
-    }
-  ],
+  '/guide/' : Guide,
   '/component/': [
     {
       text: '基础组件',
@@ -29,6 +38,7 @@ export default {
       ]
     }
   ],
+  '/go/': sidebars,
   '/resource/': [
     {
       text: '资源分享',

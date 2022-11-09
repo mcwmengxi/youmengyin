@@ -23,3 +23,5 @@ npm i ymy-ui
 ```shell
 yarn add ymy-ui
 ```
+
+## use <Badge type="info">default</Badge>

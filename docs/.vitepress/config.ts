@@ -12,7 +12,7 @@ export default defineConfig({
     appearance: true,// 是否启用暗模式
     head: [
       ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
-      ['link', { rel: 'icon', type: 'image/png', href: '/public/favicon.png' }],
+      ['link', { rel: 'icon', type: 'image/png', href: '/no_profile_s.png' }],
       // would render: <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     ],
     ignoreDeadLinks: true,// 不会因为死链导致失败
@@ -35,7 +35,8 @@ export default defineConfig({
           text: 'Edit this page on GitHub'
         },
         // 配置logo
-        logo: logoUrl,
+        // logo: logoUrl,
+        logo: '/no_profile_s.png',
         // 配置导航栏
         nav,
         // 配置侧边菜单栏

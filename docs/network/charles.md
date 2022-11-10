@@ -27,3 +27,20 @@ Help ==> SSL Proxying ==> Install Charles Root Certificate ==> 证书路径 ==> 
 
 3.2、手机证书信任
 1、Help ==> SSL Proxying ==> Install Charles Root Certificate on a Mobile Device or Remote Browser
+
+2、手机设置 --> 无限区域网 --> 选择WIFI --> 配置代理 --> 输入电脑ip,端口8888 (IP可在Help -> Local IP Addresser查看)
+
+3、打开浏览器 --> chls.pro/ssl下载证书
+
+4、手机设置 --> 通用 --> 描述文件与设备管理 --> 选择证书安装
+
+5、IOS 10以后需要信任证书
+手机设置 --> 通用 --> 关于本机 --> 证书信任设置
+
+### 4.开启代理
+
+4.1、电脑开启代理
+Proxy ==> Windows Proxy
+
+4.2、手机开启代理
+手机设置 --> 无限区域网 --> 选择WIFI --> 配置代理 --> 输入电脑ip,端口8888 (IP可在Help -> Local IP Addresser查看)

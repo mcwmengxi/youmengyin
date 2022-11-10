@@ -1,6 +1,10 @@
 const GoLang = [
     { text: '介绍', link: '/go/index', },
-    { text: '安装环境', link: '/go/install', }
+    { text: '安装环境', link: '/go/install', },
+    { text: '变量声明', link: '/go/variable', }
+]
+const NetWork = [
+    { text: 'Charles抓包', link: '/network/charles', }
 ]
 // 导航栏配置
 export default [
@@ -16,8 +20,13 @@ export default [
             { text: 'Element Plus', link: 'https://element-plus.gitee.io/zh-CN/' }
         ]
     },
-    {   text: 'Go语言',
+    {   
+        text: 'Go语言',
         items: GoLang
+    },
+    {
+        text: '网络相关',
+        items: NetWork
     }
 ]
 

@@ -56,7 +56,7 @@ tar xvf youmengyin/dist.tar -C /home/webserver/static/youmengyin/dist/
 安装docker-compose
 一个完整的应用程序，往往都不是一个容器组成的，而是通过容器组成一个容器群。一个容器群的搭建需要执行太多命令，更重要的是需要考虑太多应用和容器间的依赖关系处理，是一波令人头大的操作。docker-compose正是解决多个容器之间管理的问题。
 
-```linux
+```shell
 sudo curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 ```
 curl 使用不了可以通过pip安装
@@ -101,7 +101,7 @@ compose  es  hilde  jenkins  lek  nginx
 [root@luo compose]# vim docker-compose.yml 
 
 编写docker-compose.yml
-```xshell
+```shell
 version: '3'
 services:                                      # 集合
   docker_jenkins:

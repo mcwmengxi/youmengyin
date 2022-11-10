@@ -1,6 +1,10 @@
 const Go = [
   { text: '介绍', link: '/go/index'},
-  { text: '安装', link: '/go/install'}
+  { text: '安装', link: '/go/install'},
+  { text: '变量声明', link: '/go/variable'}
+]
+const NetWork = [
+  { text: 'Charles抓包', link: '/network/charles' }
 ]
 const Guide = [
   {
@@ -14,7 +18,8 @@ const Guide = [
 ]
 const sidebars = [
   { text: 'go', items: Go, collapsible: true, collapsed :true},
-  { text: 'Guide', items: Guide}
+  { text: 'Guide', items: Guide},
+  { text: '网络相关', item: NetWork}
 ]
 export default {
   '/guide/' : Guide,

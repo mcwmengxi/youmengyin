@@ -1,7 +1,8 @@
 const Go = [
   { text: '介绍', link: '/go/index'},
   { text: '安装', link: '/go/install'},
-  { text: '变量声明', link: '/go/variable'}
+  { text: '变量声明', link: '/go/variable'},
+  { text: '数组使用', link: '/go/array', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

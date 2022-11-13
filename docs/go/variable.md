@@ -78,9 +78,6 @@ func demo_1() {
 ```
 :::
 
-运行结果：
-
-![](https://github.com/xinliangnote/Go/blob/master/00-基础语法/images/02-变量声明/2_go_1.png)
 
 ## 变量声明
 
@@ -145,10 +142,6 @@ func demo_2() {
 ```
 :::
 
-运行结果：
-
-![](https://github.com/xinliangnote/Go/blob/master/00-基础语法/images/02-变量声明/2_go_2.png)
-
 ## 输出方法
 
 **fmt.Print**：输出到控制台（仅只是输出）
@@ -180,6 +173,3 @@ func demo_3() {
 ```
 :::
 
-运行结果：
-
-![](https://github.com/xinliangnote/Go/blob/master/00-基础语法/images/02-变量声明/2_go_3.png)

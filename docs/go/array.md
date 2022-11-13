@@ -126,6 +126,7 @@ func modifyArr_1(a *[5]int) {
 
 三、数组赋值问题，同样类型的数组（长度一样且每个元素类型也一样）才可以相互赋值，反之不可以。
 
+::: details 查看代码
 ``` go
 //数组赋值
 func transfer_2() {
@@ -135,5 +136,5 @@ func transfer_2() {
 	fmt.Println(arr_1, arr_1 == arr)
 }
 ```
-
+:::
 运行会报错：cannot use arr (type [5]int) as type [6]int in assignment

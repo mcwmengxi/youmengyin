@@ -2,7 +2,8 @@ const GoLang = [
     { text: '介绍', link: '/go/index', },
     { text: '安装环境', link: '/go/install', },
     { text: '变量声明', link: '/go/variable', },
-    { text: '数组使用', link: '/go/array', }
+    { text: '数组使用', link: '/go/array', },
+    { text: '切片', link: '/go/slice', }
 ]
 const NetWork = [
     { text: 'Charles抓包', link: '/network/charles', }

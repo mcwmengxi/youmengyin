@@ -3,7 +3,8 @@ const Go = [
   { text: '安装', link: '/go/install'},
   { text: '变量声明', link: '/go/variable'},
   { text: '数组使用', link: '/go/array', },
-  { text: '切片', link: '/go/slice', }
+  { text: '切片', link: '/go/slice', },
+  { text: '结构体', link: '/go/struct', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

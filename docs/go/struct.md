@@ -48,18 +48,18 @@ func struct_1() {
 ::: details 查看代码
 ```go
 type Result struct {
-	statusCode int    `json:"code"`
-	message    string `json: "msg"`
+	StatusCode int    `json:"statusCode"`
+	Message    string `json: "message"`
 }
 
 func struct_2() {
 	var res1 Result
-	res1.statusCode = 200
-	res1.message = "success"
+	res1.StatusCode = 200
+	res1.Message = "success"
 
 	//序列化
 	var jsons, errs = json.Marshal(res1)
-	fmt.Println(jsons, errs)
+	// fmt.Println(jsons, errs)
 	if errs != nil {
 		fmt.Println("errors: ", errs)
 	}
@@ -69,7 +69,7 @@ func struct_2() {
 	//反序列化
 	var res2 Result
 	errs = json.Unmarshal(jsons, &res2)
-	fmt.Println(jsons, errs)
+	// fmt.Println(jsons, errs)
 	if errs != nil {
 		fmt.Println("json unmarshal error:", errs)
 	}
@@ -80,49 +80,38 @@ func struct_2() {
 :::
 运行结果：
 
-![](https://img-blog.csdnimg.cn/e8aaa8aedd374dbd86dbcb77fc1d7159.png)
+![](https://img-blog.csdnimg.cn/2cc05495e6e04c679a142f2bf4ae40f6.png)
+
 
 
 ## 改变数据
 
-```
-//demo_13.go
-package main
-
-import (
-	"encoding/json"
-	"fmt"
-)
-
-type Result struct {
-	Code    int    `json:"code"`
-	Message string `json:"msg"`
+::: details 查看代码
+```go
+func struct_3() {
+	var res1 Result
+	res1.StatusCode = 200
+	res1.Message = "success"
+	print(&res1)
+	set(&res1)
+	print(&res1)
 }
-
-func main() {
-	var res Result
-	res.Code    = 200
-	res.Message = "success"
-	toJson(&res)
-	
-	setData(&res)
-	toJson(&res)
+func set(res *Result) {
+	res.StatusCode = 500
+	res.Message = "error message!"
 }
-
-func setData (res *Result) {
-	res.Code    = 500
-	res.Message = "fail"
-}
-
-func toJson (res *Result) {
+func print(res *Result) {
 	jsons, errs := json.Marshal(res)
+
 	if errs != nil {
-		fmt.Println("json marshal error:", errs)
+		fmt.Println("json unmarshal error:", errs)
 	}
-	fmt.Println("json data :", string(jsons))
+	fmt.Println("output :", string(jsons))
 }
+
 ```
+:::
 
 运行结果：
 
-![](https://github.com/xinliangnote/Go/blob/master/00-基础语法/images/05-结构体/5_go_3.png)
+![](https://img-blog.csdnimg.cn/00116ac55f904dccb304524f19cc2b59.png)

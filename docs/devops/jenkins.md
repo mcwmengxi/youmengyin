@@ -129,3 +129,9 @@ services:                                      # 集合
       - /home/nginx/conf.d/:/etc/nginx/conf.d
       - /home/webserver/static/jenkins/dist/:/usr/share/nginx/html
 ```
+
+现在新版的Jenkins容器在页面上重启的话 都会把容器停止掉而不重启 每次安装完插件后自己手工重启一下Jenkins容器
+
+```
+docker run -d -u root --rm -p 9510:8080 --name jenkins -v jenkins-data:/var/jenkins_home jenkins/jenkins
+```

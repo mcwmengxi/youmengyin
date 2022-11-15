@@ -132,6 +132,17 @@ services:                                      # 集合
 
 现在新版的Jenkins容器在页面上重启的话 都会把容器停止掉而不重启 每次安装完插件后自己手工重启一下Jenkins容器
 
+5ebde6b51761
+docker exec -it jenkins/jenkins bash
 ```
 docker run -d -u root --rm -p 9510:8080 --name jenkins -v jenkins-data:/var/jenkins_home jenkins/jenkins
 ```
+1.首先使用ssh工具上传xz包到Linux的​​/usr/local​​目录：
+xz -d node-v16.16.0-linux-x64.tar.xz 变成tar
+2.使用docker命令复制到docker容器下指定的目录（注意容器是正在启动的）：
+docker cp /usr/local/node-v16.16.0-linux-x64.tar jenkins:/var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node16
+3.进入容器，查看:
+docker exec -it jenkins bash
+
+tar -xvf node-v16.16.0-linux-x64.tar
+

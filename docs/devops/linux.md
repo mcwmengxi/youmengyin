@@ -33,3 +33,7 @@ source /etc/profile
 
 验证
 node -v npm -v
+
+
+查看nginx目录
+ps -ef | grep nginx 

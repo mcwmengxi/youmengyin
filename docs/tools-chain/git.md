@@ -26,3 +26,9 @@
 ![](https://img-blog.csdnimg.cn/e8ec89309aaf4844a74889efab64fde6.png)
 
 4.解决冲突，提交推送到远程
+
+
+
+npm config set registry http://registry.npmmirror.com
+
+https://registry.npmjs.org

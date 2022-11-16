@@ -146,3 +146,12 @@ docker exec -it jenkins bash
 
 tar -xvf node-v16.16.0-linux-x64.tar
 
+#nodejs
+export PATH=/var/jenkins_home/tools/jenkins.plugins.nodejs.tools.NodeJSInstallation/node16/node-v16.16.0-linux-x64/bin:PATH
+
+
+npm config set registry https://registry.npmjs.org
+
+![](https://img-blog.csdnimg.cn/a9a8119bc6354e4ea760ebb617a2c097.png)
+
+content里添加`registry=https://registry.npmjs.org`

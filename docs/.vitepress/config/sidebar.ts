@@ -9,6 +9,10 @@ const Go = [
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }
 ]
+const ToolsChain = [
+  { text: 'git', link: '/tools-chain/git'},
+  { text: 'prettier', link: '/tools-chain/prettier'}
+]
 const Guide = [
   {
     text: '指南',
@@ -21,8 +25,9 @@ const Guide = [
 ]
 const sidebars = [
   { text: 'go', items: Go, collapsible: true, collapsed :true},
-  { text: 'Guide', items: Guide},
-  { text: '网络相关', item: NetWork}
+  { text: 'Guide', items: Guide },
+  { text: '网络相关', item: NetWork },
+  { text: '工具链', item: ToolsChain }
 ]
 export default {
   '/guide/' : Guide,

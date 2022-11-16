@@ -9,6 +9,10 @@ const GoLang = [
 const NetWork = [
     { text: 'Charles抓包', link: '/network/charles', }
 ]
+const ToolsChain = [
+    { text: 'git', link: '/tools-chain/git'},
+    { text: 'prettier', link: '/tools-chain/prettier'}
+  ]
 // 导航栏配置
 export default [
     { text: '指南', link: '/guide/install', activeMatch: '^/guide/' },
@@ -30,6 +34,10 @@ export default [
     {
         text: '网络相关',
         items: NetWork
+    },
+    {
+        text: '工具链',
+        items: ToolsChain
     }
 ]
 

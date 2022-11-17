@@ -4,7 +4,8 @@ const GoLang = [
     { text: '变量声明', link: '/go/variable', },
     { text: '数组使用', link: '/go/array', },
     { text: '切片', link: '/go/slice', },
-    { text: '结构体', link: '/go/struct', }
+    { text: '结构体', link: '/go/struct', },
+    { text: '位运算', link: '/go/bitwise', }
 ]
 const NetWork = [
     { text: 'Charles抓包', link: '/network/charles', }

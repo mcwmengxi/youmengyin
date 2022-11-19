@@ -5,7 +5,8 @@ const Go = [
   { text: '数组使用', link: '/go/array', },
   { text: '切片', link: '/go/slice', },
   { text: '结构体', link: '/go/struct', },
-  { text: '位运算', link: '/go/bitwise', }
+  { text: '位运算', link: '/go/bitwise', },
+  { text: '集合', link: '/go/map', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

@@ -7,7 +7,8 @@ const Go = [
   { text: '结构体', link: '/go/struct', },
   { text: '位运算', link: '/go/bitwise', },
   { text: '集合', link: '/go/map', },
-  { text: '循环', link: '/go/cycle', }
+  { text: '循环', link: '/go/cycle', },
+  { text: '函数', link: '/go/function', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

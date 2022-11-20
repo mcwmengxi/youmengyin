@@ -6,7 +6,8 @@ const GoLang = [
     { text: '切片', link: '/go/slice', },
     { text: '结构体', link: '/go/struct', },
     { text: '位运算', link: '/go/bitwise', },
-    { text: '集合', link: '/go/map', }
+    { text: '集合', link: '/go/map', },
+    { text: '循环', link: '/go/cycle', }
 ]
 const NetWork = [
     { text: 'Charles抓包', link: '/network/charles', }

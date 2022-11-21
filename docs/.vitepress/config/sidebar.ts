@@ -8,7 +8,8 @@ const Go = [
   { text: '位运算', link: '/go/bitwise', },
   { text: '集合', link: '/go/map', },
   { text: '循环', link: '/go/cycle', },
-  { text: '函数', link: '/go/function', }
+  { text: '函数', link: '/go/function', },
+  { text: '通道', link: '/go/chan', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

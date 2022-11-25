@@ -13,9 +13,22 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "vitepress": "1.0.0-alpha.4"
+    "@types/workbox-build": "^5.0.1",
+    "@vite-pwa/vitepress": "^0.0.2",
+    "fast-glob": "^3.2.12",
+    "unocss": "^0.46.5",
+    "vite-plugin-pwa": "^0.13.3",
+    "vitepress": "1.0.0-alpha.4",
+    "workbox-window": "^6.5.4"
   },
   "dependencies": {
     "vue": "^3.2.25"
+  },
+  "pnpm": {
+    "peerDependencyRules": {
+      "ignoreMissing": [
+        "@algolia/client-search"
+      ]
+    }
   }
 }

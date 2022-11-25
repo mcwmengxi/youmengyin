@@ -17,7 +17,7 @@ hero:
     # src: https://tianyuhao.cn/images/tyh-ui/tyh-ui2.svg
     src: /assets/102649628_p0.svg
     # src: /assets/102601409_p1.svg
-    alt: tyh-ui2
+    alt: youmengyin
   actions:
     - theme: brand
       text: 快速开始
@@ -43,3 +43,13 @@ features:
 <a href="https://git.io/typing-svg"><img src="https://readme-typing-svg.demolab.com?font=Fira+Code&size=22&duration=3000&pause=1000&color=36BCF7CC&center=true&vCenter=true&width=435&lines=%E6%84%BF%E6%88%91%E5%A6%82%E9%95%BF%E9%A3%8E%EF%BC%8C%E6%B8%A1%E5%90%9B%E8%A1%8C%E4%B8%87%E9%87%8C%E3%80%82" alt="Typing SVG" /></a>
 </div>
 <!-- Placeholder -->
+
+<script setup>
+import { onMounted } from 'vue'
+import { addReleaseTag } from './.vitepress/utils/addReleaseTag.js'
+
+onMounted(() => {
+  addReleaseTag()
+})
+
+</script>

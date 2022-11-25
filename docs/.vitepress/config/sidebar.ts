@@ -1,3 +1,25 @@
+import { DefaultTheme } from 'vitepress'
+import { sync } from 'fast-glob'
+
+function getSidebarsItems(path: string) {
+  const links: DefaultTheme.SidebarItem[] = [];
+  sync(`docs/${path}/*`, {
+    // onlyDirectories: true,
+    objectMode: true,
+  }).forEach(({ name,path : url }) => {
+    url = url.replace('docs/', '')
+    // console.log(url);
+    
+    if (/.md$/g.test(name)) {
+      links.push({
+        text: name.replace('.md', ''),
+        link: `/${url.replace('.md', '')}`,
+      });
+    }
+  });
+  return links;
+}
+
 const Go = [
   { text: '介绍', link: '/go/index'},
   { text: '安装', link: '/go/install'},
@@ -32,7 +54,8 @@ const sidebars = [
   { text: 'go', items: Go, collapsible: true, collapsed :true},
   { text: 'Guide', items: Guide },
   { text: '网络相关', item: NetWork },
-  { text: '工具链', item: ToolsChain }
+  // { text: '工具链', item: ToolsChain }
+  { text: '工具链', item: getSidebarsItems('tools-chain') }
 ]
 export default {
   '/guide/' : Guide,

@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitepress';
+import fg from 'fast-glob'
+import { resolve } from 'path'
 import sidebar from './config/sidebar';
 import nav from './config/nav';
 import footer from './config/footer';
+import { withPwa } from "@vite-pwa/vitepress";
+import Unocss from 'unocss/vite'
 const logo = "https://iconfont.alicdn.com/p/illus/file/WgLsw4nYmfzB/d57e706d-2783-4917-911e-c19f03d63b14_origin.svg";
 const logoUrl = "https://p3-passport.byteimg.com/img/user-avatar/22c8c35573946132067839366a854c6c~100x100.awebp"
-export default defineConfig({
+
+
+export default withPwa(defineConfig({
     lang: "zh-CN",
     title: 'ymy-ui',
     base: '/youmengyin/',
@@ -17,6 +23,46 @@ export default defineConfig({
     ],
     ignoreDeadLinks: true,// 不会因为死链导致失败
     lastUpdated: true,// 上次更新时间
+    pwa: {
+      base: "/",
+      scope: "/",
+      outDir: ".vitepress/dist",
+      registerType: "autoUpdate",
+      includeAssets: fg.sync("**/*.{png,svg,ico,txt}", {
+        cwd: resolve(__dirname, "../public"),
+      }),
+      manifest: {
+        name: "youmengyin",
+        short_name: "youmengyin",
+        theme_color: "#ffffff",
+        icons: [
+          {
+            src: "assets/102601409_p1.svg",
+            sizes: "192x192",
+            type: "image/svg",
+            purpose: "any maskable",
+          },
+          {
+            src: "assets/102649628_p0.svg",
+            sizes: "512x512",
+            type: "image/svg",
+            purpose: "any maskable",
+          },
+          {
+            src: "favicon.png",
+            sizes: "165x165",
+            type: "image/png",
+          },
+        ],
+      },
+      workbox: {
+        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
+      },
+      devOptions: {
+        enabled: true,
+        navigateFallback: "/",
+      },
+    },
     // markdown解析器
     markdown: {
       theme: 'material-palenight',
@@ -26,9 +72,9 @@ export default defineConfig({
     // srcDir: '', // 存储 markdown 页面的目录（相对于项目根目录）。
     titleTemplate: 'YMY',
     themeConfig: {
-        // siteTitle: '网站标题', // 自定义此项以替换导航中的默认网站标题
-        outline: [2, 4], // 要在大纲中显示的页眉级别
-        outlineTitle: '自定义右侧边栏的标题',
+        siteTitle: '网站标题', // 自定义此项以替换导航中的默认网站标题
+        outlineTitle: '目录', // 自定义右侧边栏的标题
+        outline: [2, 6], // 要在大纲中显示的页眉级别
         // 编辑链接允许您显示一个链接，用于在 Git 管理服务（如 GitHub 或 GitLab）上编辑页面
         editLink: {
           pattern: 'https://github.com/vuejs/vitepress/edit/main/docs/:path',
@@ -43,6 +89,7 @@ export default defineConfig({
         sidebar,
         // 配置页脚
         footer,
+        lastUpdatedText: "最近更新时间",
         algolia: {
             appId: 'QM8Y7EPOUO',
             apiKey: 'dca4c36e01076d19747ee4b7a678ecef',
@@ -71,5 +118,14 @@ export default defineConfig({
         //   prev: '上一篇',
         //   next: '下一篇'
         // },
-    }
-})
+    },
+    vite: {
+      build: {
+        chunkSizeWarningLimit: 2000,
+      },
+      plugins: [Unocss()]
+    },
+    vue: {
+      reactivityTransform: true,
+    },
+}))

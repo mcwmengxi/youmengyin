@@ -12,7 +12,7 @@ const logoUrl = "https://p3-passport.byteimg.com/img/user-avatar/22c8c3557394613
 export default defineConfig({
     lang: "zh-CN",
     title: 'ymy-ui',
-    base: '/',
+    base: '/youmengyin/',
     description: 'Just playing around.',
     appearance: true,// 是否启用暗模式
     head: [

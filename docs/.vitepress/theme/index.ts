@@ -1,7 +1,7 @@
 import DefaultTheme from 'vitepress/theme';
-import { App, h } from 'vue';
+import { App } from 'vue';
 import 'uno.css'
-import RegisterSW from './components/RegisterSW.vue'
+
 // import * as QxUI from "@ymy/components";
 // import "@ymy/theme-chalk";
 // 自定义 CSS
@@ -19,9 +19,4 @@ export default {
 		// register global components
 		// app.component('MyGlobalComponent' /* ... */);
 	},
-	Layout() {
-    return h(DefaultTheme.Layout, null, {
-      'layout-bottom': () => h(RegisterSW)
-    })
-  }
 };

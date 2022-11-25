@@ -1,19 +1,18 @@
 import { defineConfig } from 'vitepress';
 import fg from 'fast-glob'
-import { resolve } from 'path'
+
 import sidebar from './config/sidebar';
 import nav from './config/nav';
 import footer from './config/footer';
-import { withPwa } from "@vite-pwa/vitepress";
 import Unocss from 'unocss/vite'
 const logo = "https://iconfont.alicdn.com/p/illus/file/WgLsw4nYmfzB/d57e706d-2783-4917-911e-c19f03d63b14_origin.svg";
 const logoUrl = "https://p3-passport.byteimg.com/img/user-avatar/22c8c35573946132067839366a854c6c~100x100.awebp"
 
 
-export default withPwa(defineConfig({
+export default defineConfig({
     lang: "zh-CN",
     title: 'ymy-ui',
-    base: '/youmengyin/',
+    base: '/',
     description: 'Just playing around.',
     appearance: true,// 是否启用暗模式
     head: [
@@ -23,46 +22,6 @@ export default withPwa(defineConfig({
     ],
     ignoreDeadLinks: true,// 不会因为死链导致失败
     lastUpdated: true,// 上次更新时间
-    pwa: {
-      base: "/",
-      scope: "/",
-      outDir: ".vitepress/dist",
-      registerType: "autoUpdate",
-      includeAssets: fg.sync("**/*.{png,svg,ico,txt}", {
-        cwd: resolve(__dirname, "../public"),
-      }),
-      manifest: {
-        name: "youmengyin",
-        short_name: "youmengyin",
-        theme_color: "#ffffff",
-        icons: [
-          {
-            src: "assets/102601409_p1.svg",
-            sizes: "192x192",
-            type: "image/svg",
-            purpose: "any maskable",
-          },
-          {
-            src: "assets/102649628_p0.svg",
-            sizes: "512x512",
-            type: "image/svg",
-            purpose: "any maskable",
-          },
-          {
-            src: "favicon.png",
-            sizes: "165x165",
-            type: "image/png",
-          },
-        ],
-      },
-      workbox: {
-        globPatterns: ["**/*.{css,js,html,svg,png,ico,txt,woff2}"],
-      },
-      devOptions: {
-        enabled: true,
-        navigateFallback: "/",
-      },
-    },
     // markdown解析器
     markdown: {
       theme: 'material-palenight',
@@ -128,4 +87,4 @@ export default withPwa(defineConfig({
     vue: {
       reactivityTransform: true,
     },
-}))
+})

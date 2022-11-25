@@ -52,10 +52,10 @@ const Guide = [
 ]
 const sidebars = [
   { text: 'go', items: Go, collapsible: true, collapsed :true},
-  { text: 'Guide', items: Guide },
-  { text: '网络相关', item: NetWork },
-  // { text: '工具链', item: ToolsChain }
-  { text: '工具链', item: getSidebarsItems('tools-chain') }
+  // { text: 'Guide', items: Guide },
+  // { text: '网络相关', item: NetWork },
+  // // { text: '工具链', item: ToolsChain }
+  // { text: '工具链', item: getSidebarsItems('tools-chain') }
 ]
 export default {
   '/guide/' : Guide,

@@ -36,11 +36,13 @@ const Go = [
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }
 ]
-const ToolsChain = [
-  { text: '工具链', item: getSidebarsItems('tools-chain') },
-  // { text: 'git', link: '/tools-chain/git'},
-  // { text: 'prettier', link: '/tools-chain/prettier'}
-]
+// const ToolsChain = [
+//   // { text: '工具链', item: getSidebarsItems('tools-chain') },
+//   { text: 'git', link: '/tools-chain/git'},
+//   { text: 'prettier', link: '/tools-chain/prettier'},
+//   { text: 'github-ci', link: '/tools-chain/github-ci'}
+// ]
+const ToolsChain = getSidebarsItems('tools-chain')
 const Guide = [
   {
     text: '指南',
@@ -81,7 +83,12 @@ export default {
     }
   ],
   '/go/': sidebars,
-  '/tools-chain/': ToolsChain,
+  '/tools-chain/': [{
+    text: '工具链',
+    link: '/tools-chain/',
+    items: ToolsChain
+  }
+  ],
   '/resource/': [
     {
       text: '资源分享',

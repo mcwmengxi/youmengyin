@@ -1,6 +1,6 @@
 ## github-ci
 
-```yml
+```bash
 name: Build and Deploy
 permissions:
   contents: write

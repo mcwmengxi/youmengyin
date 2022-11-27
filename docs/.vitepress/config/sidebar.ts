@@ -31,7 +31,8 @@ const Go = [
   { text: '集合', link: '/go/map', },
   { text: '循环', link: '/go/cycle', },
   { text: '函数', link: '/go/function', },
-  { text: '通道', link: '/go/chan', }
+  { text: '通道', link: '/go/chan', },
+  { text: 'orm', link: '/go/xorm', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

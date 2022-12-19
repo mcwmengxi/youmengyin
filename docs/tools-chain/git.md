@@ -32,3 +32,22 @@
 npm config set registry http://registry.npmmirror.com
 
 https://registry.npmjs.org
+
+**ssh**
+
+` ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
+
+config
+```
+# github
+Host github.com
+HostName ssh.github.com
+User mcwmengxi
+IdentityFile ~/.ssh/id_ed25519_mcwmengxi
+PreferredAuthentications publickey
+Port 443
+
+
+```
+sourcetree添加ssh秘钥
+`ssh -T git@github.com`

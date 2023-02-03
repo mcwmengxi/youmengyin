@@ -10,7 +10,8 @@ const GoLang = [
     { text: '循环', link: '/go/cycle', },
     { text: '函数', link: '/go/function', },
     { text: '通道', link: '/go/chan', },
-    { text: 'orm', link: '/go/xorm', }
+    { text: 'orm', link: '/go/xorm', },
+    { text: 'rpc', link: '/go/rpc', }
 ]
 const NetWork = [
     { text: 'Charles抓包', link: '/network/charles', }

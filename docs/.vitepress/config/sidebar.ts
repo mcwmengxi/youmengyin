@@ -33,7 +33,9 @@ const Go = [
   { text: '函数', link: '/go/function', },
   { text: '通道', link: '/go/chan', },
   { text: 'orm', link: '/go/xorm', },
-  { text: 'rpc', link: '/go/rpc', }
+  { text: 'rpc', link: '/go/rpc', },
+  { text: '断言和反射', link: '/go/assertionOrReflect', },
+  { text: 'sync包', link: '/go/sync', }
 ]
 const NetWork = [
   { text: 'Charles抓包', link: '/network/charles' }

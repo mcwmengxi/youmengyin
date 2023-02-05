@@ -1,0 +1,1 @@
+import{_ as s,o as n,c as a,a as e}from"./app.e4e7f5a5.js";const y=JSON.parse('{"title":"","description":"","frontmatter":{},"headers":[],"relativePath":"devops/linux.md","lastUpdated":1675618107000}'),l={name:"devops/linux.md"},p=e("",11),r=[p];function i(o,t,c,b,d,m){return n(),a("div",null,r)}var _=s(l,[["render",i]]);export{y as __pageData,_ as default};

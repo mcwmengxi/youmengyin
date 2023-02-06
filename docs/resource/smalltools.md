@@ -9,3 +9,6 @@ Readme Typing SVG
 png-to-svg
 
 https://products.aspose.app/pdf/zh/conversion/png-to-svg
+
+go的米老鼠表情合集
+https://static.golangjob.cn/avatar/gopher21.png

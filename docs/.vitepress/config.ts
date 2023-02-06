@@ -88,3 +88,14 @@ export default defineConfig({
       reactivityTransform: true,
     },
 })
+
+function getSideBarItem(path: string, option?: Record<string, any>) {
+  const values = fg.sync(`docs/${path}/*`, {
+    onlyDirectories: false,
+    objectMode: true,
+    ...option
+  })
+  console.log('1',values);
+  
+}
+getSideBarItem('public')

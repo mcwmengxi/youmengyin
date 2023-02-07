@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitepress';
-import fg from 'fast-glob'
+import { defineConfig, DefaultTheme } from 'vitepress';
+import fg, {sync} from 'fast-glob'
 
 import sidebar from './config/sidebar';
 import nav from './config/nav';
@@ -89,13 +89,48 @@ export default defineConfig({
     },
 })
 
-function getSideBarItem(path: string, option?: Record<string, any>) {
+function getItem(path: string, option?: Record<string, any>) {
+  const links: DefaultTheme.SidebarItem[] = [];
   const values = fg.sync(`docs/${path}/*`, {
     onlyDirectories: false,
     objectMode: true,
     ...option
   })
-  console.log('1',values);
+
+  Object.values(values).forEach(({ name,path : url }) => {
+    url = url.replace('docs/', '')  
+    if (/.md$/g.test(name)) {
+      links.push({
+        text: name.replace('.md', ''),
+        link: `/${url.replace('.md', '')}`,
+      });
+    }
+  });
+  console.log(links);
+  return links;
   
 }
-getSideBarItem('public')
+function getSideBarItem(path: string, option?: Record<string, any>) {
+  const links: DefaultTheme.SidebarItem[] = [];
+  //${path}/
+  const values = fg.sync(`docs/*`, {
+    onlyDirectories: true,
+    objectMode: false,
+    ...option
+  })
+  // values.forEach()
+
+  Object.values(values).forEach((dir:string ) => {
+    dir = dir.replace('docs/', '')  
+    if (/.md$/g.test(name)) {
+      links.push({
+        text: name.replace('.md', ''),
+        link: `/${dir.replace('.md', '')}`,
+      });
+    }
+  });
+  console.log(Object.values(values));
+  return links;
+  
+}
+getSideBarItem('go')

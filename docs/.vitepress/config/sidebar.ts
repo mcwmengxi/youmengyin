@@ -17,6 +17,7 @@ function getSidebarsItems(path: string) {
       });
     }
   });
+  
   return links;
 }
 

@@ -106,7 +106,6 @@ function getItem(path: string, option?: Record<string, any>) {
       });
     }
   });
-  console.log(links);
   return links;
   
 }
@@ -119,18 +118,26 @@ function getSideBarItem(path: string, option?: Record<string, any>) {
     ...option
   })
   // values.forEach()
-
+  const sidebars = {}
   Object.values(values).forEach((dir:string ) => {
-    dir = dir.replace('docs/', '')  
-    if (/.md$/g.test(name)) {
-      links.push({
-        text: name.replace('.md', ''),
-        link: `/${dir.replace('.md', '')}`,
-      });
-    }
+    dir = dir.replace('docs/', '') 
+    sidebars[dir2Path(dir)] = sidebars[dir2Path(dir)] || []
+    if(dir!== 'public') { 
+      sidebars[dir2Path(dir)].push({
+        text:dir,
+        link: dir2Path(getItem(dir)[0]),
+        items: getItem(dir)
+      })
+    } 
   });
-  console.log(Object.values(values));
-  return links;
+  console.log(sidebars);
+  return sidebars
+  // return links;
+}
+function getNavItem(){
   
+}
+function dir2Path(dir){
+  return '/'+dir+'/'
 }
 getSideBarItem('go')

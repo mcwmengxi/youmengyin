@@ -56,3 +56,28 @@ sourcetree添加ssh秘钥
 解除ssh验证
 
 git config --global http.sslVerify false
+
+
+## 用户账号管理
+>如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
+
+
+**管理同一目录下的配置**
+
+目录下建立.gitconfig
+```bash
+[user]
+  name = mcwmengxi
+  email = 1395568275@qq.com
+```
+
+修改git的全局配置文件.gitconfig,把当前目录添加全局配置文件中
+```bash
+[includeIf "gitdir:D:/project/"]
+        path = D:/project/.gitconfig
+```
+
+**单独配置项目用户名**
+
+git config user.name mcwmengxi 
+git config user.email 1395568275@qq.com 

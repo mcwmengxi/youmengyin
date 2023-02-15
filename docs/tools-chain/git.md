@@ -51,3 +51,8 @@ Port 443
 ```
 sourcetree添加ssh秘钥
 `ssh -T git@github.com`
+
+
+解除ssh验证
+
+git config --global http.sslVerify false

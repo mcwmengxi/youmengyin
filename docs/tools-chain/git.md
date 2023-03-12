@@ -186,3 +186,12 @@ git config --global http.sslVerify false
 
 git config user.name mcwmengxi 
 git config user.email 1395568275@qq.com 
+
+## git代理
+
+.gitconfig文件开启代理,访问github,git仓库走ssh
+```
+[http]
+  proxy = http://127.0.0.1:26501
+  sslverify = false # 禁用 SSL 安全证书检查
+```

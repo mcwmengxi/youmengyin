@@ -34,3 +34,13 @@
 
 - TypeScript
 - 算法，有一本书叫 `《学习JavaScript 数据结构与算法 第三版》` 可以先看一下
+
+## 2023-03-08
+
+>小程序长列表优化实践
+https://cloud.tencent.com/developer/article/1842225?from=article.detail.1782749&areaSource=106000.11&traceId=Y8p3eHg8h-IUMSs8Nrbvz
+
+
+https://cloud.tencent.com/developer/article/2091421?from=article.detail.1842225&areaSource=106000.1&traceId=mdkXjZiu6L6xcnnzGhpbP
+
+https://cloud.tencent.com/developer/article/1586645?from=article.detail.2091421&areaSource=106000.14&traceId=9JgEVeZkoWiROI62LsCOB

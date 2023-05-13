@@ -44,3 +44,65 @@ https://cloud.tencent.com/developer/article/1842225?from=article.detail.1782749&
 https://cloud.tencent.com/developer/article/2091421?from=article.detail.1842225&areaSource=106000.1&traceId=mdkXjZiu6L6xcnnzGhpbP
 
 https://cloud.tencent.com/developer/article/1586645?from=article.detail.2091421&areaSource=106000.14&traceId=9JgEVeZkoWiROI62LsCOB
+
+## 2023-03-19
+
+查询本次安装的版本
+rpm -qa|grep redis
+查询安装位置
+rpm -ql redis-5.0.3-5.module_el8.4.0+955+7126e393.x86_64开启Redis Server
+cd /usr/bin
+redis-server
+
+①通过指令找到redis进程，查看所有关于它的进程详情。
+ps -ef | grep redis
+
+root      3086     1  0 Apr24 ?        00:00:07 ./bin/redis-server *:6379        
+root      3531  3467  0 01:00 pts/0    00:00:00 grep -i redis 
+如上图：进程号为 3086 即为redis服务器
+
+②使用kill杀死该进程
+kill -9 3086 
+
+③输入重启指令即可
+./redis-server
+
+a、打开Redis配置文件Redis.conf
+cd /etc
+vim redis.conf
+按下键盘i进入编辑模式
+
+找到如下参数，并修改：
+
+针对问题①的修改：
+bind 127.0.0.1  	 //行数：69   =》修改为#bind 127.0.0.1 
+protected-mode yes      //行数：89  =》修改为protected-mode no
+daemonize yes 	        //行数：137  =》修改为daemonize no //设置为no则不作为后台运行，否则后台运行
+针对问题②的修改：
+b、保存配置文件并退出
+按下键盘esc退出编辑模式，然后按shift + : 键，再录入wq,回车即可。
+
+c、重新启动Redis Server
+redis-server /etc/redis.conf
+此处进行Redis服务器启动并指定配置文件，以应用我们改的配置。
+
+注：如果上面设置daemonize参数
+为no时，回车后，效果如下：（为空白，实则已经非后台执行，当前控制台已被占用）
+为yes时：回车后，效果如下：（后台执行，可继续操作）
+
+2、连接
+以Windows 10 为例，连接方式如下：
+D:\WorkSpace\Redis\redis-cli -h x.x.x.x -p 6379 -a code6076..
+3、设置开机自启
+启动服务
+
+systemctl start redis
+如果开启服务出现任何输出，则需要根据提示，根据日志进行配置，我就遇到了redis日志权限不足。有类似情况使用如下命令： chown redis:redis /var/log/redis/redis.log
+报错如下图：
+
+设置自启
+systemctl enable redis
+然后重启服务器
+reboot
+重启完成后，查看状态：
+systemctl stutas redis

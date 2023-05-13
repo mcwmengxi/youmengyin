@@ -60,3 +60,18 @@ func main()  {
 	}
 }
 ```
+
+## gorm
+
+主键gorm: "primaryKey"
+自定义列名column: "name"
+type 
+
+```go
+Name string `gorm: "primaryKey;colummn:name;type:varchar(20);"`
+```
+自定义表名
+实现TableName方法，支持条件编译
+
+结构体声明
+1对1 1对多 多对多

@@ -106,3 +106,31 @@ systemctl enable redis
 reboot
 重启完成后，查看状态：
 systemctl stutas redis
+## 2023-04-18
+docker-desktop换源
+```
+{
+  "builder": {
+    "gc": {
+      "defaultKeepStorage": "20GB",
+      "enabled": true
+    }
+  },
+  "experimental": false,
+  "features": {
+    "buildkit": true
+  }
+}
+```
+
+```
+{
+  "registry-mirrors": [
+    "https://20jyns64.mirror.aliyuncs.com",
+    "http://hub-mirror.c.163.com"
+  ],
+  "insecure-registries": [],
+  "debug": true,
+  "experimental": false
+}
+```

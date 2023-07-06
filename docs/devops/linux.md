@@ -1,6 +1,4 @@
-查看防火墙端口开放
 
-`firewall-cmd --zone=public --list-ports`
 
 容器没有vim环境,通过cat命令追加实现修改效果
 我的是debian 11.x (bullseye),具体参见https://developer.aliyun.com/mirror/debian
@@ -37,3 +35,28 @@ node -v npm -v
 
 查看nginx目录
 ps -ef | grep nginx 
+
+### 防火墙
+查看防火墙端口开放
+`firewall-cmd --zone=public --list-ports`
+`firewall-cmd --list-all`
+
+开放端口
+
+`firewall-cmd --zone=public --add-port=12360/tcp --permanent`
+`firewall-cmd --remove-port=12350-12365/tcp --permanent`
+`firewall-cmd --reload`
+
+关闭防火墙
+
+`systemctl stop firewalld.servic`
+查看防火墙状态
+`firewall-cmd --state`
+
+查看监听的端口
+`netstat -lnpt`
+ps:centos7默认没有 netstat 命令，需要安装 net-tools 工具，`yum install -y net-tools`
+检查端口被哪个进程占用
+netstat -lnpt |grep 8888
+查看进程的详细信息
+ps 8888

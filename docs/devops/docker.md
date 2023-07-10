@@ -140,3 +140,20 @@ http://101.132.70.183:9510/
 jenkins_token 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
 ```
 
+### 常用命令
+>后台启用容器
+
+`docker run -d centos`
+docker 容器使用后台启动，需要有一个前台应用，如果没有，docker就会自动停止运行
+
+查看日志 
+-t 日志加上时间
+-f 保留打印窗口，持续打印
+--tail 显示最后的几行
+docker logs -tf --tail 10 [container_id]
+
+查看容器进程信息
+docker top [container_id]
+
+查看镜像元数据
+docker inspect [container_id]

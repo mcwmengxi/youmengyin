@@ -157,3 +157,178 @@ docker top [container_id]
 
 查看镜像元数据
 docker inspect [container_id]
+
+### Windows Docker
+
+setting -> Docker Engine -> apply & restart 配置镜像加速
+``` json
+{
+  "debug": true,
+  "experimental": false,
+  "insecure-registries": [],
+  "registry-mirrors": [
+    "https://20jyns64.mirror.aliyuncs.com",
+    "http://hub-mirror.c.163.com",
+    "https://mirror.ccs.tencentyun.com"
+  ]
+}
+```
+
+#### 镜像image命令
+
+如果 `docker images` 出现 REPOSITORY 是<none>的情况，可以先运行 `docker image prune` 删除
+```shell
+[root@docker01 ~]# docker images
+REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
+centos              latest              831691599b88        4 weeks ago         215MB
+```
+下载镜像： `docker pull <image-name>:<tag>`
+查看所有镜像 `docker images`
+删除镜像 `docker rmi <image-id>`
+上传镜像 `docker push <username>/<repository>:<tag>`，要先注册 hub.docker.com
+
+
+#### 容器命令：
+
+docker run 【可选参数】 镜像名 启动镜像
+#参数说明
+–nane="Name”容器名字 tomcat01 tomcat02，用来区分容器
+-d 后台方式运行
+-it 使用交互方式运行，进入容器查看内容
+-p 指定容器的端口，例：-p 8080:8080
+-p（大写） ip:主机端口：容器端口
+-p 主机端口：容器端口（常用）
+-p 容器端口
+容器端口
+-P（小写） 随机指定端口
+
+查看所有容器 `docker ps`，加 -a 显示隐藏的容器
+停止容器 `docker stop <container-id>`
+删除容器 `docker rm <container-id>` ，加 -f 是强制删除
+查看容器信息，如 IP 地址 `docker inspect <container-id>`
+查看容器日志 `docker logs <container-id>`
+进入容器控制台 `docker exec -it <container-id> /bin/sh`
+
+##### 启动一个Docker容器
+
+拉取镜像 `docker pull nginx`
+查看镜像 `docker images`
+```shell
+PS C:\Users\QSKJ-00330> docker images
+REPOSITORY    TAG            IMAGE ID       CREATED         SIZE
+youmengyin    latest         94def47346a5   2 months ago    395MB
+node          16.16.0-slim   ee7e3b6dfb88   11 months ago   176MB
+nginx         latest         605c77e624dd   18 months ago   141MB
+hello-world   latest         feb5d9fea6a5   21 months ago   13.3kB
+mysql         8.0.21         8e85dd5c3255   2 years ago     544MB
+redis         6.0.6          1319b1eaa0b7   2 years ago     104MB
+```
+
+启动容器 `docker run -p 81:80 -d --name nginx-test nginx`, 返回容器id
+查看容器列表 `docker ps`
+```shell
+PS C:\Users\QSKJ-00330> docker run -p 81:80 -d --name nginx-test nginx
+0c96d41f0293b969ff41371e870a090979f19039df6c1d2a2fc898d29d385ed9
+PS C:\Users\QSKJ-00330> docker ps
+CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                NAMES
+0c96d41f0293   nginx     "/docker-entrypoint.…"   54 seconds ago   Up 52 seconds   0.0.0.0:81->80/tcp   nginx-test
+```
+主机验证nginx `http://localhost:81/`
+
+查看容器信息 `docker inspect 9`
+
+```shell
+PS C:\Users\QSKJ-00330> docker inspect 0c96
+[
+    {
+        "Id": "0c96d41f0293b969ff41371e870a090979f19039df6c1d2a2fc898d29d385ed9"
+    }
+]
+```
+
+
+查看容器日志 `docker logs 0c96`
+
+```shell
+PS C:\Users\QSKJ-00330> docker logs 0c96
+/docker-entrypoint.sh: /docker-entrypoint.d/ is not empty, will attempt to perform configuration
+/docker-entrypoint.sh: Looking for shell scripts in /docker-entrypoint.d/
+/docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
+```
+
+进入容器控制台 `docker exec -it 0c96 /bin/sh`
+`exit ` 退出控制台
+
+停止容器 `docker stop 0c96`
+
+删除容器
+`docker ps -a` 查看所有容器(被停止的容器)
+执行 `docker rm 0c96` 删除容器
+
+文件映射 `docker run -p 81:80 -d -v E:/static:/usr/share/nginx/html --name nginx-test nginx`
+
+#### Dockerfile
+
+>.dockerignore忽略文件
+
+```
+node_modules
+.git
+logs
+.history
+.docker-volumes
+```
+
+>编写dockerfile构建文件
+
+```dockerfile
+# 基于哪个镜像的基础上进行构建
+FROM node:16
+
+# 工作目录
+WORKDIR /youmengyin
+
+# 拷贝当前目录下的文件 到 /youmengyin 中 .dockerignore 文件中可以声明忽略拷贝的文件
+COPY  . /youmengyin
+
+# 构建镜像时, 一般用于做一些系统配置, 安装必备的软件, 可有多个 RUN
+RUN ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime && echo 'Asia/Shanghai' > /etc/timezone
+RUN npm set registry  https://registry.npmmirror.com
+RUN npm install
+
+# 启动容器时, 只能有一个 CMD
+# npx pm2 log  cmd 最后的命令是一个阻塞控制台的程序
+CMD echo $SERVER_NAME && echo $SERVER_NAME && npm run dev && npx pm2 log
+
+# 环境变量
+ENV SERVER_NAME='youmengyin-server'
+ENV AUTHOR_NAME='mcwmengxi'
+```
+
+
+`docker build -t <name> . ` . 指Dockerfile在当前目录下
+`docker images` 查看结果
+
+```bash
+$ docker build -t youmengyin-server .
+ => => naming to docker.io/library/youmengyin-server                                                                                                                                                                             
+$ docker images
+REPOSITORY          TAG            IMAGE ID       CREATED          SIZE
+youmengyin-server   latest         5028425a672b   12 seconds ago   1.05GB
+youmengyin          latest         94def47346a5   2 months ago     395MB
+node                16.16.0-slim   ee7e3b6dfb88   11 months ago    176MB
+nginx               latest         605c77e624dd   18 months ago    141MB
+hello-world         latest         feb5d9fea6a5   21 months ago    13.3kB
+mysql               8.0.21         8e85dd5c3255   2 years ago      544MB
+redis               6.0.6          1319b1eaa0b7   2 years ago      104MB
+```
+
+启动容器验证
+```bash
+// 启动容器
+docker run -p 8081:3000 -d --name youmengyin1 youmengyin-server
+// 查看容器列表
+docker ps
+// 查看容器日志
+docker logs 4b8
+```

@@ -140,24 +140,6 @@ http://101.132.70.183:9510/
 jenkins_token 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
 ```
 
-### 常用命令
->后台启用容器
-
-`docker run -d centos`
-docker 容器使用后台启动，需要有一个前台应用，如果没有，docker就会自动停止运行
-
-查看日志 
--t 日志加上时间
--f 保留打印窗口，持续打印
---tail 显示最后的几行
-docker logs -tf --tail 10 [container_id]
-
-查看容器进程信息
-docker top [container_id]
-
-查看镜像元数据
-docker inspect [container_id]
-
 ### Windows Docker
 
 setting -> Docker Engine -> apply & restart 配置镜像加速
@@ -209,6 +191,7 @@ docker run 【可选参数】 镜像名 启动镜像
 查看容器日志 `docker logs <container-id>`
 进入容器控制台 `docker exec -it <container-id> /bin/sh`
 
+
 ##### 启动一个Docker容器
 
 拉取镜像 `docker pull nginx`
@@ -225,6 +208,8 @@ redis         6.0.6          1319b1eaa0b7   2 years ago     104MB
 ```
 
 启动容器 `docker run -p 81:80 -d --name nginx-test nginx`, 返回容器id
+docker 容器使用后台启动，需要有一个前台应用，如果没有，docker就会自动停止运行
+
 查看容器列表 `docker ps`
 ```shell
 PS C:\Users\QSKJ-00330> docker run -p 81:80 -d --name nginx-test nginx
@@ -235,8 +220,9 @@ CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS       
 ```
 主机验证nginx `http://localhost:81/`
 
-查看容器信息 `docker inspect 9`
+查看容器进程信息 docker top [container_id]
 
+查看镜像元数据 docker inspect [container_id]
 ```shell
 PS C:\Users\QSKJ-00330> docker inspect 0c96
 [
@@ -247,6 +233,11 @@ PS C:\Users\QSKJ-00330> docker inspect 0c96
 ```
 
 
+查看容器日志
+-t 日志加上时间
+-f 保留打印窗口，持续打印
+--tail 显示最后的几行
+docker logs -tf --tail 10 [container_id]
 查看容器日志 `docker logs 0c96`
 
 ```shell
@@ -256,7 +247,10 @@ PS C:\Users\QSKJ-00330> docker logs 0c96
 /docker-entrypoint.sh: Launching /docker-entrypoint.d/10-listen-on-ipv6-by-default.sh
 ```
 
-进入容器控制台 `docker exec -it 0c96 /bin/sh`
+进入正在运行的容器
+`docker exec -it 0c96 /bin/sh` 进入容器后开启一个新的终端
+docker attach [container_id] 进入容器后正在执行的终端，，不会启动新的进程
+
 `exit ` 退出控制台
 
 停止容器 `docker stop 0c96`
@@ -266,6 +260,9 @@ PS C:\Users\QSKJ-00330> docker logs 0c96
 执行 `docker rm 0c96` 删除容器
 
 文件映射 `docker run -p 81:80 -d -v E:/static:/usr/share/nginx/html --name nginx-test nginx`
+
+容器拷贝到主机, 也可以通过卷技术实现数据同步
+docker cp [container_id]:/home/test.go /home
 
 #### Dockerfile
 

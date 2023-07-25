@@ -112,6 +112,15 @@ const article = [
     ],
   },
 ]
+const develops = [
+  { text: 'index', link: '/docs/devops/index' },
+  { text: 'package_tools', link: '/docs/devops/package_tools' },
+  { text: 'docker', link: '/docs/devops/docker' },
+  { text: 'jenkins', link: '/docs/devops/jenkins' },
+  { text: 'linux', link: '/docs/devops/linux' },
+  { text: 'mysql', link: '/docs/devops/mysql' },
+  { text: 'redis', link: '/docs/devops/redis' },
+]
 const docs = [
   {
     text: 'JavaScript',
@@ -147,6 +156,7 @@ const docs = [
       { text: '其它', link: '/docs/typescript/other' },
     ],
   },
+  { text: '开发',items: develops }
 ]
 export default {
   '/article/': article,

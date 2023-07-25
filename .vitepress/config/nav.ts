@@ -20,6 +20,15 @@ const ToolsChain = [
   { text: 'git', link: '/docs/tools-chain/git' },
   { text: 'prettier', link: '/docs/tools-chain/prettier' },
 ]
+const Develops = [
+  { text: 'index', link: '/docs/devops/index' },
+  { text: 'package_tools', link: '/docs/devops/package_tools' },
+  { text: 'docker', link: '/docs/devops/docker' },
+  { text: 'jenkins', link: '/docs/devops/jenkins' },
+  { text: 'linux', link: '/docs/devops/linux' },
+  { text: 'mysql', link: '/docs/devops/mysql' },
+  { text: 'redis', link: '/docs/devops/redis' },
+]
 // 导航栏配置
 export default [
   {
@@ -48,5 +57,9 @@ export default [
   {
     text: '工具链',
     items: ToolsChain,
+  },
+  {
+    text: '开发',
+    items: Develops,
   },
 ]

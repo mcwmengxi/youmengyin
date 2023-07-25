@@ -301,8 +301,9 @@ CMD echo $SERVER_NAME && echo $SERVER_NAME && npm run dev && npx pm2 log
 ENV SERVER_NAME='youmengyin-server'
 ENV AUTHOR_NAME='mcwmengxi'
 ```
-
-
+- build 构建dockerfile构建镜像
+- t test:v1 -t指定镜像名字 版本号
+- . 指Dockerfile在当前目录下
 `docker build -t <name> . ` . 指Dockerfile在当前目录下
 `docker images` 查看结果
 
@@ -328,4 +329,47 @@ docker run -p 8081:3000 -d --name youmengyin1 youmengyin-server
 docker ps
 // 查看容器日志
 docker logs 4b8
+```
+
+### 注意点
+
+设置docker 开机自启
+```shell
+查看已经启动的服务 
+systemctl list-units -lype=service
+
+查看是否设置开机启动
+systemctl ldit-unit-filed | grep enable
+
+设置开机启动
+systemctl enable docker.service
+
+关闭开机启动
+systemctl disable docker.service
+```
+
+设置docker容器自动启动
+```shell
+启动时加restart-always
+docker run -tid -name 容器id -p 端口号 -restart-always -v 挂载
+
+已经启用的项目 使用update更新
+docker update --restart = always 容器id
+```
+
+restart可选项
+- no 不自动重启容器 默认
+- on-failure 容器发生错误而退出（容器退出状态不为0）重启容器
+- unless-stopped 在容器已经stop或docker stop/restart的时候重启容器
+- always 在容器已经stop或docker stop/restart的时候重启容器
+
+常用命令
+```shell
+docker ps 查看当前运行中的容器
+docker images 查看镜像列表
+docker rm container-id 删除指定 id 的容器
+docker stop/start container-id 停止/启动指定 id 的容器
+docker rmi image-id 删除指定镜像
+docker volume ls 查看volume列表
+docker network ls 查看网络列表
 ```

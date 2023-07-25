@@ -1,10 +1,6 @@
-# jenkins
+## Docker
 
 查看jdk版本 `yum search java|grep jdk`
-
-
-
-## Docker
 
 ### Docker概述
 
@@ -17,7 +13,6 @@
 仓库repository: 类似于git，用于存放镜像
 
 ## 安装docker
-
 
 查看系统内核 `uname -r`
 
@@ -40,15 +35,11 @@ yum remove docker \
 yum install -y yum-utils
 
 // 3.设置镜像仓库
-yum-config-manager \
-    --add-repo \
-    https://download.docker.com/linux/centos/docker-ce.repo # 默认是国外的
-yum-config-manager \
-    --add-repo \
-    http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo # 推荐使用阿里云的
+yum-config-manager \ --add-repo \ https://download.docker.com/linux/centos/docker-ce.repo # 默认是国外的
+yum-config-manager \ --add-repo \ http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo # 推荐使用阿里云的
 // 4.安装docker包 docker-ce 社区版 ee企业版
 
- 首先更新yum软件索引`yum makecache fast`
+ 首先更新yum软件索引 `yum makecache fast`
  
  `yum install docker-ce docker-ce-cli containerd.io`
  
@@ -86,13 +77,9 @@ nginx           1.10      0346349a1a64   5 years ago     182MB
 
 ### 阿里云镜像加速
 
-
-
-
-
 ![](https://img-blog.csdnimg.cn/9f25c969936a42f48fd6f74e61b1ca74.png)
 
-配置加速
+**配置加速**
 
 ```shell
 sudo mkdir -p /etc/docker
@@ -107,31 +94,25 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
+**安装Jenkins**
 
+```bash
+docker run -p 8080:8080 -p 50000:50000 -v jenkins_data:/var/jenkins_home jenkinsci/blueocean
 
-安装Jenkins
-
-`docker run -p 8080:8080 -p 50000:50000 -v jenkins_data:/var/jenkins_home jenkinsci/blueocean`
-
-`docker run -d -u root --rm -p 9510:8080 --name jenkins -v jenkins-data:/var/jenkins_home jenkins/jenkins`
-
-开放端口
-
-```shell
-firewall-cmd --query-port=9510/tcp
-firewall-cmd --zone=public --add-port=9510/tcp --permanent
-firewall-cmd --reload
-
-http://101.132.70.183:9510/
-de94d06957faad89826e58c8bbe263152a05a21debe60226660b10efdd0cf706
+docker run -d -u root --rm -p 9510:8080 --name jenkins -v jenkins-data:/var/jenkins_home jenkins/jenkins
 ```
 
-
-
+**开放端口**
 ```shell
-// 进入容器实例
+# firewall-cmd --query-port=9510/tcp
+# firewall-cmd --zone=public --add-port=9510/tcp --permanent
+# firewall-cmd --reload
+# http://101.132.70.183:9510/
+# de94d06957faad89826e58c8bbe263152a05a21debe60226660b10efdd0cf706
+
+# 进入容器实例
 docker exec -it jenkins bash
-// 查看初始化密码
+# 查看初始化密码
 cat /var/jenkins_home/secrets/initialAdminPassword
 
 不太熟悉，安装推荐插件
@@ -143,7 +124,7 @@ jenkins_token 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
 ### Windows Docker
 
 setting -> Docker Engine -> apply & restart 配置镜像加速
-``` json
+```json
 {
   "debug": true,
   "experimental": false,
@@ -158,9 +139,9 @@ setting -> Docker Engine -> apply & restart 配置镜像加速
 
 #### 镜像image命令
 
-如果 `docker images` 出现 REPOSITORY 是<none>的情况，可以先运行 `docker image prune` 删除
+如果 `docker images` 出现 REPOSITORY 是none的情况，可以先运行 `docker image prune` 删除
 ```shell
-[root@docker01 ~]# docker images
+# [root@docker01 ~]# docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 centos              latest              831691599b88        4 weeks ago         215MB
 ```
@@ -278,7 +259,7 @@ logs
 
 >编写dockerfile构建文件
 
-```dockerfile
+```shell
 # 基于哪个镜像的基础上进行构建
 FROM node:16
 
@@ -300,7 +281,7 @@ CMD echo $SERVER_NAME && echo $SERVER_NAME && npm run dev && npx pm2 log
 # 环境变量
 ENV SERVER_NAME='youmengyin-server'
 ENV AUTHOR_NAME='mcwmengxi'
-```
+```bash
 - build 构建dockerfile构建镜像
 - t test:v1 -t指定镜像名字 版本号
 - . 指Dockerfile在当前目录下

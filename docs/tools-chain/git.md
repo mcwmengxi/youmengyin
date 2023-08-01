@@ -195,3 +195,13 @@ git config user.email 1395568275@qq.com
   proxy = http://127.0.0.1:26501
   sslverify = false # 禁用 SSL 安全证书检查
 ```
+
+
+sourceTree无法使用
+https://zhuanlan.zhihu.com/p/637566727
+
+```bash
+ERROR [2023-07-31 23:14:29,681] [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - Unable to load MEF components
+```
+删除该目录下两个.cache文件 Composition.cache Assemblies.cache
+`C:\Users\mengxi\AppData\Local\Atlassian\SourceTree.exe_Url_fop3hzd4ikr21gr5nqmqd4tnru2hl5kn\3.4.12.0`

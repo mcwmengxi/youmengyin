@@ -134,3 +134,15 @@ docker-desktop换源
   "experimental": false
 }
 ```
+## 2023-08-07
+
+`vue-router 4.1.4+` 不再支持params隐式传参, 该传参方式之前一直是不推荐的，因为一旦刷新页面参数就获取不到了。
+
+**官方根据不同场景推荐了四种解决方案**
+
+1. 用pinia替代
+2. 与已有的params和query合并
+3. 使用state
+4. 使用meta
+[详情查看：官方更新日志](https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22)
+

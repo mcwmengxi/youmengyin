@@ -146,3 +146,34 @@ docker-desktop换源
 4. 使用meta
 [详情查看：官方更新日志](https://github.com/vuejs/router/blob/main/packages/router/CHANGELOG.md#414-2022-08-22)
 
+## 2023-08-09
+
+Go 中 main 包默认不会加载其他文件， 而其他包都是默认加载的。 `go run number.go byte.go`
+
+`go run *.go`
+
+## 2023-08-10
+
+ref 数组并不保证与源数组相同的顺序
+```bash
+// template
+<ComposeOrderItem
+  v-for="(item, idx) in purOrderList"
+  :key="item.uuid + '__' + idx"
+  :ref="(el) => composeOrderItem(el, item.uuid)"
+  v-model="purOrderList[idx]"
+  :index="idx"
+  @select-supplier="(val) => selectSupplier(val, idx)"
+  @del="delComposeOrderItem"
+></ComposeOrderItem>
+
+// const composeOrderItemRefs = ref<Recordable>([]);
+// const composeOrderItem = (el: any, id: number) => {
+//   if (el) {
+//     composeOrderItemRefs.value.push({
+//       id,
+//       el,
+//     });
+//   }
+// };
+```

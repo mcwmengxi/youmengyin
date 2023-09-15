@@ -354,3 +354,149 @@ docker rmi image-id 删除指定镜像
 docker volume ls 查看volume列表
 docker network ls 查看网络列表
 ```
+
+## 挂载主机目录
+
+### 数据卷
+```bash
+# 创建一个数据卷
+$ docker volume create my-vol
+# 查看所有的 `数据卷`
+docker volume ls
+
+docker volume rm my-vol
+# 无主的数据卷可能会占据很多空间，要清理请使用以下命
+docker volume prune
+```
+
+### 挂载一个主机目录作为数据卷
+
+> 使用 `--mount` 标记可以指定挂载一个本地主机的目录到容器中去。
+
+```bash
+# -v $(pwd)/src:/usr/share/nginx/html \
+docker run -d -P --name web --mount type=bind,source=$(pwd)/src,target=/usr/share/nginx/html,readonly nginx
+```
+
+上面的命令加载主机当前目录下的 `/src` 目录到容器的 `/usr/share/nginx/html`目录。这个功能在进行测试的时候十分方便，比如用户可以放置一些程序到本地目录中，来查看容器是否正常工作。本地目录的路径必须是绝对路径，以前使用 `-v` 参数时如果本地目录不存在 Docker 会自动为你创建一个文件夹，现在使用 `--mount` 参数时如果本地目录不存在，Docker 会报错。
+
+Docker 挂载主机目录的默认权限是 `读写`，用户也可以通过增加 `readonly` 指定为 `只读`，如果你在容器内 `/usr/share/nginx/html` 目录新建文件，会显示错误。
+
+```bash
+docker exec -it 58b73728634a bash
+docker attach 58b73728634a
+```
+`exec`如果从这个bash中 exit，不会导致容器的停止,而`attach`会
+
+```bash
+cd /usr/share/nginx/html
+echo "test file" > test.txt
+```
+
+在主机目录下会有同样的文件
+
+### 查看数据卷的具体信息
+
+在主机里使用以下命令可以查看 `web` 容器的信息
+
+```bash
+$ docker inspect web
+```
+`挂载主机目录` 的配置信息在 "Mounts" Key 下面
+
+```json
+  "Mounts": [
+      {
+          "Type": "bind",
+          "Source": "E:\\learn-project/src",
+          "Destination": "/usr/share/nginx/html",
+          "Mode": "",
+          "RW": true,
+          "Propagation": "rprivate"
+      }
+  ],
+```
+### 挂载一个本地主机文件作为数据卷
+
+`--mount` 标记也可以从主机挂载单个文件到容器中
+
+```bash
+# linux
+$ docker run --rm -it \
+   # -v $HOME/.bash_history:/root/.bash_history \
+   --mount type=bind,source=$HOME/.bash_history,target=/root/.bash_history \
+   ubuntu:18.04 \
+   bash
+
+root@2affd44b4667:/# history
+1  ls
+2  diskutil list
+```
+这样就可以记录在容器输入过的命令了。
+
+## Docker 中的网络Network
+
+>docker 允许通过外部访问容器或容器互联的方式来提供网络服务。
+
+
+### 外部访问容器
+
+容器中可以运行一些网络应用，要让外部也可以访问这些应用，可以通过 `-P` 或 `-p` 参数来指定端口映射。
+当使用 `-P` 标记时，Docker 会随机映射一个端口到内部容器开放的网络端口。
+使用 `docker container ls` 可以看到，本地主机的 32768 被映射到了容器的 80 端口。此时访问本机的 32768 端口即可访问容器内 NGINX 默认页面。
+
+```bash
+$ docker run -d -P --name web --mount type=bind,source=$(pwd)/src,target=/usr/share/nginx/html nginx
+
+$ docker container ls -l
+CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                   NAMES
+58b73728634a        nginx        "/docker-entrypoint.…"   24 seconds ago      Up 20 seconds       0.0.0.0:32768->80/tcp   web
+```
+
+同样的，可以通过 `docker logs` 命令来查看访问记录。
+
+```bash
+$ docker logs 58b7
+172.17.0.1 - - [25/Aug/2020:08:34:04 +0000] "GET / HTTP/1.1" 200 612 "-" "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:80.0) Gecko/20100101 Firefox/80.0" "-"
+```
+
+`-p` 则可以指定要映射的端口，并且，在一个指定端口上只可以绑定一个容器。支持的格式有 `ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort`。
+
+
+```bash
+# 映射所有接口地址
+# 使用 `hostPort:containerPort` 格式本地的 80 端口映射到容器的 80 端口，可以执行
+$ docker run -d -p 80:80 nginx
+
+# 映射到指定地址的指定端口
+#可以使用 `ip:hostPort:containerPort` 格式指定映射使用一个特定地址，比如 localhost 地址 127.0.0.1
+$ docker run -d -p 127.0.0.1:80:80 nginx
+
+# 映射到指定地址的任意端口
+# 使用 `ip::containerPort` 绑定 localhost 的任意端口到容器的 80 端口，本地主机会自动分配一个端口。
+$ docker run -d -p 127.0.0.1::80 nginx
+
+# 还可以使用 `udp` 标记来指定 `udp` 端口
+$ docker run -d -p 127.0.0.1:80:80/udp nginx
+
+```
+
+> 查看映射端口配置
+
+使用 `docker port` 来查看当前映射的端口配置，也可以查看到绑定的地址
+
+```bash
+PS E:\learn-project> docker port  58b7 80
+0.0.0.0:32768
+```
+
+注意：
+* 容器有自己的内部网络和 ip 地址（使用 `docker inspect` 查看，Docker 还可以有一个可变的网络配置。）
+* `-p` 标记可以多次使用来绑定多个端口
+
+例如
+
+```bash
+$ docker run -d  -p 80:80  -p 443:443 nginx
+```
+

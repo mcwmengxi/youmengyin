@@ -177,3 +177,203 @@ ref 数组并不保证与源数组相同的顺序
 //   }
 // };
 ```
+## 2023-11-29
+
+npm run build / start 报错 Error:error:0308010C:digital enveloperoutines::unsupported
+
+**原因**
+node17以上会存在这个问题： github.com/nodejs/node…
+node17及以后版本中支持 OpenSSL3.0, 而OpenSSL3.0对允许算法和秘钥大小增加了严格的限制，可能会对生态系统造成一些影响。
+
+**解决方法**
+
+配置环境变量 NODE_OPTIONS="--openssl-legacy-provider" ，让 Nodejs 使用旧版本兼容的 OpenSSL[!https://stackoverflow.com/questions/69692842/error-message-error0308010cdigital-envelope-routinesunsupported]
+
+```bash
+ "dev": "SET NODE_OPTIONS=--openssl-legacy-provider && cross-env SERVER_ENV=dev vue-cli-service serve"
+```
+
+arco 依赖预构建优化
+```typescript
+import fs from 'fs';
+import path from 'path';
+
+const rootPath = path.resolve(__dirname, '../../');
+export function optimizeDeps() {
+  return {
+    name: 'optimizeDeps',
+    configResolved: (config: any) => {
+      const arr = config.optimizeDeps.include.concat(optimizeArco());
+      config.optimizeDeps.include = Array.from(new Set(arr));
+    },
+  };
+}
+
+function optimizeArco(): string[] {
+  const includes: string[] = ['@arco-design/web-vue/es'];
+  const folders = fs.readdirSync(
+    path.resolve(rootPath, './node_modules/@arco-design/web-vue/es')
+  );
+  // eslint-disable-next-line array-callback-return
+  folders.map((name) => {
+    const folderName = path.resolve(
+      rootPath,
+      './node_modules/@arco-design/web-vue/es',
+      name
+    );
+    const stat = fs.lstatSync(folderName);
+    if (stat.isDirectory()) {
+      const styleFolder = path.resolve(folderName, 'style');
+      if (fs.existsSync(styleFolder)) {
+        const stat = fs.lstatSync(styleFolder);
+        if (stat.isDirectory()) {
+          includes.push(`@arco-design/web-vue/es/${name}/style`);
+        }
+      }
+    }
+  });
+
+  return includes;
+}
+export default {};
+```
+
+**路由根据网络空闲时间加载**
+
+```typescript
+import { createRouter, createWebHashHistory } from 'vue-router';
+import NProgress from 'nprogress'; // progress bar
+import 'nprogress/nprogress.css';
+
+// import { useDebounceFn } from '@vueuse/core';
+import { appRoutes } from './routes';
+import { REDIRECT_MAIN, NOT_FOUND_ROUTE } from './routes/base';
+import createRouteGuard from './guard';
+
+NProgress.configure({ showSpinner: false }); // NProgress Configuration
+if (import.meta.env.MODE === 'development') {
+  const componentsToLoad = appRoutes.map((item) => item.component);
+  const loadComponentsWhenNetworkIdle = useDebounceFn(() => {
+    if (componentsToLoad.length > 0) {
+      const component = componentsToLoad.pop();
+      component?.();
+      console.log(
+        `剩余${componentsToLoad.length}个路由未加载`,
+        componentsToLoad
+      );
+    }
+  });
+  const observer: PerformanceObserver = new PerformanceObserver(
+    (list: PerformanceObserverEntryList) => {
+      const entries: PerformanceEntryList = list.getEntries();
+      entries.forEach((entry) => {
+        if (entry.entryType === `resource`) {
+          // 网络请求结束
+          loadComponentsWhenNetworkIdle();
+        }
+      });
+    }
+  );
+  observer.observe({ entryTypes: ['resource'] });
+}
+const router = createRouter({
+  history: createWebHashHistory(),
+  routes: [
+    {
+      path: '/',
+      redirect: 'goods/index',
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('@/views/login/index.vue'),
+      meta: {
+        requiresAuth: false,
+      },
+    },
+    ...appRoutes,
+    REDIRECT_MAIN,
+    NOT_FOUND_ROUTE,
+  ],
+  scrollBehavior() {
+    return { top: 0 };
+  },
+});
+
+createRouteGuard(router);
+
+export default router;
+```
+
+**git-cz使用**
+
+```bash 
+npm install -g cz-git commitizen
+```
+
+```json
+// .czrc
+{
+  "path": "cz-git",
+  "$schema": "https://cdn.jsdelivr.net/gh/Zhengqbbb/cz-git@1.7.1/docs/public/schema/cz-git.json",
+  "useEmoji": true,
+  "types": [
+    {
+      "value": "feat",
+      "name": "feat:     ✨  A new feature",
+      "emoji": ":sparkles:"
+    },
+    {
+      "value": "fix",
+      "name": "fix:      🐛  A bug fix",
+      "emoji": ":bug:"
+    },
+    {
+      "value": "docs",
+      "name": "docs:     📝  Documentation only changes",
+      "emoji": ":memo:"
+    },
+    {
+      "value": "style",
+      "name": "style:    💄  Changes that do not affect the meaning of the code",
+      "emoji": ":lipstick:"
+    },
+    {
+      "value": "refactor",
+      "name": "refactor: ♻️   A code change that neither fixes a bug nor adds a feature",
+      "emoji": ":recycle:"
+    },
+    {
+      "value": "perf",
+      "name": "perf:     ⚡️  A code change that improves performance",
+      "emoji": ":zap:"
+    },
+    {
+      "value": "test",
+      "name": "test:     ✅  Adding missing tests or correcting existing tests",
+      "emoji": ":white_check_mark:"
+    },
+    {
+      "value": "build",
+      "name": "build:    📦️   Changes that affect the build system or external dependencies",
+      "emoji": ":package:"
+    },
+    {
+      "value": "ci",
+      "name": "ci:       🎡  Changes to our CI configuration files and scripts",
+      "emoji": ":ferris_wheel:"
+    },
+    {
+      "value": "chore",
+      "name": "chore:    🔨  Other changes that don't modify src or test files",
+      "emoji": ":hammer:"
+    },
+    {
+      "value": "revert",
+      "name": "revert:   ⏪️  Reverts a previous commit",
+      "emoji": ":rewind:"
+    }
+  ]
+}
+
+```

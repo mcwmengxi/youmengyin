@@ -377,3 +377,24 @@ npm install -g cz-git commitizen
 }
 
 ```
+
+## 2023-12-14
+
+**image图片存在跨域问题的分析和解决**
+
+iframe页面使用ImageApi下载图片转base64图片跨域,解决新生成图片的跨域问题。对于用户以前访问过的图片，浏览器默认情况下会将其缓存起来。当我们从 JS 的代码中创建的 `<img>` 再去访问同一个图片时，浏览器就不会再发起新的请求，而是直接访问缓存的图片。而缓存中的图片是不带跨域头的，所以浏览器直接就拒绝了.
+
+原因：由于浏览器的缓存原因，图片在列表页通过img标签加载不需要跨域
+但是在iframe中，由于缓存原因，即使给img加上crossorigin="anonymous"，也会有跨域问题
+
+解决方式：
+图片增加crossOrigin属性
+`<img crossOrigin="anonymous"/>`
+
+生成图片时，使用时间戳去直接访问服务器资源，绕过访问浏览器缓存, 这一种方式需要服务器支持解析参数
+```
+const img = new Image();
+img.src = `${src}?${Date.now()}`;
+img.crossOrigin = 'anonymous';
+```
+参考博客[!https://www.cnblogs.com/liangtao999/p/15892525.html]

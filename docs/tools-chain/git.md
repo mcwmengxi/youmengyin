@@ -205,3 +205,7 @@ ERROR [2023-07-31 23:14:29,681] [1] [Sourcetree.Composition.VSMef.Net48.VSMefCom
 ```
 删除该目录下两个.cache文件 Composition.cache Assemblies.cache
 `C:\Users\mengxi\AppData\Local\Atlassian\SourceTree.exe_Url_fop3hzd4ikr21gr5nqmqd4tnru2hl5kn\3.4.12.0`
+
+git pull --tags origin master
+git stash list
+git stash apply stash@{0}

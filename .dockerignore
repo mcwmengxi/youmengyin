@@ -3,3 +3,7 @@ node_modules
 logs
 .history
 .docker-volumes
+/.vitepress
+/.git
+/caches
+/docs

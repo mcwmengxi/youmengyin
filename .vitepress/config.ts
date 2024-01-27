@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import fg from 'fast-glob'
 
 import sidebar from './config/sidebar'
 import nav from './config/nav'
@@ -14,7 +13,7 @@ export default defineConfig({
   lang: 'zh-CN',
   title: 'ymy-ui',
   base: '/youmengyin/',
-  description: 'Just playing around.',
+  description: '青萱织梦人的个人博客，记录随笔与学习笔记',
   appearance: true, // 是否启用暗模式
   head: [
     [
@@ -28,10 +27,11 @@ export default defineConfig({
   lastUpdated: true, // 上次更新时间
   // markdown解析器
   markdown: {
-    theme: 'material-palenight',
+    // theme: 'material-palenight',
     lineNumbers: true,
   },
-  // outDir: '',
+  // outDir: '../.vitepress/dist',
+  outDir: '',
   // srcDir: '', // 存储 markdown 页面的目录（相对于项目根目录）。
   titleTemplate: 'YMY',
   themeConfig: {
@@ -66,22 +66,19 @@ export default defineConfig({
       { icon: 'twitter', link: '...' },
     ],
     // 广告
-    carbonAds: {
-      code: 'your-carbon-code',
-      placement: 'your-carbon-placement',
-    },
-    // docFooter: {
-    //   prev: '上一篇',
-    //   next: '下一篇'
+    // carbonAds: {
+    //   code: 'your-carbon-code',
+    //   placement: 'your-carbon-placement',
     // },
-  },
-  vite: {
-    build: {
-      chunkSizeWarningLimit: 2000,
+    // docFooter: {
+      //   prev: '上一篇',
+      //   next: '下一篇'
+      // },
     },
-    plugins: [Unocss()],
-  },
-  vue: {
-    reactivityTransform: true,
-  },
-})
+    vite: {
+      build: {
+        chunkSizeWarningLimit: 2000,
+      },
+      plugins: [Unocss()],
+    },
+  })

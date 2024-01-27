@@ -1,9 +1,9 @@
 import { DefaultTheme } from 'vitepress'
-import { sync } from 'fast-glob'
+import glob from 'fast-glob'
 
 function getSidebarsItems(path: string, rootPath: string = 'docs') {
   const links: DefaultTheme.SidebarItem[] = []
-  sync(`${rootPath}/${path}/*`, {
+  glob.sync(`${rootPath}/${path}/*`, {
     // onlyDirectories: true,
     objectMode: true,
   }).forEach(({ name, path: url }) => {

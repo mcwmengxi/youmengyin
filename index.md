@@ -1,6 +1,6 @@
 ---
 layout: home
-title: 'A storybook By Vue3 && Vite Press '
+title: '青萱织梦人的个人博客，记录随笔与学习笔记'
 titleTemplate: Vite & Vue powered static site generator
 head:
   - - meta
@@ -12,7 +12,7 @@ head:
 hero:
   name: YMY
   text: 笔记专区
-  tagline: 一个轻量级笔记记录站，基于 vue3 + typescript，全面拥抱 vue3
+  tagline: 一个轻量级笔记记录站，记录随笔与学习笔记
   image:
     src: /assets/102649628_p0.svg
     # src: /assets/102601409_p1.svg
@@ -37,7 +37,6 @@ features:
     details: 严格的 TypeScript 类型
 ---
 <Home/>
-<!-- Placeholder -->
 
 <script setup>
 import { onMounted } from 'vue'

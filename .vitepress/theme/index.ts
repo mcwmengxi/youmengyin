@@ -4,9 +4,10 @@ import 'uno.css'
 
 // 自定义 CSS
 // https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
-import './style/index.scss'
-import './style/code.css'
-import './style/overrides.css'
+// import './style/index.scss'
+// import './style/code.css'
+// import './style/overrides.css'
+import './style/base.css'
 
 export default {
   ...DefaultTheme,

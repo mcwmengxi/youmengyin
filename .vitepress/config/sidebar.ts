@@ -37,14 +37,16 @@ const Go = [
 const NetWork = [{ text: 'Charles抓包', link: '/docs/network/charles' }]
 const ToolsChain = getSidebarsItems('tools-chain')
 const VueArti = getSidebarsItems('vue')
-console.log(ToolsChain)
 
 const sidebars = [{ text: 'go', items: Go, collapsible: true, collapsed: true }]
 
 const article = [
   {
     text: '里程碑',
-    items: [{ text: '里程碑 2023', link: '/article/milepost/milepost-2023' }],
+    items: [
+      { text: '里程碑 2023', link: '/article/milepost/milepost-2023' },
+      { text: '里程碑 2024', link: '/article/milepost/milepost-2024' }
+    ],
   },
   // {
   //   text: '年度总结',

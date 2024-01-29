@@ -1,3 +1,5 @@
+import { DefaultTheme } from 'vitepress'
+
 const GoLang = [
   { text: '介绍', link: '/docs/go/index' },
   { text: '安装环境', link: '/docs/go/install' },
@@ -62,4 +64,4 @@ export default [
     text: '开发',
     items: Develops,
   },
-]
+] as DefaultTheme.NavItem[]

@@ -108,7 +108,7 @@ reboot
 systemctl stutas redis
 ## 2023-04-18
 docker-desktop换源
-```
+```json
 {
   "builder": {
     "gc": {

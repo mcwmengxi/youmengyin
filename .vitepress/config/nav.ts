@@ -31,6 +31,9 @@ const Develops = [
   { text: 'mysql', link: '/docs/devops/mysql' },
   { text: 'redis', link: '/docs/devops/redis' },
 ]
+const Linux = [
+  { text: 'index', link: '/docs/linux/index' },
+]
 // 导航栏配置
 export default [
   {
@@ -64,4 +67,8 @@ export default [
     text: '开发',
     items: Develops,
   },
+  {
+    text: 'Linux',
+    items: Linux,
+  }
 ] as DefaultTheme.NavItem[]

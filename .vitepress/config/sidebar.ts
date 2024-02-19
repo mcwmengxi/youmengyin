@@ -160,6 +160,9 @@ const docs = [
   },
   { text: '开发',items: develops }
 ]
+const linux = [
+  { text: 'index', link: '/docs/linux/index' },
+]
 export default {
   '/article/': article,
   '/docs/': docs,
@@ -188,4 +191,5 @@ export default {
       ],
     },
   ],
+  '/linux/': linux,
 }

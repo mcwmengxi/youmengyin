@@ -123,6 +123,14 @@ const develops = [
   { text: 'mysql', link: '/docs/devops/mysql' },
   { text: 'redis', link: '/docs/devops/redis' },
 ]
+const interview = [
+  {
+    text: '面试题',
+    items: [
+      { text: 'index', link: '/docs/interview/index' },
+    ],
+  },
+]
 const docs = [
   {
     text: 'JavaScript',
@@ -153,18 +161,21 @@ const docs = [
   {
     text: 'TypeScript',
     items: [
-      { text: '基础', link: '/docs/typescript/index' },
+      { text: '基础', collapsed: true, items: new Array(10).fill({}).map((item, idx) => ({ text: `基础-${idx+1}`, link: `/docs/typescript/base/base-${idx+1}` })) },
       { text: '类型', link: '/docs/typescript/type' },
       { text: '其它', link: '/docs/typescript/other' },
+      { text: 'TS最佳实践', link: '/docs/typescript/ts-best-practice' }
     ],
   },
-  { text: '开发',items: develops }
+  { text: '开发',items: develops },
+  ...interview
 ]
 const linux = [
   { text: 'index', link: '/docs/linux/index' },
 ]
 export default {
   '/article/': article,
+  '/interview/': interview,
   '/docs/': docs,
   '/go/': sidebars,
   '/tools-chain/': [

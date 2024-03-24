@@ -81,5 +81,10 @@ export default [
       { text: 'javascript', link: '/docs/interview/javascript' },
       { text: 'Vue', link: '/docs/interview/Vue' },
     ],
-  }
+  },
+  {
+    text: 'TypeScript',
+    items: new Array(10).fill({}).map((item, idx) => ({ text: `基础-${idx+1}`, link: `/docs/typescript/ep/ep${idx+1}` })) 
+
+  },
 ] as DefaultTheme.NavItem[]

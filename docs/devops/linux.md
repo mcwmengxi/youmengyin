@@ -346,3 +346,48 @@ Linux 允许将 一个命令的输出 可以通过管道做为另一个命令的
 
 - more ：分屏显示内容
 - grep ：在命令执行结果的基础上查询指定的文本
+
+## 目录管理
+
+
+## 文件管理
+
+## 用户管理
+
+
+```bash
+// 创建用户
+useradd test
+useradd test -u 1004
+[root@luo ~]# id test
+uid=1005(test) gid=1005(test) groups=1005(test)
+
+useradd -s /sbin/nollogin test01
+
+[root@luo ~]# grep test /etc/passwd
+test:x:1005:1005::/home/test:/bin/bash
+
+// 删除用户
+userdel -r test01
+
+// 修改密码
+passwd test01
+
+// 修改用户信息
+
+usermod -s /bin/bash test01
+```
+
+用户组
+
+```bash
+cat /etc/group
+tail -3 /etc/group
+groupadd testgroup
+
+// 追加到某个组
+usermod -aG testgroup test 
+
+[root@luo ~]# id test
+uid=1005(test) gid=1005(test) groups=1005(test),1006(testgroup)
+```

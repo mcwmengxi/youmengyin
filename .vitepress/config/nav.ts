@@ -34,6 +34,7 @@ const Develops = [
 ]
 const Linux = [
   { text: 'index', link: '/docs/linux/index' },
+  { text: 'linux初体验', link: '/docs/linux/liunx1'}
 ]
 // 导航栏配置
 export default [

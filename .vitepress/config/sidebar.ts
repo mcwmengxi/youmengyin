@@ -172,6 +172,7 @@ const docs = [
 ]
 const linux = [
   { text: 'index', link: '/docs/linux/index' },
+  { text: 'linux初体验', link: '/docs/linux/liunx1'}
 ]
 export default {
   '/article/': article,

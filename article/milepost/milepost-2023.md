@@ -398,3 +398,7 @@ img.src = `${src}?${Date.now()}`;
 img.crossOrigin = 'anonymous';
 ```
 参考博客[!https://www.cnblogs.com/liangtao999/p/15892525.html]
+
+## 2023-12-31
+>window 保留了一些端口，保留的端口我们是不能用的，所以只有修改配置文件中的端口即可。查看保留端口的命令
+netsh int ipv4 show excludedportrange protocol=tcp

@@ -21,6 +21,7 @@ const NetWork = [{ text: 'Charles抓包', link: '/docs/network/charles' }]
 const ToolsChain = [
   { text: 'git', link: '/docs/tools-chain/git' },
   { text: 'prettier', link: '/docs/tools-chain/prettier' },
+  { text: 'pnpm', link: '/docs/tools-chain/pnpm' },
 ]
 const Develops = [
   { text: 'index', link: '/docs/devops/index' },

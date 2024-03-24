@@ -72,5 +72,14 @@ export default [
   {
     text: 'Linux',
     items: Linux,
+  },
+  {
+    text: '面试',
+    items: [
+      { text: 'index', link: '/docs/interview/index' },
+      { text: '面试题', link: '/docs/interview/interview' },
+      { text: 'javascript', link: '/docs/interview/javascript' },
+      { text: 'Vue', link: '/docs/interview/Vue' },
+    ],
   }
 ] as DefaultTheme.NavItem[]

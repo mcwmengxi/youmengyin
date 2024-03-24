@@ -1,3 +1,12 @@
+# monorepo
+
+>monorepo有别于常规项目结构，一个项目对于一个git仓库，为了更方便进行模块管理、依赖管理
+
+
+- lerna 
+- pnpm workspace
+- turborepo
+
 `monnorepo`采用了单仓库多项目的代码管理方式，先比与传统的`multi-repo`模式，更有助于简化代码共享、版本控制、构建和部署等方面的复杂性，并提供更好的可重用性和协作性。传统模式下多个子包往往是相互依赖的，一个包更新后，其它包也需要按照特定顺序进行更新。
 通过`monorepo`模式，任意一个模块发生修改，另一个模块能够立即反馈而不用走繁琐的发布和依赖更新流程；各个模块之间也能够充分复用配置、CI 流程的脚本；各个包的版本和互相之间的依赖关系得到集中管理。
 
@@ -309,3 +318,426 @@ pnpm --filter "...[HEAD~1]" run build
 ```
 
 ## 幽灵依赖
+
+
+## 搭建组件库
+
+```bash
+# pnpm-workspace.yaml
+packages:
+  - 'packages/*'
+  - 'examples/*'
+  - 'docs'
+```
+
+
+```bash
+# -w 代表在根目录操作
+pnpm install -wD eslint typescript vite sass @vitejs/plugin-vue
+pnpm install -wS vue
+
+# --filter 选项过滤子模块
+pnpm install -S lodash --filter utils
+```
+
+新增utils包
+```bash
+# mkdir index.ts
+# packages/utils/package.json
+{
+  "name": "@qx-components/utils",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts"
+}
+
+# 根目录下添加新的依赖项
+pnpm install -w @qx-ui/utils
+```
+
+
+**组件库文档**
+```bash
+# 主题插件支持
+pnpm i -D vitepress-theme-demoblock --filter docs
+
+# 配置 config.js
+import { demoBlockPlugin } from 'vitepress-theme-demoblock'
+markdown: {
+  config: (md) => {
+    md.use(demoBlockPlugin, { cssPreprocessor: 'scss' })
+  }
+}
+
+# **注入主题和插件**
+
+# register-components.js自动生成
+"scripts": {
+  "**register:com**ponents": "vitepress-rc"
+}
+```
+
+## 集成lint代码规范工具
+
+### 引言
+
+- 如何集成 ESLint，控制代码风格？
+- ESLint 如何与 Vue、TypeScript 配合使用？
+- 如何集成 StyleLint，控制样式风格？
+- StyleLint 如何与 Vue、SCSS 配合使用？
+- Prettier 应该如何使用？
+- 如何集成 commitlint 与 husky，控制提交信息风格？
+- 如何实现增量 Lint 检查？更好地应对积重难返的“屎山”项目。
+
+### ESLint
+
+>ESLint 是在JS代码中识别和报告模式匹配的工具，它的目标是保证代码的一致性和避免错误。
+
+**了解配置字段**
+```js
+// 结合了 typescript-eslint 实现了对 TypeScript 的支持
+
+module.exports = {
+  "root": true,
+  // 继承已有配置对象
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", // ts支持
+    "plugin:vue/vue3-recommended",
+  ],
+
+  // 如何理解代码
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": ["./tsconfig.json"]
+  },
+
+  // 添加哪些规则
+  "plugins": [ 
+    "@typescript-eslint",
+  ],
+
+  // 已添加规则的开启 / 关闭
+  "rules": {
+    "@typescript-eslint/strict-boolean-expressions": [
+      2,
+      {
+        "allowString" : false,
+        "allowNumber" : false
+      }
+    ]
+  },
+
+  
+  // 对特殊文件应用特殊配置
+  "overrides": [
+    {
+      "files": ["*.vue"],
+      "rules": {
+        // 所有 .vue 文件除了应用上面的公共规则配置外，还需应用的独特规则配置。
+      },
+    },
+  ],
+}
+```
+
+ESLint 如何理解代码？
+
+parser 和 parserOptions 选项与 ESLint 如何理解我们的代码相关。这里分析器 @typescript-eslint/parser 负责解析 TypeScript 语言，将代码转化为 AST 语法树，便于进行分析。而 parserOptions 可以对解析器的能力进行详细设置。
+
+ESLint 如何判断代码是否规范？
+
+ESLint 提供了 自定义规则 的接口，开发者需要遵照接口，根据分析器的 AST 产物，实现规范检查逻辑，再将实现的多条规范聚合为 plugin 插件的形式。plugin 字段指定了 ESLint 应用什么规则集，具有理解哪些规范的能力。
+
+规则的启用与禁用
+
+有了规则集，能够理解规范，不代表 ESLint 就要对不规范的内容做出响应，还需要进一步在 rules 字段中对这些规则进行开启或者关闭的声明，只有开启的规则才会生效。
+
+继承已有配置
+
+面对琳琅满目的规则集，我们完全在项目中配置是不可取的。因此社区逐渐演进出了许多配置预设，让我们可以一键继承，从而减少绝大多数手动配置的工作量。例如例子中的 eslint:recommended、plugin:@typescript-eslint/recommended 就代表继承了 eslint 和 typescript-eslint 的推荐配置。
+
+配置的重写
+如果我们希望某些文件应用一些独特的配置，可以使用 overrides 字段实现。overrides 的每个成员对象都需要指定目标文件，除了应用所有父级配置之外，还要应用成员对象中声明的独有配置。ESLint 支持文件级别的重写。
+
+
+#### 规则集的选型
+
+eslint-config-airbnb: Airbnb 规则集
+eslint-config-alloy：腾讯 AlloyTeam 的规则集
+eslint-config-standard: StandardJS 规则集
+
+#### 依赖安装
+
+```bash
+pnpm i -wD eslint
+
+# 解析TypeScript、Vue
+pnpm i -wD @typescript-eslint/parser @typescript-eslint/eslint-plugin
+
+pnpm i -wD eslint-plugin-vue (eslint-plugin-import)
+
+# 安装 Airbnb 规则集，便于我们一键继承
+pnpm i -wD eslint-config-airbnb-base eslint-config-airbnb-typescript
+
+# 编写配置文件时，提供完善的类型支持
+pnpm i -wD eslint-define-config
+```
+
+#### 配置
+
+```js
+// .eslintrc.js
+
+module.exports = {
+  // 指定此配置为根级配置，eslint 不会继续向上层寻找
+  "root": true,
+
+  // 将浏览器 API、ES API 和 Node API 看做全局变量，不会被特定的规则(如 no-undef)限制。
+  "env": {
+    "browser": true,
+    "es2022": true,
+    "node": true,
+  },
+
+  // 继承已有配置对象
+  "extends": [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended", // ts支持
+    "plugin:vue/vue3-recommended",
+  ],
+
+  // 如何理解代码
+  "parser": "vue-eslint-parser",
+  "parserOptions": {
+    "parser": "@typescript-eslint/parser",
+    "sourceType": 'module',
+    "project": ["./tsconfig.eslint.json"],
+    // TypeScript 解析器也要负责 vue 文件的 <script>
+    "extraFileExtensions": [".vue"],
+    "ecmaVersion": 'ES2022'
+  },
+
+  // 添加哪些规则
+  "plugins": [ 
+    "@typescript-eslint",
+  ],
+
+  // 已添加规则的开启 / 关闭
+  "rules": {
+    "@typescript-eslint/strict-boolean-expressions": [
+      2,
+      {
+        "allowString" : false,
+        "allowNumber" : false
+      }
+    ]
+  },
+
+  
+  // 对特殊文件应用特殊配置
+  "overrides": [
+    {
+      "files": ["*.vue"],
+      "rules": {
+        // 所有 .vue 文件除了应用上面的公共规则配置外，还需应用的独特规则配置。
+      },
+    },
+  ],
+}
+```
+
+>这里我们需要注意一下`parserOptions.project`字段，`TypeScript`解析器需要一个`tsconfig`文件来确认解析范围。
+
+`tsconfig.json`已经被占用做其他用途(IDE 语言服务), 另外建立一个`ESLint`专用的文件`tsconfig.eslint.json`, 在其中包含所有希望被规范化的源码文件,这也是`typescript-eslint`官方为`monorepo`型工程推荐的一种解决方案[(Monorepo Configuration)](https://typescript-eslint.io/getting-started/typed-linting/monorepos/)
+
+```json
+{
+  // eslint 检查专用，不要包含到 tsconfig.json 中
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    // 参考 https://typescript-eslint.io/linting/typed-linting/monorepos
+    "noEmit": true
+  },
+  "include": [
+    // 只检查，不构建，因此要包含所有需要检查的文件
+    "**/*",
+    "**/.*.*"
+  ],
+  "exclude": ["**/dist", "**/node_modules"]
+}
+```
+
+## Stylelint
+
+
+>Stylelint 是一个强大的 CSS 格式化工具，可以帮助使用者避免语法错误并统一编码风格。
+
+```bash
+pnpm i -wD stylelint stylelint-config-standard stylelint-config-recommended-vue stylelint-scss stylelint-config-standard-scss stylelint-order (stylelint-config-recess-order)
+```
+
+### 解决这个Unknown word (CssSyntaxError)Stylelint(CssSyntaxError)
+
+1.给vscode-stylelint指定stylelint的配置文件
+```json
+"stylelint.configFile": ".stylelintrc.js"
+```
+2.stylelint的配置文件中指定语法为postcss-html
+```js
+module.exports={
+  customSyntax: 'postcss-html',
+}
+
+// 使用ovrrides字段重写无效,只能换成postcss-html解析
+customSyntax: 'postcss-scss',
+"ovrrides": [
+  {
+    "files": [ '*.vue', '**/*.vue' ],
+    "customSyntax": 'postcss-html'
+  }
+],
+```
+
+## Prettier
+
+>Prettier 是一个固执己见的代码格式化工具
+
+`ESLint` 和 `Stylelint` 本身就有控制代码风格的规则。只不过它们只针对 `JS / TS / CSS`,`Prettier`可以不进行这些文件格式化，所以`Prettier`显得有点是被边缘化的，但是你也可以使用Prettier来格式化, 如果你想详细了解如何配合使用`ESLint`、`Stylelint`和`Prettier`，使它们之间可以互相兼容，可以阅读这篇文章：[你不能再说你不会配置`ESLint`和`prettier`了](https://juejin.cn/post/7239987776552714300)
+
+```json
+// 项目级别配置 .vscode/settings.json
+{
+  // 已有配置...
+
+  // 关闭 IDE 自带的样式验证
+  "css.validate": false,
+  "less.validate": false,
+  "scss.validate": false,
+  // 指定 stylelint 生效的文件类型(尤其是 vue 文件)。
+  "stylelint.validate": ["css", "scss", "postcss", "vue"],
+
+  // 启用 eslint 的格式化能力
+  "eslint.format.enable": true,
+  // eslint 会在检查出错误时，给出对应的文档链接地址
+  "eslint.codeAction.showDocumentation": {
+    "enable": true
+  },
+  // 指定 eslint 生效的文件类型(尤其是 vue 文件)。
+  "eslint.probe": ["javascript", "typescript", "vue"],
+  // 指定 eslint 的工作区，使每个子模块下的 .eslintignore 文件都能对当前目录生效。
+  "eslint.workingDirectories": [{"mode": "auto"}],
+}
+
+```
+- `editor.codeActionsOnSave` 的相关配置，让 ESLint 和 Stylelint 的自动修复功能在保存文件时触发。 当然，部分复杂的错误无法自动修复，需要人工检视。
+- 将默认的格式化工具设为 Prettier，但是禁用自动格式化，避免格式化与自动修复之间的冲突。自动格式化只对非 `ESLint` 和 `Stylelint` 目标的文件开启， 例如 `json`、`yaml`。
+
+```json
+// .vscode/settings.json
+{
+  // 已有配置。。。
+
+  // 设置默认格式化工具为 Prettier
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  // 默认禁用自动格式化(手动格式化快捷键：Shift + Alt + F)
+  "editor.formatOnSave": false,
+  "editor.formatOnPaste": false,
+
+  // 启用自动代码修复功能，保存时触发 eslint 和 stylelint 的自动修复。
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+    "source.fixAll.stylelint": true
+  },
+
+  // volar 可以处理 vue 文件的格式化
+  "[vue]": {
+    "editor.defaultFormatter": "Vue.volar"
+  },
+
+  // json、yaml 等配置文件保存时自动格式化
+  "[json]": {
+    "editor.formatOnSave": true
+  },
+  "[jsonc]": {
+    "editor.formatOnSave": true
+  },
+  "[yaml]": {
+    "editor.formatOnSave": true
+  }
+}
+
+```
+
+## commitlint
+
+>commitlint 工具可以检查 Git 提交信息是否符合规范
+
+```bash
+pnpm i -wD @commitlint/config-conventional @commitlint/cli
+```
+
+```js
+// commitlint.config.js
+module.exports = {
+  extends: ['@commitlint/config-conventional'],
+};
+```
+
+## 通过 husky 集成到 Git hooks 中
+
+Git 提供了一个叫做 Git Hooks 的功能，它能让我们在特定的重要动作发生时触发自定义脚本。
+`Git Hooks`中的`commit-msg`钩子就正好可以在`commit`动作发生的时候执行`commitlint`脚本
+>如果需要详细了解 Git Hooks 可以阅读以下文章：[一文带你彻底学会 Git Hooks 配置](https://juejin.cn/post/6844904194634153992)
+
+```bash
+pnpm i -wD husky
+npx husky-init
+```
+
+## lint-staged 实现增量检查
+
+>`lint-staged`包含一个可以执行任意`shell`任务的脚本，在执行脚本时以 暂存区 的文件列表作为参数，并支持按`glob`模式进行过滤。
+
+`lint-staged`的目标就是这些`git add`后提交到暂存区的文件
+
+如果你想更多地理解暂存区的概念，这里推荐一些博文：
+
+[Git三大特色之Stage(暂存区)](https://juejin.cn/post/6844903634333876237)
+
+[深入学习之前先理解 git 暂存区](https://juejin.cn/post/6844903479035576328)
+
+当然，如果你对 Git 也不太了解，这里也推荐一个交互式的 Git 学习网站：
+
+[Learn Git Branching](https://learngitbranching.js.org/?locale=zh_CN)
+
+```bash
+pnpm i -wD lint-staged
+
+# pre-commit echo
+npm run lint-staged
+# package.json
+{
+  "scripts": {
+    ...
+    "lint-staged": "npx lint-staged"
+  },
+  "lint-staged": {
+    "*.{js,ts,jsx,tsx}": [
+      "eslint --fix"
+    ],
+    "*.vue": [
+      "stylelint --fix",
+      "eslint --fix"
+    ],
+    "*.{scss,css}": [
+      "stylelint --fix"
+    ],
+    "*.{html,json,md}": [
+      "prettier --write"
+    ]
+  },
+}
+```
+

@@ -128,6 +128,9 @@ const interview = [
     text: '面试题',
     items: [
       { text: 'index', link: '/docs/interview/index' },
+      { text: '面试题', link: '/docs/interview/interview' },
+      { text: 'javascript', link: '/docs/interview/javascript' },
+      { text: 'Vue', link: '/docs/interview/Vue' },
     ],
   },
 ]
@@ -172,6 +175,7 @@ const docs = [
 ]
 const linux = [
   { text: 'index', link: '/docs/linux/index' },
+  { text: 'linux初体验', link: '/docs/linux/liunx1'}
 ]
 export default {
   '/article/': article,

@@ -21,6 +21,7 @@ const NetWork = [{ text: 'Charles抓包', link: '/docs/network/charles' }]
 const ToolsChain = [
   { text: 'git', link: '/docs/tools-chain/git' },
   { text: 'prettier', link: '/docs/tools-chain/prettier' },
+  { text: 'pnpm', link: '/docs/tools-chain/pnpm' },
 ]
 const Develops = [
   { text: 'index', link: '/docs/devops/index' },
@@ -33,6 +34,7 @@ const Develops = [
 ]
 const Linux = [
   { text: 'index', link: '/docs/linux/index' },
+  { text: 'linux初体验', link: '/docs/linux/liunx1'}
 ]
 // 导航栏配置
 export default [
@@ -70,5 +72,19 @@ export default [
   {
     text: 'Linux',
     items: Linux,
-  }
+  },
+  {
+    text: '面试',
+    items: [
+      { text: 'index', link: '/docs/interview/index' },
+      { text: '面试题', link: '/docs/interview/interview' },
+      { text: 'javascript', link: '/docs/interview/javascript' },
+      { text: 'Vue', link: '/docs/interview/Vue' },
+    ],
+  },
+  {
+    text: 'TypeScript',
+    items: new Array(10).fill({}).map((item, idx) => ({ text: `基础-${idx+1}`, link: `/docs/typescript/ep/ep${idx+1}` })) 
+
+  },
 ] as DefaultTheme.NavItem[]

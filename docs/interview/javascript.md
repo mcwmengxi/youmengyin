@@ -156,3 +156,169 @@ function Debounce(fn:Function, delay:number){
 
 **1. 使用缓存**
 
+## 5.异步并发限制怎么做？
+
+### 5.1 实现一个带并发限制的promise异步调度器
+
+实现思路：
+
+先把要执行的promise function 存到数组内
+最多执行为2，那我们必然是要启动的时候就要让两个promise函数执行
+设置一个临时变量，表示当前执行ing几个promise
+然后一个promise执行完成将临时变量-1
+然后借助递归重复执行
+
+```js
+class Scheduler {
+  constructor(){
+    this.promises = []
+    this.limits = 2
+    this.count = 0
+  }
+
+  add(promiseCreator){
+    this.promises.push(promiseCreator)
+  }
+  async send() {
+    if (this.promises.length === 0 || this.count >= this.limits) { return }
+    this.count++
+    await this.promises.shift()()
+    this.count--
+    this.send.bind(this)()
+    // this.promises.shift()().then(() => {
+    //   this.count--
+    //   this.send.bind(this)()
+    // })
+  }
+  run() {
+    for (let i = 0; i < this.limits; i++) {
+      this.send.bind(this)()
+    }
+  }
+}
+
+var scheduler = new Scheduler()
+
+const  timeout = (time) => {
+  return new Promise(resolve=>{
+      setTimeout(resolve,time)
+  })
+}
+const addTask = (time,order) => {
+  scheduler.add(()=> timeout(time).then( ()=>console.log(order) ) )
+}
+// 3421 控制并发为后执行是2314
+addTask(1000,1)
+addTask(500,2)
+addTask(300,3)
+addTask(400,4)
+
+scheduler.run()
+
+```
+
+### 5.2 前端如果 100 个请求，你怎么用 Promise 去控制并发？
+
+```js
+// 设计一个函数，可以限制请求的并发，同时请求结束之后，调用callback函数
+sendRequest(requestList: , limits, callback): voidsendRequest([
+		() => request('1'), 
+		() => request('2'), 
+		() => request('3'), 
+		() => request('4')],3, //并发数
+		(res)=>{
+			console.log(res)
+}) 
+function request (url,time=1){
+		return new Promise((resolve,reject)=>{
+			setTimeout(()=>{
+				console.log('请求结束：'+url);
+				if(Math.random() > 0.5){
+					resolve('成功')
+				}else{
+					reject('错误;')
+				}
+			},time*1e3)
+		})
+}
+```
+
+**await实现**
+
+1. 用race的特性可找到并发任务里最快结束的请求
+2. 用for await 可保证for结构体下面的代码是最后await后的微任务，而在最后一个微任务下，可保证所有的promise已经存入promises里（如果没命中任何一个await，即限制并发数>任务数的时候，虽然不是在微任务当中，也可以保证所有的promise都在里面），最后利用allSettled，等待所有的promise状态转变后，调用回调函数
+3. 并发任务池用Set结构存储，可通过指针来删除对应的任务，通过闭包引用该指针从而达到 动态控制并发池数目
+4. for await 结构体里，其实await下面，包括结构体外都是属于微任务（前提是有一个await里面的if被命中），至于这个微任务什么时候被加入微任务队列，要看请求的那里的在什么时候开始标记（resolve/reject）
+5. for await 里其实已经在此轮宏任务当中并发执行了，await后面的代码被挂起来，等前一个promise转变状态–>移出pool–>将下一个promise捞起加入pool当中 -->下一个await等待最快的promise，如此往复。
+
+```js
+async function sendRequest(requestList,limits,callback){
+  // 维护一个promise队列
+  const promises = [] 
+  const pool = new Set() // 当前的并发池,用Set结构方便删除
+  // 开始并发执行所有的任务
+  for(let request of requestList){
+    // 开始执行前，先await 判断 当前的并发任务是否超过限制
+    if (pool.size >= limits) { 
+      // 这里因为没有try catch ，所以要捕获一下错误，不然影响下面微任务的执行
+      await Promise.race(pool).catch(err => err)
+    }
+
+    const promise = request()
+    const cb = () => {
+      pool.delete(promise) // 从并发池中删除
+    }
+    promise.then(cb,cb)
+    pool.add(promise) // 添加到并发池
+    promises.push(promise) // 添加到promise队列
+    // 一旦有一个请求完成，就从并发池中删除，并且从队列中删除
+  }
+  // 等最后一个for await 结束，这里是属于最后一个 await 后面的 微任务
+
+  // 注意这里其实是在微任务当中了，当前的promises里面是能确保所有的promise都在其中(前提是await那里命中了if)
+  Promise.allSettled(promises).then(callback,callback)
+}
+```
+
+**采用递归调用来实现**
+
+```js
+function multiRequest(urls, maxNum) {
+ const len = urls.length; // 请求总数量
+ const res = new Array(len).fill(0); // 请求结果数组
+ let sendCount = 0; // 已发送的请求数量
+ let finishCount = 0; // 已完成的请求数量
+ return new Promise((resolve, reject) => {
+     // 首先发送 maxNum 个请求，注意：请求数可能小于 maxNum，所以也要满足条件2
+     // 同步的 创建maxNum个next并行请求 然后才去执行异步的fetch 所以一上来就有5个next并行执行
+     while (sendCount < maxNum && sendCount < len) { 
+         next();
+     }
+     function next () {
+         let current = sendCount ++; // 当前发送的请求数量，后加一 保存当前请求url的位置
+         // 递归出口
+         if (finishCount >= len) { 
+         // 如果所有请求完成，则解决掉 Promise，终止递归
+             resolve(res);
+             return;
+         }
+         const url = urls[current];
+         fetch(url).then(result => {
+             finishCount ++;
+             res[current] = result;
+             if (current < len) { // 如果请求没有发送完，继续发送请求
+                 next();
+             }
+         }, err => {
+             finishCount ++;
+             res[current] = err;
+             if (current < len) { // 如果请求没有发送完，继续发送请求
+                 next();
+             }
+         });
+     }
+ });
+}
+
+```
+

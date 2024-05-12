@@ -1,7 +1,6 @@
 import { defineConfig } from 'vitepress'
 import sidebar from './config/sidebar'
 import nav from './config/nav'
-import footer from './config/footer'
 import Unocss from 'unocss/vite'
 const logo =
   'https://iconfont.alicdn.com/p/illus/file/WgLsw4nYmfzB/d57e706d-2783-4917-911e-c19f03d63b14_origin.svg'
@@ -9,8 +8,8 @@ const logoUrl =
   'https://p3-passport.byteimg.com/img/user-avatar/22c8c35573946132067839366a854c6c~100x100.awebp'
 
 export default defineConfig({
+  title: 'ymy博客',
   lang: 'zh-CN',
-  title: 'ymy-ui',
   base: '/youmengyin/',
   description: '青萱织梦人的个人博客，记录随笔与学习笔记',
   appearance: true, // 是否启用暗模式
@@ -48,7 +47,10 @@ export default defineConfig({
     // 配置侧边菜单栏
     sidebar,
     // 配置页脚
-    footer,
+    footer: {
+      message: 'Released under the MIT License.',
+      copyright: `Copyright © 2022-${new Date().getFullYear()} Ymy`
+    },
     docFooter: {
       prev: '上一篇',
       next: '下一篇'

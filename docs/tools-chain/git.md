@@ -18,7 +18,9 @@
 | git reset --hard 版本号   | 获取历史版本                  |
 | git remote add origin xxx | 关联远程仓库                  |
 
+
 ## 基本操作
+
 ```bash
 git init
 
@@ -293,9 +295,9 @@ git config --global user.email 'xxxxx@qq.com'
 
 ## 合并两个没有共同历史提交记录的分支
 
-某个git仓库原有master分支，后面自己本地新建了一个项目，然后把新建的这个推到了这个仓库的另外一个分支temp
 
->直接合并报错`fatal: refusing to merge unrelated histories`
+某个git仓库原有master分支，后面自己本地新建了一个项目，然后把新建的这个推到了这个仓库的另外一个分支temp
+直接合并报错`fatal: refusing to merge unrelated histories`
 
 **解决方案**：采用git rebase --onto变基的方法
 
@@ -309,7 +311,6 @@ git config --global user.email 'xxxxx@qq.com'
 ![](https://img-blog.csdnimg.cn/32c39134241b44d9bfa92adcc67dea45.png)
 
 
-
 3.在该分支上拉取允许不相关历史的操作,然后手动解决冲突
 
 `git pull --allow-unrelated-histories`
@@ -319,17 +320,20 @@ git config --global user.email 'xxxxx@qq.com'
 4.解决冲突，提交推送到远程
 
 
-
+```bash
 npm config set registry http://registry.npmmirror.com
 
 https://registry.npmjs.org
+
+```
 
 **ssh**
 
 ` ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
 
 config
-```
+
+```bash
 # github
 Host github.com
 HostName ssh.github.com
@@ -338,24 +342,25 @@ IdentityFile ~/.ssh/id_ed25519_mcwmengxi
 PreferredAuthentications publickey
 Port 443
 
-
 ```
+
 sourcetree添加ssh秘钥
 `ssh -T git@github.com`
 
 
 解除ssh验证
 
-git config --global http.sslVerify false
-
+`git config --global http.sslVerify false`
 
 ## 用户账号管理
+
 >如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
 
 
 **管理同一目录下的配置**
 
-目录下建立.gitconfig
+目录下建立`.gitconfig`
+
 ```bash
 [user]
   name = mcwmengxi
@@ -365,17 +370,18 @@ git config --global http.sslVerify false
 修改git的全局配置文件.gitconfig,把当前目录添加全局配置文件中
 ```bash
 [includeIf "gitdir:D:/project/"]
-        path = D:/project/.gitconfig
+  path = D:/project/.gitconfig
 ```
 
 **单独配置项目用户名**
-
+```bash
 git config user.name mcwmengxi 
 git config user.email 1395568275@qq.com 
+```
 
 ## git代理
 
-.gitconfig文件开启代理,访问github,git仓库走ssh
+`.gitconfig`文件开启代理,访问`github,git`仓库走`ssh`
 ```
 [http]
   proxy = http://127.0.0.1:26501
@@ -383,15 +389,13 @@ git config user.email 1395568275@qq.com
 ```
 
 
-sourceTree无法使用
-https://zhuanlan.zhihu.com/p/637566727
+sourceTree无法使用 https://zhuanlan.zhihu.com/p/637566727
 
 ```bash
-ERROR [2023-07-31 23:14:29,681] [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - Unable to load MEF components
+ERROR [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - Unable to load MEF components
 ```
+
 删除该目录下两个.cache文件 Composition.cache Assemblies.cache
+
 `C:\Users\mengxi\AppData\Local\Atlassian\SourceTree.exe_Url_fop3hzd4ikr21gr5nqmqd4tnru2hl5kn\3.4.12.0`
 
-git pull --tags origin master
-git stash list
-git stash apply stash@{0}

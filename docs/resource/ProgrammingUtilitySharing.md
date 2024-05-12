@@ -1,5 +1,5 @@
-# 2022年技术胖私藏工具分享
-300+编程实用工具
+# 工具分享
+
 ## Javascript
 ### 工具
 * Underscore.js
@@ -38,12 +38,7 @@ https://viteshot.com/
 * Valine
 快速、简洁且高效的无后端评论系统
 https://valine.js.org/
-* cnpm
-淘宝提供的一个完整 npmjs.org 镜像，你可以用此代替官方版本(只读)，同步频率目前为 10分钟 一次以保证尽量与官方服务同步
-https://npmmirror.com/
-* yarn
-快速、可靠和安全的依赖管理
-https://yarnpkg.com/
+
 * responsively-app
 一种改进的 Web 浏览器，有助于响应式 Web 开发。Web 开发人员必须拥有开发工具
 https://responsively.app/
@@ -177,9 +172,6 @@ https://100px.net/
 * Darkmode.js
 在几秒钟内为您的网站添加暗模式/夜间模式
 https://darkmodejs.learn.uno/?_360safeparam=8406218
-* ECharts
-强大的交互式图表和浏览器数据可视化库
-https://echarts.apache.org/zh/index.html
 * PixiJS
 使用最快，最灵活的2D WebGL渲染器创建精美的内容
 https://pixijs.com/
@@ -457,9 +449,6 @@ https://github.com/chalk/chalk
 * Timer.js
 简单而轻量级的库，无需任何依赖项来创建和管理计时器
 https://github.com/husa/timer.js
-* day.js
-极简的 JavaScript 库，它使用与 Moment.js 兼容的 API 为现代浏览器解析、验证、操作和显示日期和时间
-https://day.js.org/
 * Socket.io
 支持基于事件的实时双向通信
 https://socket.io/
@@ -506,46 +495,13 @@ https://github.com/webfansplz/temir
 适用于 Node.js 的时尚、直观且用户友好的提示
 https://github.com/enquirer/enquirer
 ## 跨平台
-### 框架
-* uni-app
-使用 Vue.js 开发所有前端应用的框架，开发者编写一套代码，可发布到iOS、Android、Web（响应式）、以及各种小程序等13个平台
-https://uniapp.dcloud.io/
-* react-native
-使用 React 构建移动应用程序
-https://reactnative.dev/
-* Flutter
-Google 的开源框架，用于构建美观、本机编译的多平台应用程序
-https://flutter.dev/
-* chameleon
-一套代码运行多端，一端所见即多端所见
-http://cml.didi.cn/
-* Taro
-遵循 React 语法规范的多端统一开发框架
-https://taro.zone/
-* Electron
-使用 JavaScript，HTML 和 CSS 构建跨平台的桌面应用程序
-https://www.electronjs.org/
-* MicroApp
-京东零售推出的微前端框架。基于webcomponent-like渲染，从组件思维实现微前端，旨在降低上手难度，提高工作效率
-https://micro-zoe.github.io/micro-app/
-* Tauri
-使用 Web 前端构建更小、更快、更安全的桌面应用程序
-https://tauri.studio/
-* Hippy
-跨平台的开发框架，旨在帮助开发者编写一次，运行在三个平台（iOS、Android 和 Web）上
-https://hippyjs.org/#/
-* 无界
-基于 Web Components + iframe 微前端框架，具备成本低、速度快、原生隔离、功能强等一系列优点。
-https://wujie-micro.github.io/doc/
-* qiankun
-微前端的实现，基于single-spa。它旨在使构建生产就绪的微前端架构系统变得更加容易和轻松。
-https://qiankun.umijs.org/zh
+
 ### Flutter
 * pub.dev
 Dart和Flutter应用程序的官方包存储库
 https://pub.dev/
 * awesome-flutter-plugins
-尽可能收集好用的Flutter插件以便更效率的开发
+尽可能收集好用的Flutter插件以便更效率的开
 https://github.com/jahnli/awesome-flutter-plugins
 * flutter-widget.live
 使用 Flutter for web 构建的网站，用于在线实时预览小部件示例。
@@ -684,12 +640,6 @@ http://commitizen.github.io/cz-cli/
 *  commitlint
 git commit 校验工具
 https://commitlint.js.org/#/
-* husky
-Git hooks 工具，可以防止使用 Git hooks 的一些不好的 commit 或者 push
-https://typicode.github.io/husky/#/
-* lint-staged
-代码提交之前,进行代码规则检查并尝试修复，能够确保进入git库的代码都是符合代码规则
-https://github.com/okonet/lint-staged
 * anywhere
 随启随用的静态文件服务器
 https://github.com/JacksonTian/anywhere
@@ -722,155 +672,6 @@ https://www.alltoall.net/
 * Convertio
 将文件转换成任意格式
 https://convertio.co/zh/
-## Vue3生态工具
-### 1.Web UI库
-*  ElementUI Plus
-一套为开发者、设计师和产品经理准备的基于 Vue 3.0 的桌面端组件库
-https://element-plus.org/zh-CN/
-*  Ant Design of Vue
-Ant Design 的 Vue 实现，开发和服务于企业级后台产品
-https://www.antdv.com/docs/vue/introduce-cn
-*  BalmUI
-基于谷歌的 Material Design，附带 Vue 插件和指令，以及从简单到复杂的高度可定制组件
-https://next-material.balmjs.com/
-*  Naive UI
-图森Vue3的组件库，文档完整，我项目中经常使用
-https://www.naiveui.com/zh-CN/os-theme
-* arco.design
-字节跳动企业级产品设计系统，支持React和Vue双版本
-https://arco.design/
-* Quasar
-轻松构建高性能和高质量的Vue.js 3用户界面，好用，但没有中文文档
-https://quasar.dev/
-* iDUX
-Vue3.x 的 UI 组件库，完全使用 TypeScript 开发
-https://idux.site/
-* TDesign
-腾讯业务团队在服务业务过程中沉淀的一套企业级设计体系
-https://tdesign.tencent.com/
-https://tdesign.tencent.com/vue-next/overview
-* PrimeVue
-易于使用、多功能、高性能的 Vue UI 组件库
-https://www.primefaces.org/primevue/
-* DevUI
-华为基于 Vue3 和 DevUI 设计的 UI 组件
-https://vue-devui.github.io/
-* vuestic-ui
-Vue 3 的免费和开源 UI 库 ,UI非常好看，并且有可用后台管理界面。
-https://vuestic.dev/
-* Headless UI
-完全无样式、完全可访问的 UI 组件，旨在与 Tailwind CSS 完美集成。
-https://headlessui.com/
-*  View UI Plus
-基于 Vue.js 3 的企业级 UI 组件库和前端解决方案
-https://www.iviewui.com/
-### 2.移动UI库
-*  Vant
-有赞轻量、可靠的移动端组件库
-https://vant-contrib.gitee.io/vant/#/zh-CN
-*  NutUI
-京东风格的轻量级移动端 Vue 组件库，非常适合移动端电商使用。
-https://nutui.jd.com/#/
-* Varlet
-Material 风格移动端组件库 ，文档非常齐全。
-https://varlet.gitee.io/varlet-ui/#/zh-CN/home
-*  nutui-bingo
-京东基于 NutUI 的抽奖组件库，助力营销活动和小游戏场景。
-https://nutui.jd.com/bingo/#/
-### 3.相关工具
-*  unplugin-vue-components
-antfu 按需组件自动导入，开箱即用地支持 Vue 2 和 Vue 3，Tree-shakable，只注册你使用的组件，附有流行UI 库的内置解析器。
-https://www.npmjs.com/package/unplugin-vue-components
-*  vuex-persistedstate
-在页面重新加载之间保持并重载您的 Vuex 状态
-https://github.com/robinvdvleuten/vuex-persistedstate
-*   vuex-persist
-支持 Typescript 的Vuex插件，它能够将应用程序的状态保存到持久存储中，例如 Cookies 或 localStorage
-https://championswimmer.in/vuex-persist/
-*  @vueuse/gesture
-手势库，使应用程序具有交互性
-https://gesture.vueuse.org/
-* unplugin-auto-import
-antfu 自动导入 Vite、Webpack、Rollup 和 esbuild 的 API。支持 TypeScript。
-https://github.com/antfu/unplugin-auto-import
-* pinia-plugin-persistedstate
-Pinia 商店的可配置持久性
-https://github.com/prazdevs/pinia-plugin-persistedstate
-* https://vue-termui.dev/
-一个基于 Vue.js 的终端 UI 框架，可让您轻松构建现代终端应用程序
-https://vue-termui.dev/
-### 4.可视化
-* Pdfvuer
-DF 查看器，使用 Mozilla 的 PDF.js，支持 Vue2 和 Vue3
-https://arkokoley.github.io/pdfvuer/
-* vue3-marquee
-无缝滚动组件
-https://vue3-marquee.vercel.app/
-* Vue-ECharts
-百度ECharts 的 Vue.js 组件。 配置参考Echarts官方 基于 ECharts v5+ 开发，适用于Vue.js 2/3。
-https://vue-echarts.dev/
-*  iconpark
-字节跳动出品，将一个SVG图标转化为多个主题，并生成React图标，Vue图标，svg图标
-https://iconpark.oceanengine.com/home
-### 5.插件
-*  vue-multiselect-next
-Vue.js 的通用选择/多选/标记组件
-https://vue-multiselect.js.org/
-*  vue-print-nb
-用于印刷、简单、快速、方便、轻便的指令包装器
-https://github.com/Power-kxLee/vue-print-nb
-*  vue-i18n-next
-Vue3的国际化插件
-https://vue-i18n.intlify.dev/
-* vue-cropper
-简单的vue图片裁剪插件
-http://github.xyxiao.cn/vue-cropper/example/
-*  Grid Layout
-Vue.js 的网格布局系统
-https://jbaysolutions.github.io/
-* Vue Qrcode Reader
-允许在不离开浏览器的情况下检测和解码二维码
-https://gruhn.github.io/vue-qrcode-reader/
-* Makeit Captcha
-基于 Vue3 + Vite + Canvas 开发的滑块验证码，动态生成验证滑块，结合后端的二次校验，能有效的避免被抓取模拟验证https://admin.makeit.vip/components/captcha
-* vue3-clipboard
-Vue 3 的 clipboard.js
-https://github.com/soerenmartius/vue3-clipboard
-*  vue.draggable
-基于Sortable.js的Vue 3拖放组件
-https://sortablejs.github.io/vue.draggable.next/#/simple
-* BetterScroll
-解决移动端（已支持 PC）各种滚动场景需求的插件。
-https://better-scroll.github.io/docs/zh-CN/
-### 6.相关生态
-* Vue 插件库
-https://www.vue365.cn/
-* Pinia
-轻量级状态管理库，API 设计更接近Vuex 5的提案
-https://pinia.vuejs.org/
-* Nuxt Modules
-Nuxt 发现我们的模块列表以增强您的Nuxt 项目
-https://modules.nuxtjs.org/
-* Nuxt 3
-轻量级应用框架,可用来创建服务端渲染 (SSR) 应用
-https://v3.nuxtjs.org/
-*  vuepress
-Vue 驱动的静态网站生成器
-https://v2.vuepress.vuejs.org/zh/
-* VueUse
-强大的 Vue 组合实用程序集合
-https://vueuse.org/
-### 7.动画
-* vue-starport
-带有动画的跨路由共享组件
-https://vue-starport.netlify.app/
-* @vueuse/motion
-Vue Composables 让你的组件动起来
-https://motion.vueuse.org/
-### 8.音视频
-* @vueuse/sound
-用于播放音效的 Vue 组合
-https://sound.vueuse.org/
 ## 全栈-后端
 ### 插件
 * isomorphic-git
@@ -943,9 +744,6 @@ https://github.com/mrmlnc/fast-glob
 node.js 的流式 torrent 客户端
 https://github.com/mafintosh/peerflix
 ### 工具
-* Nginx
-高性能的HTTP和反向代理web服务器，同时也提供了IMAP/POP3/SMTP服务
-https://blog.redis.com.cn/doc/
 * PM2
 Node进程管理工具，如性能监控、自动重启、负载均衡等
 https://pm2.keymetrics.io/docs/usage/process-management/
@@ -964,19 +762,7 @@ https://github.com/nexe/nexe
 * debug
 模仿 Node.js 核心调试技术的小型 JavaScript 调试实用程序。适用于 Node.js 和 Web 浏览器
 https://github.com/debug-js/debug
-### 数据库
-* mongoose
-旨在在异步环境中工作的 MongoDB 对象建模
-https://mongoosejs.com/
-* GraphQL
-用于 API 的查询语言也是一个满足你数据查询的运行时
-https://graphql.cn/
-* lowdb数据库
-适用于Node，Electron和浏览器的小型JSON数据库。由Lodash驱动
-https://github.com/typicode/lowdb
-* nedb
-适用于Node.js，nw.js，Electron和浏览器的嵌入式持久性数据库或内存数据库,API是MongoDB的子集
-https://github.com/louischatriot/nedb
+
 ### API
 * 网易云音乐 API
 全部接口已升级到最新，具备登录接口,多达200多个接口
@@ -1017,18 +803,3 @@ https://www.free-api.com/
 * douban-imdb-api
 基于豆瓣、IMDB、烂番茄评分的电影电视剧双语(中英)数据api接口
 https://www.iqi360.com/p/douban-imdb-api
-### 框架
-* Koa
-基于 Node.js 平台的下一代 web 开发框架
-https://koajs.com/
-* Express
-用于Node.js 的快速、独立、简约的 Web 框架
-https://expressjs.com/
-* egg.js
-为企业级框架和应用而生
-https://www.eggjs.org/
-* Nest.js
-构建高效且可扩展的服务器端应用程序的渐进式Node.js框架
-https://nestjs.com/
-
-*XMind: ZEN - Trial Version*

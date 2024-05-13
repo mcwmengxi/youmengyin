@@ -1,6 +1,6 @@
 {
   "name": "youmengyin",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "private": true,
   "type": "module",
@@ -29,5 +29,8 @@
         "@algolia/client-search"
       ]
     }
+  },
+  "dependencies": {
+    "oh-my-live2d": "^0.19.3"
   }
 }

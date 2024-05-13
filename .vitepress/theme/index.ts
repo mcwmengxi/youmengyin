@@ -11,5 +11,18 @@ import './style/base.css'
 
 export default {
   ...DefaultTheme,
-  enhanceApp({ app }: { app: App }) {},
+  async enhanceApp({ app }: { app: App }) {
+    if (!import.meta.env.SSR) {
+      const { loadOml2d } = await import('oh-my-live2d')
+      loadOml2d({
+        tips: {
+          style: { top: '-45px' },
+        },
+        models: [
+          { path: "https://cdn.jsdelivr.net/gh/journey-ad/blog-img/live2d/Diana/Diana.model3.json", scale: 0.25},
+          // path: 'https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json'
+        ]
+      })
+    }
+  },
 }

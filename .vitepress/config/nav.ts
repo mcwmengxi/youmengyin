@@ -29,6 +29,10 @@ export default [
       {
         text: '📋Electron',
         link: '/docs/electron/index',
+      },
+      {
+        text: '📋Android',
+        link: '/docs/android/index',
       }
     ]
   },

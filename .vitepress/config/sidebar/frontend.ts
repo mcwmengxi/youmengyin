@@ -282,4 +282,14 @@ function sidebarElectron(){
     },
   ]
 }
-export { sidebarFront, sidebarFlutter, sidebarElectron }
+function sidebarAndroid(){
+  return [
+    {
+      text: 'Android',
+      items: [
+        { text: 'index', link: '/docs/android/index' },
+      ]
+    },
+  ]
+}
+export { sidebarFront, sidebarFlutter, sidebarElectron, sidebarAndroid }

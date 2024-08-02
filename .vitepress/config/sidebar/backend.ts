@@ -14,6 +14,7 @@ const Go = [
   { text: 'rpc', link: '/docs/go/rpc' },
   { text: '断言和反射', link: '/docs/go/assertionOrReflect' },
   { text: 'sync包', link: '/docs/go/sync' },
+  { text: '学习资料', link: 'docs/go/bytedance'}
 ]
 
 function sidebarGo(){

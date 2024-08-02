@@ -101,6 +101,15 @@ function sidebarFront() {
                   link: '/docs/front-end/modules/webpack/plugins'
                 },
               ]
+            },
+            {
+              text: 'Vite',
+              items: [
+                {
+                  text: 'vite基础',
+                  link: '/docs/front-end/modules/vite/basic'
+                },
+              ]
             }
           ]
         },

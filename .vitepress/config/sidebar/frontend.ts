@@ -30,6 +30,7 @@ function sidebarFront() {
             { text: '生成器', link: '/docs/front-end/javascript/generator' },
             { text: 'proxy 代理', link: '/docs/front-end/javascript/proxy' },
             { text: '事件循环', link: '/docs/front-end/javascript/event-loop' },
+            { text: '网页的各种距离', link: '/docs/front-end/javascript/distance' },
           ],
         }, 
         {

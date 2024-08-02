@@ -388,8 +388,9 @@ git config user.email 1395568275@qq.com
   sslverify = false # 禁用 SSL 安全证书检查
 ```
 
+## 实际场景使用git
 
-sourceTree无法使用 https://zhuanlan.zhihu.com/p/637566727
+[**sourceTree无法打开**](https://zhuanlan.zhihu.com/p/637566727)
 
 ```bash
 ERROR [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - Unable to load MEF components
@@ -399,3 +400,34 @@ ERROR [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - U
 
 `C:\Users\mengxi\AppData\Local\Atlassian\SourceTree.exe_Url_fop3hzd4ikr21gr5nqmqd4tnru2hl5kn\3.4.12.0`
 
+**移除本地分支与远程的关联**
+
+```bash
+# 1.查看分支的远程关联
+git branch -vv
+
+# 2.移除远程关联
+git branch --unset-upstream
+
+git branch -vv
+```
+
+**多个提交合并成一个**
+
+```bash
+# 1.查看提交记录
+git log -8 --oneline
+
+# 2.选择合并范围 假设你想要合并最近的四个commits
+git rebase -i HEAD~4
+
+# 3.进行交互式变基 在打开的编辑器中，你会看到一列commit列表，每个commit前都有一个命令提示符，默认是pick。要将多个commits合并为一个，你需要将除了第一个commit之外的其他commit前的pick改为squash或者s。这告诉Git要将这些commits与前一个commit合并。
+
+# 4.按esc退出编译模式，按大写ZZ保存并关闭编辑器，Git会开始rebase的过程。如果有需要，它会停下来让你解决合并期间产生的冲突。
+
+# 5.编辑合并后的提交信息 Git将会打开一个新的编辑器窗口，让你编辑最终的提交信息。
+
+# 6.查看合并后日志并推送到远程
+git log --oneline
+git push --force 
+```

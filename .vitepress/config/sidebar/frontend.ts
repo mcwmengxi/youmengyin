@@ -256,10 +256,20 @@ function sidebarFlutter(){
     {
       text: 'flutter基础',
       items: [
-        { text: 'index', link: '/views/flutter/index' },
-        { text: '基础入门', link: '/views/flutter/base'},
+        { text: 'index', link: '/docs/flutter/index' },
+        { text: '基础入门', link: '/docs/flutter/base'},
       ]
     },
   ]
 }
-export { sidebarFront, sidebarFlutter }
+function sidebarElectron(){
+  return [
+    {
+      text: 'Electron',
+      items: [
+        { text: 'index', link: '/docs/electron/index' },
+      ]
+    },
+  ]
+}
+export { sidebarFront, sidebarFlutter, sidebarElectron }

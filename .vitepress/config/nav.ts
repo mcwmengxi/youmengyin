@@ -25,6 +25,10 @@ export default [
       {
         text: '📋Flutter ',
         link: '/docs/flutter/index',
+      },
+      {
+        text: '📋Electron',
+        link: '/docs/electron/index',
       }
     ]
   },

@@ -4,6 +4,6 @@ export { default as sidebarPatterns } from './patterns'
 
 export { sidebarDesign } from './vue-source'
 export { sidebarArticle } from './article'
-export { sidebarFront, sidebarFlutter } from './frontend'
+export * from './frontend'
 export { sidebarDevelops, sidebarTools } from './develops'
 export { sidebarGo, sidebarSql, sidebarReg, sidebarOtherBe } from './backend'

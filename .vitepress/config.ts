@@ -33,7 +33,10 @@ export default defineConfig({
   themeConfig: {
     siteTitle: '浅月流歌', // 自定义此项以替换导航中的默认网站标题
     outlineTitle: '目录', // 自定义右侧边栏的标题
-    outline: [2, 6], // 要在大纲中显示的页眉级别
+    outline: {
+      level: [2, 6], // 要在大纲中显示的页眉级别
+      label: '文章目录'
+    },
     // 编辑链接允许您显示一个链接，用于在 Git 管理服务（如 GitHub 或 GitLab）上编辑页面
     editLink: {
       pattern: 'https://github.com/mcwmengxi/youmengyin/edit/master/docs/:path',

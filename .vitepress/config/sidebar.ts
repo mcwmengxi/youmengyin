@@ -1,6 +1,6 @@
 import { DefaultTheme } from 'vitepress'
 import glob from 'fast-glob'
-import { sidebarInterview,sidebarAlgorithm, sidebarPatterns, sidebarDesign,sidebarFlutter, sidebarArticle,sidebarTools, sidebarGo, sidebarSql,sidebarReg, sidebarOtherBe, sidebarFront, sidebarDevelops } from './sidebar/index'
+import { sidebarInterview,sidebarAlgorithm, sidebarPatterns, sidebarDesign,sidebarFlutter, sidebarArticle,sidebarTools, sidebarGo, sidebarSql,sidebarReg, sidebarOtherBe, sidebarFront, sidebarDevelops, sidebarReact } from './sidebar/index'
 import { sidebarAndroid, sidebarElectron } from './sidebar/frontend'
 
 export function getSidebarsItems(path: string, rootPath: string = 'docs') {
@@ -55,6 +55,7 @@ export default {
 
   // 前端
   '/docs/front-end': sidebarFront(),
+  '/docs/front-end/react/': sidebarReact(),
   // flutter
   '/docs/flutter': sidebarFlutter(),
   '/docs/electron': sidebarElectron(),

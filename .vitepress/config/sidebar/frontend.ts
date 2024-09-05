@@ -1,6 +1,6 @@
 import { getSidebarsItems } from '../sidebar'
 
-function sidebarFront() {
+export function sidebarFront() {
   return [
     {
       text: '前端',
@@ -261,7 +261,20 @@ function sidebarFront() {
     },
   ]
 }
-function sidebarFlutter(){
+
+export function sidebarReact() {
+  return [
+    {
+      text: '入门',
+      items: [
+        { text: 'React基本介绍', link: '/docs/front-end/react/basic/introduce' },
+        { text: 'React开发环境搭建', link: '/docs/front-end/react/basic/development' },
+        { text: 'tsx语法入门', link: '/docs/front-end/react/basic/tsx' },
+      ]
+    },
+  ]
+}
+export function sidebarFlutter(){
   return [
     {
       text: 'flutter基础',
@@ -272,7 +285,7 @@ function sidebarFlutter(){
     },
   ]
 }
-function sidebarElectron(){
+export function sidebarElectron(){
   return [
     {
       text: 'Electron',
@@ -282,7 +295,7 @@ function sidebarElectron(){
     },
   ]
 }
-function sidebarAndroid(){
+export function sidebarAndroid(){
   return [
     {
       text: 'Android',
@@ -292,4 +305,3 @@ function sidebarAndroid(){
     },
   ]
 }
-export { sidebarFront, sidebarFlutter, sidebarElectron, sidebarAndroid }

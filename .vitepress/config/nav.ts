@@ -23,6 +23,10 @@ export default [
         link: '/docs/front-end/index',
       },
       {
+        text: '📋React',
+        link: '/docs/front-end/react/basic/introduce',
+      },
+      {
         text: '📋Flutter ',
         link: '/docs/flutter/index',
       },

@@ -272,6 +272,13 @@ export function sidebarReact() {
         { text: 'tsx语法入门', link: '/docs/front-end/react/basic/tsx' },
       ]
     },
+    {
+      text: '工具',
+      items: [
+        { text: 'Babel', link: '/docs/front-end/react/tools/babel' },
+        { text: 'Swc', link: '/docs/front-end/react/tools/swc' },
+      ]
+    },
   ]
 }
 export function sidebarFlutter(){

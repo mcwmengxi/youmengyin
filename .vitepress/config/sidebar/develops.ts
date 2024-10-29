@@ -7,6 +7,7 @@ const devlops = [
   { text: 'mysql', link: '/docs/devops/mysql' },
   { text: 'redis', link: '/docs/devops/redis' },
   { text: 'shell', link: '/docs/devops/shell' },
+  { text: 'vscode', link: '/docs/devops/vscode' }
 ]
 const linux = [
   { text: 'index', link: '/docs/devops/linux/index' },

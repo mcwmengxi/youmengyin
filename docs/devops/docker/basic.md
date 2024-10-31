@@ -217,3 +217,252 @@ on:
   pull_request:
     branches: [ main ]
 ```
+
+3.jobs： 定义一个或多个作业，每个作业可以运行在不同的环境中
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+```
+
+4.steps： 每个作业由一系列步骤组成，这些步骤可以是 shell 命令、脚本或使用预构建的 Action：
+
+```yaml
+steps:
+  - name: Checkout code
+    uses: actions/checkout@v2
+  - name: Run tests
+    run: |
+      npm install
+      npm test
+```
+
+5.环境变量： 可以在工作流中定义和使用环境变量：
+
+```yaml
+env:
+  NODE_VERSION: '14.x'
+```
+
+6.uses： 引用 GitHub Marketplace 上的 Action，例如：
+
+```yaml
+- name: Setup Node.js environment
+  uses: actions/setup-node@v2
+  with:
+    node-version: ${{ env.NODE_VERSION }}
+
+```
+
+7.with： 传递参数给 Action：
+
+```yaml
+- name: Publish package to NPM
+  run: |
+    npm publish
+  env:
+    NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+```
+
+8.needs： 定义作业之间的依赖关系：
+
+```yaml
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+```
+
+9.strategy： 在多个环境中并行运行作业：
+
+```yaml
+strategy:
+  matrix:
+    os: [ubuntu-latest, windows-latest]
+
+```
+
+10.if 条件： 控制步骤是否执行：
+
+```yaml
+- name: Deploy to production
+  if: github.ref == 'refs/heads/main'
+  run: |
+    # deployment logic here
+
+
+```
+
+## 使用 Docker Compose 部署 nest 项目
+
+### 编写 Dockerfile
+
+Dockerfile 文件内容如下：
+
+```Dockerfile
+
+# 构建阶段
+FROM node:20.0 AS build-stage
+
+WORKDIR /app
+
+# 设置 npm 镜像源
+RUN npm config set registry https://registry.npmmirror.com/
+
+# 安装 pnpm 并设置 pnpm 镜像源
+RUN npm install -g pnpm \
+    && pnpm config set registry https://registry.npmmirror.com/
+
+# 复制 package.json 和 pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
+
+# 使用 pnpm 安装依赖
+RUN pnpm install
+
+# 复制所有源代码并构建应用
+COPY . .
+RUN pnpm run build
+
+# 生产阶段
+FROM node:20 AS production-stage
+
+WORKDIR /app
+
+# 从构建阶段复制构建结果和依赖
+COPY --from=build-stage /app/dist /app/dist
+COPY --from=build-stage /app/node_modules /app/node_modules
+COPY --from=build-stage /app/config /app/config
+
+# 暴露端口并启动应用
+EXPOSE 3000
+CMD ["node", "dist/main.js"]
+
+```
+
+**文件解释**
+这段Dockerfile描述了一个典型的多阶段构建过程，用于构建和部署Node.js应用程序。下面是对每一部分的详细解释：
+
+**构建阶段 (Build Stage)**
+FROM node:20.0 AS build-stage
+
+- 使用Node.js 20.0版本作为构建阶段的基础镜像。
+
+WORKDIR /app
+
+- 设置工作目录为/app。
+
+设置 npm 镜像源
+
+- 更改npm的默认注册表为<https://registry.npmmirror.com/，这有助于加速依赖包的下载。>
+
+安装 pnpm 并设置 pnpm 镜像源
+
+- 全局安装pnpm，并将其注册表也更改为<https://registry.npmmirror.com/。>
+
+复制 package.json 和 pnpm-lock.yaml
+
+- 将package.json和pnpm-lock.yaml文件复制到容器内的/app目录。
+
+使用 pnpm 安装依赖
+
+- 使用pnpm安装项目依赖。
+
+复制所有源代码并构建应用
+
+- 将项目的所有源代码复制到容器内。
+运行pnpm run build命令来构建应用。
+
+**生产阶段 (Production Stage)**
+FROM node:20 AS production-stage
+
+- 使用Node.js 20版本作为生产阶段的基础镜像。
+
+从构建阶段复制构建结果和依赖
+
+- 从构建阶段复制编译后的文件(dist)、依赖包(node_modules)以及配置文件(config)到生产阶段的容器内。
+
+暴露端口并启动应用
+
+- 暴露3000端口，这是应用监听的端口。
+启动应用，使用node dist/main.js命令。
+
+这种多阶段构建方法有以下优点：
+
+>减小最终镜像的大小，因为构建阶段的临时文件不会被包含在最终的生产镜像中。
+提高安全性，因为生产镜像只包含必要的文件和依赖，没有构建工具。
+加快构建速度，因为构建阶段和生产阶段可以独立优化。
+
+### 编写 docker-compose.yml
+
+```yaml
+
+version: '3'
+# 定义服务，即需要运行的容器集合
+services:
+  nest-app:
+    container_name: nest-app
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    # 定义该服务所依赖的其他服务，它们将按照依赖顺序启动
+    depends_on:
+      - mysql-container
+      - redis-container
+    # 定义项目环境变量
+    environment:
+      - NODE_ENV=prod
+    ports:
+      - '3000:3000'
+    networks:
+      - common-network
+
+  # 定义一个名为'mysql-container'的服务，使用mysql镜像
+  mysql-container:
+    container_name: mysql-container
+    image: mysql
+    restart: always
+    ports:
+      - '3306:3306'
+    # 数据卷配置，用于持久化存储
+    volumes:
+      - /home/Unusual-server/mysql/log:/var/log
+      - /home/Unusual-server/mysql/data:/var/lib/mysql
+      # - /home/Unusual-server/mysql/conf.d:/ect/mysql/conf.d
+      # 初始执行的SQL文件，可用于初始化数据库
+      # - /home/Unusual-server/mysql/init:/docker-entrypoint-initdb.d/
+    environment:
+      MYSQL_DATABASE: us
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      # 设置容器时区
+      TZ: 'Asia/Shanghai'
+    command: --character-set-server=utf8mb4
+      --collation-server=utf8mb4_general_ci
+      --explicit_defaults_for_timestamp=true
+    networks:
+      - common-network
+
+  # 定义一个名为'redis-container'的服务，使用redis镜像
+  redis-container:
+    container_name: redis-container
+    image: redis
+    # 初始配置密码
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD}"]
+    ports:
+      - '6379:6379'
+    # 数据卷配置，用于持久化存储
+    volumes:
+      - /home/Unusual-server/redis:/data
+    networks:
+      - common-network
+# 创建网络桥
+networks:
+  common-network:
+    driver: bridge
+
+```

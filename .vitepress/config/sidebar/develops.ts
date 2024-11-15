@@ -18,6 +18,7 @@ const linux = [
 const docker = [
   { text: 'docker', link: '/docs/devops/docker/docker' },
   { text: 'docker常用命令', link: '/docs/devops/docker/basic' },
+  { text: 'docker容器编排', link: '/docs/devops/docker/docker-compose' },
 ]
 
 function sidebarDevelops() {

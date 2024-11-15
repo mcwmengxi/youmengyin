@@ -1,8 +1,8 @@
-## Docker
+# Docker
 
 查看jdk版本 `yum search java|grep jdk`
 
-### Docker概述
+## Docker概述
 
 >由客户端、远程仓库、服务器组成
 
@@ -16,8 +16,8 @@
 
 查看系统内核 `uname -r`
 
-查看配置信息 	`cat /etc/os-release`
-![](https://img-blog.csdnimg.cn/70190a5c7cf14099938e27f13ab47799.png)
+查看配置信息  `cat /etc/os-release`
+![信息](https://img-blog.csdnimg.cn/70190a5c7cf14099938e27f13ab47799.png)
 
 ```shell
 // 移除docker旧的版本
@@ -37,6 +37,7 @@ yum install -y yum-utils
 // 3.设置镜像仓库
 yum-config-manager \ --add-repo \ https://download.docker.com/linux/centos/docker-ce.repo # 默认是国外的
 yum-config-manager \ --add-repo \ http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo # 推荐使用阿里云的
+sudo sed -i 's/download.docker.com/mirrors.aliyun.com\/docker-ce/g' /etc/yum.repos.d/docker-ce.repo
 // 4.安装docker包 docker-ce 社区版 ee企业版
 
  首先更新yum软件索引 `yum makecache fast`
@@ -50,7 +51,7 @@ yum-config-manager \ --add-repo \ http://mirrors.aliyun.com/docker-ce/linux/cent
 
  :rocket:运行`hello-world`镜像
 
-![](https://img-blog.csdnimg.cn/2579e49de8944579b1f523da0e96fa6b.png)
+![结果](https://img-blog.csdnimg.cn/2579e49de8944579b1f523da0e96fa6b.png)
 
 查看镜像`docker images`
 
@@ -75,9 +76,29 @@ nginx           1.10      0346349a1a64   5 years ago     182MB
 
 `rm -rf /var/lib/containerd`
 
-### 阿里云镜像加速
+## 建立 docker 用户组
 
-![](https://img-blog.csdnimg.cn/9f25c969936a42f48fd6f74e61b1ca74.png)
+>默认情况下，docker 命令会使用 Unix socket 与 Docker 引擎通讯。而只有 root 用户和 docker 组的用户才可以访问 Docker 引擎的 Unix socket。出于安全考虑，一般 Linux 系统上不会直接使用 root 用户。因此，更好地做法是将需要使用 docker 的用户加入 docker 用户组。
+
+建立 docker 组：
+
+```bash
+sudo groupadd docker
+```
+
+将当前用户加入 docker 组：
+
+```bash
+sudo usermod -aG docker $USER
+```
+
+退出当前终端并重新登录(或者使用 newgrp docker 命令使更改生效)，进行如下测试。
+
+## 镜像加速
+
+[DockerHub国内镜像源列表](!https://github.com/dongyubin/DockerHub)
+
+![阿里云镜像加速](https://img-blog.csdnimg.cn/9f25c969936a42f48fd6f74e61b1ca74.png)
 
 **配置加速**
 
@@ -86,7 +107,7 @@ sudo mkdir -p /etc/docker
 
 sudo tee /etc/docker/daemon.json <<-'EOF'
 {
-  "registry-mirrors": ["https://20jyns64.mirror.aliyuncs.com"]
+  "registry-mirrors": ["https://20jyns64.mirror.aliyuncs.com", "https://hub.geekery.cn"]
 }
 EOF
 sudo systemctl daemon-reload
@@ -103,6 +124,7 @@ docker run -d -u root --rm -p 9510:8080 --name jenkins -v jenkins-data:/var/jenk
 ```
 
 **开放端口**
+
 ```shell
 # firewall-cmd --query-port=9510/tcp
 # firewall-cmd --zone=public --add-port=9510/tcp --permanent
@@ -121,9 +143,34 @@ http://101.132.70.183:9510/
 jenkins_token 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
 ```
 
+## 添加内核参数
+
+如果在 CentOS 使用 Docker 看到下面的这些警告信息：
+
+```bash
+WARNING: bridge-nf-call-iptables is disabled
+WARNING: bridge-nf-call-ip6tables is disabled
+```
+
+请添加内核配置参数以启用这些功能。
+
+```bash
+$ sudo tee -a /etc/sysctl.conf <<-EOF
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+```
+
+然后重新加载 sysctl.conf 即可
+
+```bash
+sudo sysctl -p
+```
+
 ### Windows Docker
 
 setting -> Docker Engine -> apply & restart 配置镜像加速
+
 ```json
 {
   "debug": true,
@@ -140,21 +187,24 @@ setting -> Docker Engine -> apply & restart 配置镜像加速
 #### 镜像image命令
 
 如果 `docker images` 出现 REPOSITORY 是none的情况，可以先运行 `docker image prune` 删除
+
 ```shell
 # [root@docker01 ~]# docker images
 REPOSITORY          TAG                 IMAGE ID            CREATED             SIZE
 centos              latest              831691599b88        4 weeks ago         215MB
 ```
+
 下载镜像： `docker pull <image-name>:<tag>`
 查看所有镜像 `docker images`
 删除镜像 `docker rmi <image-id>`
 上传镜像 `docker push <username>/<repository>:<tag>`，要先注册 hub.docker.com
 
-
-#### 容器命令：
+#### 容器命令
 
 docker run 【可选参数】 镜像名 启动镜像
-#参数说明
+
+# 参数说明
+
 –nane="Name”容器名字 tomcat01 tomcat02，用来区分容器
 -d 后台方式运行
 -it 使用交互方式运行，进入容器查看内容
@@ -172,11 +222,11 @@ docker run 【可选参数】 镜像名 启动镜像
 查看容器日志 `docker logs <container-id>`
 进入容器控制台 `docker exec -it <container-id> /bin/sh`
 
-
 ##### 启动一个Docker容器
 
 拉取镜像 `docker pull nginx`
 查看镜像 `docker images`
+
 ```shell
 PS C:\Users\QSKJ-00330> docker images
 REPOSITORY    TAG            IMAGE ID       CREATED         SIZE
@@ -192,6 +242,7 @@ redis         6.0.6          1319b1eaa0b7   2 years ago     104MB
 docker 容器使用后台启动，需要有一个前台应用，如果没有，docker就会自动停止运行
 
 查看容器列表 `docker ps`
+
 ```shell
 PS C:\Users\QSKJ-00330> docker run -p 81:80 -d --name nginx-test nginx
 0c96d41f0293b969ff41371e870a090979f19039df6c1d2a2fc898d29d385ed9
@@ -199,11 +250,13 @@ PS C:\Users\QSKJ-00330> docker ps
 CONTAINER ID   IMAGE     COMMAND                  CREATED          STATUS          PORTS                NAMES
 0c96d41f0293   nginx     "/docker-entrypoint.…"   54 seconds ago   Up 52 seconds   0.0.0.0:81->80/tcp   nginx-test
 ```
+
 主机验证nginx `http://localhost:81/`
 
 查看容器进程信息 docker top [container_id]
 
 查看镜像元数据 docker inspect [container_id]
+
 ```shell
 PS C:\Users\QSKJ-00330> docker inspect 0c96
 [
@@ -212,7 +265,6 @@ PS C:\Users\QSKJ-00330> docker inspect 0c96
     }
 ]
 ```
-
 
 查看容器日志
 -t 日志加上时间
@@ -232,7 +284,7 @@ PS C:\Users\QSKJ-00330> docker logs 0c96
 `docker exec -it 0c96 /bin/sh` 进入容器后开启一个新的终端
 docker attach [container_id] 进入容器后正在执行的终端，，不会启动新的进程
 
-`exit ` 退出控制台
+`exit` 退出控制台
 
 停止容器 `docker stop 0c96`
 
@@ -303,6 +355,7 @@ redis               6.0.6          1319b1eaa0b7   2 years ago      104MB
 ```
 
 启动容器验证
+
 ```bash
 // 启动容器
 docker run -p 8081:3000 -d --name youmengyin1 youmengyin-server
@@ -315,6 +368,7 @@ docker logs 4b8
 ### 注意点
 
 设置docker 开机自启
+
 ```shell
 查看已经启动的服务 
 systemctl list-units -lype=service
@@ -330,6 +384,7 @@ systemctl disable docker.service
 ```
 
 设置docker容器自动启动
+
 ```shell
 启动时加restart-always
 docker run -tid -name 容器id -p 端口号 -restart-always -v 挂载
@@ -339,12 +394,14 @@ docker update --restart = always 容器id
 ```
 
 restart可选项
+
 - no 不自动重启容器 默认
 - on-failure 容器发生错误而退出（容器退出状态不为0）重启容器
 - unless-stopped 在容器已经stop或docker stop/restart的时候重启容器
 - always 在容器已经stop或docker stop/restart的时候重启容器
 
 常用命令
+
 ```shell
 docker ps 查看当前运行中的容器
 docker images 查看镜像列表
@@ -358,6 +415,7 @@ docker network ls 查看网络列表
 ## 挂载主机目录
 
 ### 数据卷
+
 ```bash
 # 创建一个数据卷
 $ docker volume create my-vol
@@ -386,6 +444,7 @@ Docker 挂载主机目录的默认权限是 `读写`，用户也可以通过增�
 docker exec -it 58b73728634a bash
 docker attach 58b73728634a
 ```
+
 `exec`如果从这个bash中 exit，不会导致容器的停止,而`attach`会
 
 ```bash
@@ -400,8 +459,9 @@ echo "test file" > test.txt
 在主机里使用以下命令可以查看 `web` 容器的信息
 
 ```bash
-$ docker inspect web
+docker inspect web
 ```
+
 `挂载主机目录` 的配置信息在 "Mounts" Key 下面
 
 ```json
@@ -416,6 +476,7 @@ $ docker inspect web
       }
   ],
 ```
+
 ### 挂载一个本地主机文件作为数据卷
 
 `--mount` 标记也可以从主机挂载单个文件到容器中
@@ -432,12 +493,12 @@ root@2affd44b4667:/# history
 1  ls
 2  diskutil list
 ```
+
 这样就可以记录在容器输入过的命令了。
 
 ## Docker 中的网络Network
 
 >docker 允许通过外部访问容器或容器互联的方式来提供网络服务。
-
 
 ### 外部访问容器
 
@@ -461,7 +522,6 @@ $ docker logs 58b7
 ```
 
 `-p` 则可以指定要映射的端口，并且，在一个指定端口上只可以绑定一个容器。支持的格式有 `ip:hostPort:containerPort | ip::containerPort | hostPort:containerPort`。
-
 
 ```bash
 # 映射所有接口地址
@@ -491,12 +551,12 @@ PS E:\learn-project> docker port  58b7 80
 ```
 
 注意：
-* 容器有自己的内部网络和 ip 地址（使用 `docker inspect` 查看，Docker 还可以有一个可变的网络配置。）
-* `-p` 标记可以多次使用来绑定多个端口
+
+- 容器有自己的内部网络和 ip 地址（使用 `docker inspect` 查看，Docker 还可以有一个可变的网络配置。）
+- `-p` 标记可以多次使用来绑定多个端口
 
 例如
 
 ```bash
-$ docker run -d  -p 80:80  -p 443:443 nginx
+docker run -d  -p 80:80  -p 443:443 nginx
 ```
-

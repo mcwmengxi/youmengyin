@@ -50,7 +50,8 @@ export default [
       },
       { text: '📃 Java基础', link: '/views/after-end/java/basic/extend' },
       { text: '📃SQL常用语句', link: '/views/sql/common-sql' },
-      { text: '📃 正则基础', link: '/views/regexp/reg01' }
+      { text: '📃 正则基础', link: '/views/regexp/reg01' },
+      { text: '📃 构建工具', link: '/views/after-end/build-tools/gradle-basic' },
     ]
   },
   {

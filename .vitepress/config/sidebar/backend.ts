@@ -86,6 +86,20 @@ function sidebarOtherBe() {
         },
       ]
     },
+    {
+      text: '构建工具',
+      items: [
+        {
+          text: 'Gradle',
+          items: [
+            {
+              text: 'Gradle基础',
+              link: '/views/after-end/build-tools/gradle-basic'
+            }
+          ]
+        },
+      ]
+    },
   ]
 }
 

@@ -289,6 +289,7 @@ export function sidebarFlutter(){
       items: [
         { text: 'index', link: '/docs/flutter/index' },
         { text: '基础入门', link: '/docs/flutter/base'},
+        { text: 'dart基础语法', link: '/docs/flutter/dart'},
       ]
     },
   ]

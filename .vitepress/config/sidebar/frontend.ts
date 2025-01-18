@@ -277,6 +277,7 @@ export function sidebarReact() {
       items: [
         { text: 'Babel', link: '/docs/front-end/react/tools/babel' },
         { text: 'Swc', link: '/docs/front-end/react/tools/swc' },
+        { text: '简易版Vdom', link: '/docs/front-end/react/tools/vdom' }
       ]
     },
   ]

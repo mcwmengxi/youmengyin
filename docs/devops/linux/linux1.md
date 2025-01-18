@@ -73,7 +73,6 @@ cat
 1. more
 2. less
 
-
 which
 
 用于查找并显示指定命令的绝对路径
@@ -271,7 +270,6 @@ history -d 1108  # 删除1108行的命令
 
 >另外，历史命令默认只会保存最近执行的1000条命令
 
-
 ## 软件包管理
 
 不同的发行版，这个命令是不一样的，这个需要注意
@@ -339,28 +337,28 @@ reboot
 
 ## 参考文档
 
-linux常见基础命令 https://blog.csdn.net/tjfsuxyy/article/details/130609676
+linux常见基础命令 <https://blog.csdn.net/tjfsuxyy/article/details/130609676>
 
-linux常用操作命令 https://blog.csdn.net/fuhanghang/article/details/128848825
+linux常用操作命令 <https://blog.csdn.net/fuhanghang/article/details/128848825>
 
-windows向linux传文件 https://www.linuxprobe.com/wxlcwjkjjbcz.html
+windows向linux传文件 <https://www.linuxprobe.com/wxlcwjkjjbcz.html>
 
-date时间 https://blog.csdn.net/weixin_43901998/article/details/126634560
+date时间 <https://blog.csdn.net/weixin_43901998/article/details/126634560>
 
-uptime https://blog.csdn.net/z19861216/article/details/130881624
+uptime <https://blog.csdn.net/z19861216/article/details/130881624>
 
-磁盘空间 https://www.linuxprobe.com/learn-how-to-2.html
+磁盘空间 <https://www.linuxprobe.com/learn-how-to-2.html>
 
-free命令 https://blog.csdn.net/AnChenliang_1002/article/details/131465963
+free命令 <https://blog.csdn.net/AnChenliang_1002/article/details/131465963>
 
-echo命令 https://baijiahao.baidu.com/s?id=1762535150936455782&wfr=spider&for=pc
+echo命令 <https://baijiahao.baidu.com/s?id=1762535150936455782&wfr=spider&for=pc>
 
-ifconfig https://blog.csdn.net/jks212454/article/details/131208875
+ifconfig <https://blog.csdn.net/jks212454/article/details/131208875>
 
-yum目录 https://blog.51cto.com/u_15867943/6165536
+yum目录 <https://blog.51cto.com/u_15867943/6165536>
 
-yum源配置 https://www.python100.com/html/61245.html
+yum源配置 <https://www.python100.com/html/61245.html>
 
-scp命令 https://www.lxlinux.net/3090.html
+scp命令 <https://www.lxlinux.net/3090.html>
 
-du命令 https://blog.csdn.net/AnChenliang_1002/article/details/131466834
+du命令 <https://blog.csdn.net/AnChenliang_1002/article/details/131466834>

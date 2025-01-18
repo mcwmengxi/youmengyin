@@ -13,7 +13,8 @@ const linux = [
   { text: 'index', link: '/docs/devops/linux/index' },
   { text: 'linux基础', link: '/docs/devops/linux/basic' },
   { text: 'linux', link: '/docs/devops/linux/linux' },
-  { text: 'linux初体验', link: '/docs/devops/linux/linux1'}
+  { text: 'linux初体验', link: '/docs/devops/linux/linux1' },
+  { text: '2025学习', link: '/docs/devops/linux/2025'},
 ]
 
 function sidebarDevelops() {

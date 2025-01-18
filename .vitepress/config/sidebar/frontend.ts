@@ -310,6 +310,7 @@ export function sidebarAndroid(){
       text: 'Android',
       items: [
         { text: 'index', link: '/docs/android/index' },
+        { text: '基础', link: '/docs/android/basic' },
       ]
     },
   ]

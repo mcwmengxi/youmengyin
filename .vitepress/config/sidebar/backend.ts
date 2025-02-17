@@ -1,24 +1,31 @@
+import { getSidebarsItems } from "../sidebar"
+
 const Go = [
-  { text: '介绍', link: '/docs/go/index' },
-  { text: '安装', link: '/docs/go/install' },
-  { text: '变量声明', link: '/docs/go/variable' },
-  { text: '数组使用', link: '/docs/go/array' },
-  { text: '切片', link: '/docs/go/slice' },
-  { text: '结构体', link: '/docs/go/struct' },
-  { text: '位运算', link: '/docs/go/bitwise' },
-  { text: '集合', link: '/docs/go/map' },
-  { text: '循环', link: '/docs/go/cycle' },
-  { text: '函数', link: '/docs/go/function' },
-  { text: '通道', link: '/docs/go/chan' },
-  { text: 'orm', link: '/docs/go/xorm' },
-  { text: 'rpc', link: '/docs/go/rpc' },
-  { text: '断言和反射', link: '/docs/go/assertionOrReflect' },
-  { text: 'sync包', link: '/docs/go/sync' },
-  { text: '学习资料', link: 'docs/go/bytedance'}
+  { text: '介绍', link: '/docs/backend/go/index' },
+  { text: '安装', link: '/docs/backend/go/install' },
+  { text: '变量声明', link: '/docs/backend/go/variable' },
+  { text: '数组使用', link: '/docs/backend/go/array' },
+  { text: '切片', link: '/docs/backend/go/slice' },
+  { text: '结构体', link: '/docs/backend/go/struct' },
+  { text: '位运算', link: '/docs/backend/go/bitwise' },
+  { text: '集合', link: '/docs/backend/go/map' },
+  { text: '循环', link: '/docs/backend/go/cycle' },
+  { text: '函数', link: '/docs/backend/go/function' },
+  { text: '通道', link: '/docs/backend/go/chan' },
+  { text: 'orm', link: '/docs/backend/go/xorm' },
+  { text: 'rpc', link: '/docs/backend/go/rpc' },
+  { text: '断言和反射', link: '/docs/backend/go/assertionOrReflect' },
+  { text: 'sync包', link: '/docs/backend/go/sync' },
+  { text: '学习资料', link: 'docs/backend/go/bytedance'}
 ]
 
+const Kratos = getSidebarsItems('/backend/micro-service/kratos')
+
 function sidebarGo(){
-  return[{ text: 'Go', items: Go, collapsible: true, collapsed: true }]
+  return [
+    { text: 'Go', items: Go, collapsible: true, collapsed: true },
+    { text: '微服务框架Kratos', items: Kratos, collapsible: true, collapsed: true },
+  ]
 }
 
 function sidebarSql(){

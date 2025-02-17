@@ -43,7 +43,7 @@ export default [
   {
     text: '💻后端',
     items: [
-      { text: '⭐ GoLang基础', link: '/docs/go/index' },
+      { text: '⭐ GoLang基础', link: '/docs/backend/go/index' },
       {
         text: '📃 Python基础',
         link: '/views/after-end/python/PandasCodeSnippet'

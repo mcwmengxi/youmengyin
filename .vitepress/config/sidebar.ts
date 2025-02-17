@@ -66,7 +66,8 @@ export default {
   // 后端
   '/views/after-end': sidebarOtherBe(),
   // GoLang
-  '/docs/go': sidebarGo(),
+  '/docs/backend/go': sidebarGo(),
+  '/docs/backend/micro-service': sidebarGo(),
   // sql
   '/views/sql/': sidebarSql(),
   // 正则

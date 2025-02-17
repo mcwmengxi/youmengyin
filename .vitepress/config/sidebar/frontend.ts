@@ -257,6 +257,21 @@ export function sidebarFront() {
             },
           ]
         },
+        {
+          text: '前端代码规范和约束',
+          collapsed: true,
+          items: [
+            {
+              text: '代码检查',
+              link: '/docs/front-end/tooling/code-specification'
+            },
+            {
+              text: '提交校验',
+              link: '/docs/front-end/tooling/submit-specification'
+            },
+            
+          ]
+        },
       ]
     },
   ]

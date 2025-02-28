@@ -1,4 +1,4 @@
-# Git 基础知识
+****# Git 基础知识
 
 ## 常用命令
 
@@ -17,7 +17,6 @@
 | git pull origin master    | 同步分支到本地                |
 | git reset --hard 版本号   | 获取历史版本                  |
 | git remote add origin xxx | 关联远程仓库                  |
-
 
 ## 基本操作
 
@@ -87,6 +86,7 @@ git restore --staged filename
 # 第二步，撤销暂存区的修改
 git restore filename
 ```
+
 ## 分支管理
 
 创建和切换
@@ -148,6 +148,7 @@ git switch -c newBranchName
 ```
 
 **合并其它分支的某个commit到当前分支**
+
 ```bash
 git cherry-pick commit_id
 ```
@@ -189,7 +190,7 @@ git push -f
 ssh-keygen -t rsa -b 4096 -C "邮箱"
 ```
 
-连续敲击 3 次回车，即可 `/c/Users/` 当前用户` /.ssh/` 目录中生成 `id_rsa` 和 `id_rsa.pub` 两个文件
+连续敲击 3 次回车，即可 `/c/Users/` 当前用户`/.ssh/` 目录中生成 `id_rsa` 和 `id_rsa.pub` 两个文件
 
 ## 远程仓库
 
@@ -283,6 +284,7 @@ git tag
 # 将本地的tag提交到远程仓库
 git push --tag
 ```
+
 ## 修改用户名和邮箱
 
 输入命令：
@@ -292,9 +294,7 @@ git config --global user.name 'xxxxx'
 git config --global user.email 'xxxxx@qq.com'
 ```
 
-
 ## 合并两个没有共同历史提交记录的分支
-
 
 某个git仓库原有master分支，后面自己本地新建了一个项目，然后把新建的这个推到了这个仓库的另外一个分支temp
 直接合并报错`fatal: refusing to merge unrelated histories`
@@ -310,7 +310,6 @@ git config --global user.email 'xxxxx@qq.com'
 2.执行`git rebase --onto temp`进行变基操作
 ![](https://img-blog.csdnimg.cn/32c39134241b44d9bfa92adcc67dea45.png)
 
-
 3.在该分支上拉取允许不相关历史的操作,然后手动解决冲突
 
 `git pull --allow-unrelated-histories`
@@ -318,7 +317,6 @@ git config --global user.email 'xxxxx@qq.com'
 ![](https://img-blog.csdnimg.cn/e8ec89309aaf4844a74889efab64fde6.png)
 
 4.解决冲突，提交推送到远程
-
 
 ```bash
 npm config set registry http://registry.npmmirror.com
@@ -329,7 +327,7 @@ https://registry.npmjs.org
 
 **ssh**
 
-` ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
+`ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
 
 config
 
@@ -347,7 +345,6 @@ Port 443
 sourcetree添加ssh秘钥
 `ssh -T git@github.com`
 
-
 解除ssh验证
 
 `git config --global http.sslVerify false`
@@ -355,7 +352,6 @@ sourcetree添加ssh秘钥
 ## 用户账号管理
 
 >如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
-
 
 **管理同一目录下的配置**
 
@@ -368,12 +364,14 @@ sourcetree添加ssh秘钥
 ```
 
 修改git的全局配置文件.gitconfig,把当前目录添加全局配置文件中
+
 ```bash
 [includeIf "gitdir:D:/project/"]
   path = D:/project/.gitconfig
 ```
 
 **单独配置项目用户名**
+
 ```bash
 git config user.name mcwmengxi 
 git config user.email 1395568275@qq.com 
@@ -382,6 +380,7 @@ git config user.email 1395568275@qq.com
 ## git代理
 
 `.gitconfig`文件开启代理,访问`github,git`仓库走`ssh`
+
 ```
 [http]
   proxy = http://127.0.0.1:26501
@@ -430,4 +429,49 @@ git rebase -i HEAD~4
 # 6.查看合并后日志并推送到远程
 git log --oneline
 git push --force 
+```
+
+**风险代码合入回滚**
+
+1.风险代码提交了 Commit ，但未推至远程
+
+```bash
+# 1.撤销提交到暂存区
+git log
+git reset --soft xxx
+
+# 2.直接撤销
+git reset --hard xxx
+```
+
+2.风险代码已经推送至远程分支，但未合入
+
+```bash
+# 风险代码提交推送到远程
+git commit -m "xxxx"
+git push
+
+# 直接修复，并覆盖 上次commit
+git commit --amend
+git push --force-with-lease origin git-reset-test
+```
+
+```bash
+# fatal: The current branch git-reset-test has no upstream branch.
+# 该分支没有设置上游分支
+git push --set-upstream origin git-reset-test
+# 如果您希望 Git 在将来自动为没有跟踪上游的分支设置远程分支，可以配置 push.autoSetupRemote 选项
+git config --global push.autoSetupRemote true
+```
+
+ps: 需要注意的是，这里的强推需要避免使用 git push -f，在多人合作场景下，push -f可能会覆盖其他人的代码，而 push --force-with-lease 是一种更安全的强推做法，如果强推阶段的本地 git tree 落后于远端 git tree，push --force-with-lease会禁止强推，并引导你完成本地内容的同步后再进行后续操作。
+
+**存在风险代码的远程分支合入了主分支**
+
+>如果存在风险的代码分支已经合入了主分支，这种需要第一时间进行回滚止损。与非主分支的回滚不同，主分支应该禁用直接的强推操作，我们需要使用 revert 完成分支的回滚。
+
+```bash
+git log
+# 与reset回滚不同的是，revert会创建一个新的commit用来撤销之前变更的内容，常用于主分支的回滚场景。
+git revert xxx
 ```

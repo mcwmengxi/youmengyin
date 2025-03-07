@@ -150,8 +150,25 @@ git switch -c newBranchName
 **合并其它分支的某个commit到当前分支**
 
 ```bash
+# 单个commit的cherry-pick
 git cherry-pick commit_id
+
+# 多个连续commit的cherry-pick（不包含first_commit_ID）
+git cherry-pick first_commit_ID..last_commit_ID
+
+# 多个连续commit的cherry-pick（包含first_commit_ID）
+git cherry-pick first_commit_ID^..last_commit_ID
+
+# 多个不连续commit的cherry-pick
+git cherry-pick commit_id_1 commit_id_2 commit_id_3
 ```
+
+如果在cherry-pick过程中遇到冲突：
+
+1. 解决冲突
+2. 使用 `git add` 添加解决冲突后的文件
+3. 使用 `git cherry-pick --continue` 继续执行
+4. 如果想要放弃cherry-pick，使用 `git cherry-pick --abort`
 
 **变基**
 >rebase操作可以把本地未push的分叉提交历史整理成直线
@@ -474,4 +491,61 @@ ps: 需要注意的是，这里的强推需要避免使用 git push -f，在多�
 git log
 # 与reset回滚不同的是，revert会创建一个新的commit用来撤销之前变更的内容，常用于主分支的回滚场景。
 git revert xxx
+```
+
+**git rebase 让你的提交记录更加清晰可读**
+
+1.git rebase 的使用
+
+假设我们现在有2条分支，一个为 master，一个为 feat/1.0.1，他们都基于初始的一个提交 add readme 进行检出分支，之后，master 分支增加了 3.js 和 4.js 的文件，分别进行了2次提交，feat/1.0.1 也增加了 1.js 和 2.js 的文件，分别对应以下2条提交记录。
+
+此时，切换到 feature/1 分支下，执行 git rebase master，成功之后，通过 `git log` 查看记录。以 `master` 分支最后的提交作为基点，再逐个应用 `feat/1.0.1` 的每个更改。
+
+![](./images/git-rebase.png)
+
+大部分情况下，rebase 的过程中会产生冲突的，此时，就需要手动解决冲突，然后使用依次 `git add`  、`git rebase --continue`  的方式来处理冲突，完成 rebase 的过程，如果不想要某次 `rebase` 的结果，那么需要使用 `git rebase --skip`  来跳过这次 rebase 操作。
+
+`git cherry-pick` 冲突时的解决方法也与此类似
+
+2.git rebase 交互模式
+
+合并本地多个重复功能提交, 使git提交记录更简洁
+
+`git rebase -i ac18084`
+
+想要合并这一堆更改，我们要使用 Squash 策略进行合并，即把当前的 commit 和它的上一个 commit 内容进行合并， 大概可以表示为下面这样，在交互模式的 rebase 下，至少保留一个 pick，否则命令会执行失败。
+
+```bash
+pick  ... ...
+s     ... ... 
+s     ... ... 
+s     ... ... 
+
+```
+
+修改文件后 按下 : 然后 wq 保存退出，此时又会弹出一个编辑页面，这个页面是用来编辑提交的信息，修改为 feat: 更正，最后保存一下
+
+**配置 `git alias` 提升工作效率**
+
+更新你全局的 .gitconfig 文件，该文件用来保存全局的 git 配置，vim ~/.gitconfig
+
+```bash
+
+[alias]
+st = status -sb
+co = checkout
+br = branch
+mg = merge
+ci = commit
+ds = diff --staged
+dt = difftool
+mt = mergetool
+last = log -1 HEAD
+latest = for-each-ref --sort=-committerdate --format=\"%(committername)@%(refname:short) [%(committerdate:short)] %(contents)\"
+ls = log --pretty=format:\"%C(yellow)%h %C(blue)%ad %C(red)%d %C(reset)%s %C(green)[%cn]\" --decorate --date=short
+hist = log --pretty=format:\"%C(yellow)%h %C(red)%d %C(reset)%s %C(green)[%an] %C(blue)%ad\" --topo-order --graph --date=short
+type = cat-file -t
+dump = cat-file -p
+lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
 ```

@@ -37,7 +37,11 @@ export default [
       {
         text: '📋Android',
         link: '/docs/android/index',
-      }
+      },
+      {
+        text: '📋typescript',
+        link: '/docs/front-end/typescript/index',
+      },
     ]
   },
   {

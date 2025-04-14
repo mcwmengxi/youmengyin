@@ -585,56 +585,292 @@ try {
 }
 ```
 
-## ⚡ 执行时机
+### 3. 📝 访问器装饰器
 
-方法装饰器在类定义时执行，而不是在方法调用时执行。装饰器函数会在类被定义时立即执行，但是装饰器返回的包装函数会在每次方法调用时执行。
+访问器装饰器是 TypeScript 装饰器家族中的一员，专门用于装饰类中的访问器属性（getter 和 setter）。它允许你在不修改原始代码的情况下，拦截、修改或增强访问器的行为。
+
+访问器装饰器声明在访问器声明之前，使用 @expression 形式，其中 expression 必须计算为一个函数，该函数在运行时被调用。
+
+stage3 支持同时装饰 getter 和 setter, TypeScript5.0以下对访问器装饰器有一些限制
+
+#### 1. 日志装饰器
 
 ```typescript
-function logExecution(target: any, { kind, name }) {
-  console.log(`Decorator for ${name} executed at definition time`);
-  
-  if (kind === 'method') {
-    return function (...args: any[]) {
-      console.log(`Method ${name} called at runtime`);
-      return target.apply(this, args);
+function logAccess(value: Input, context: Record<string, any>) {
+  // console.log(value, context);
+
+  if (context.kind === 'getter') {
+    // 修改 getter
+    return function () {
+      console.log(`获取 ${context.name} 的值`);
+      const result = value.call(this);
+      return result;
+    };
+  }
+  if (context.kind === 'setter') {
+    // 修改 setter
+    return function (newValue: string) {
+      console.log(`设置 ${context.name} 的值为: ${newValue}`);
+      value.call(this, newValue);
+    };
+  }
+}
+class Person {
+  private _name: string;
+
+  constructor(name: string) {
+    this._name = name;
+  }
+
+  @logAccess
+  get name(): string {
+    return this._name;
+  }
+
+  set name(value: string) {
+    this._name = value;
+  }
+}
+const person = new Person('张三');
+console.log(person.name); // 输出: 获取 name 的值, 张三
+person.name = '李四'; // 输出: 设置 name 的值为: 李四
+console.log(person.name); // 输出: 获取 name 的值, 李四
+```
+
+#### 2. 缓存装饰器
+
+```typescript
+function lazy(value, { kind, name, addInitializer }) {
+  if (kind === 'getter') {
+    return function () {
+      const result = value.call(this);
+
+      // 给当前实例对象(this)加上value属性，并且不可修改
+      Object.defineProperty(this, name, {
+        value: result,
+        writable: false,
+      });
+      return result;
     };
   }
 }
 
-// 类定义时，装饰器就会执行
-class Example {
-  @logExecution
-  doSomething() {}
+class People {
+  @lazy
+  get value() {
+    console.log('一些计算。。。');
+    return '计算后的结果';
+  }
 }
 
-// 方法调用时，包装函数执行
-const example = new Example();
-example.doSomething();
+const inst = new People();
+console.log('1 inst.value', inst.value);
+console.log('2 inst.value', inst.value);
 ```
 
-## 💡 最佳实践
+#### 3.参数装饰器
 
-1. **性能优化**
-   - 避免在装饰器中执行耗时操作
-   - 使用装饰器工厂时，缓存重复的计算结果
-   - 合理使用元数据反射，避免过度使用
+带参数的访问器装饰器（setter/getter）可以通过装饰器工厂函数实现。
 
-2. **代码组织**
-   - 将相关的装饰器组织在同一个模块中
-   - 为装饰器提供清晰的命名和文档
-   - 遵循单一职责原则
+```typescript
+function validateLength(...args) {
+  return function (value, { kind, name, addInitializer }) {
+    // console.log({ value, kind, name, addInitializer });
+    if (kind === 'setter') {
+      return function (newValue) {
+        const [min, max] = args;
+        if (newValue.length < min) {
+          throw new Error(`${name} 长度不能小于 ${min}`);
+        }
 
-3. **错误处理**
-   - 在装饰器中添加适当的错误处理
-   - 提供有意义的错误信息
-   - 避免在装饰器中吞掉错误
+        if (newValue.length > max) {
+          throw new Error(`${name} 长度不能大于 ${max}`);
+        }
+        value.call(this, newValue);
+      };
+    }
+  };
+}
 
-## 🎯 注意事项
+class User {
+  private _username: string;
 
-1. 装饰器在类定义时执行，而不是实例化时
-2. 避免在装饰器中引入副作用
-3. 注意装饰器的执行顺序可能影响程序行为
-4. 谨慎使用装饰器替换类定义
+  constructor(username: string) {
+    this._username = username;
+  }
+
+  get username(): string {
+    return this._username;
+  }
+
+  @validateLength(3, 20)
+  set username(value: string) {
+    this._username = value;
+  }
+}
+
+const user = new User('admin');
+console.log(user.username); // admin
+
+try {
+  user.username = 'a'; // 抛出错误
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(error.message); // username 长度不能小于 3
+  }
+}
+
+try {
+  user.username = 'a'.repeat(30); // 抛出错误
+} catch (error) {
+  if (error instanceof Error) {
+    console.error(error.message); // username 长度不能大于 20
+  }
+}
+
+user.username = 'moderator'; // 有效
+console.log(user.username); // moderator
+
+```
+
+### 4. 📝 属性装饰器
+
+属性装饰器是 TypeScript 装饰器家族中的一员，用于装饰类的属性（非方法）。它允许你在不修改原始代码的情况下，监控、修改或增强类属性的行为。
+
+属性装饰器声明在属性声明之前，使用 @expression 形式，其中 expression 必须计算为一个函数，该函数在运行时被调用。
+
+属性装饰器可以应用在数据验证、日志记录、依赖注入等不同场景下
+
+```typescript
+// 模拟依赖注入容器
+const serviceContainer = new Map();
+
+function Inject(serviceName: string) {
+  return function (value: any, { kind, name, addInitializer }) {
+    if (kind === 'field') {
+      addInitializer(function () {
+        const getter = () => {
+          return serviceContainer.get(serviceName);
+        };
+
+        Object.defineProperty(this, name, {
+          get: getter,
+        });
+      });
+    }
+  };
+}
+
+// 注册服务
+serviceContainer.set('logger', { log: (msg: string) => console.log(msg) });
+
+class App {
+  @Inject('logger')
+  logger: any;
+}
+
+const app = new App();
+app.logger?.log('Hello from injected logger!');
+console.log(app.logger);
+
+```
+
+### 5. 📝 参数装饰器
+
+参数装饰器是 TypeScript 装饰器家族中较为特殊的一员，它应用于类构造函数或方法的参数声明。参数装饰器主要用于收集关于参数的元数据，通常与其他装饰器配合使用，特别是在依赖注入系统中。
+
+参数装饰器声明在参数声明之前，使用 @expression 形式，其中 expression 必须计算为一个函数，该函数在运行时被调用。
+
+现阶段TypeScript并不支持。如果需要兼容，可以开启experimentalDecorators的配置项
+
+```typescript
+function parameterDecorator(validationFn: (value: any) => boolean) {
+  return function (target: any, methodName: string, parameterIndex: number) {
+    console.log(
+      `类 ${target.constructor.name} 的方法 ${methodName} 的第 ${parameterIndex} 个参数被装饰`
+    );
+  };
+}
+
+class UserService {
+  createUser(
+    @parameterDecorator((name) => name.length >= 3)
+    name: string,
+    @parameterDecorator((age) => age >= 18)
+    age: number
+  ) {
+    console.log(`创建用户: ${name}, ${age}岁`);
+  }
+}
+
+const service = new UserService();
+service.createUser('Alice', 25);
+service.createUser('Bob', 17);
+
+```
+
+## ⚡ 装饰器执行时机
+
+方法装饰器在类定义时执行，而不是在方法调用时执行。装饰器函数会在类被定义时立即执行，但是装饰器返回的包装函数会在每次方法调用时执行。
+
+装饰器的执行顺序如下所示:
+![execute-order](./images/execute-order.png)
+这个执行顺序的规律是：
+
+1. 属性装饰器优先执行
+2. 参数装饰器在其所属方法的装饰器之前执行，且从右到左
+3. 方法装饰器在其参数装饰器之后执行
+4. 访问器装饰器在方法装饰器之后执行
+5. 类装饰器最后执行
+
+这与 TypeScript 装饰器的设计原则相符，确保成员（属性、参数、方法）的装饰器在类装饰器之前执行参数装饰器在其所属方法的装饰器之前执行，从内到外的执行顺序。
+
+```typescript
+// 类装饰器
+function classDecorator(target: Function) {
+  console.log('类装饰器执行:', target.name);
+}
+ 
+// 方法装饰器
+function methodDecorator(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  console.log(`方法装饰器执行: ${propertyKey}`);
+}
+ 
+// 访问器装饰器
+function accessorDecorator(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+  console.log(`访问器装饰器执行: ${propertyKey}`);
+}
+ 
+// 属性装饰器
+function propertyDecorator(target: any, propertyKey: string) {
+  console.log(`属性装饰器执行: ${propertyKey}`);
+}
+ 
+// 参数装饰器
+function parameterDecorator(target: any, methodName: string, parameterIndex: number) {
+  console.log(`参数装饰器执行: 方法 ${methodName} 的第 ${parameterIndex} 个参数`);
+}
+ 
+@classDecorator
+class Example {
+  @propertyDecorator
+  public property: string;
+ 
+  constructor(property: string) {
+    this.property = property;
+  }
+ 
+  @methodDecorator
+  greet(@parameterDecorator name: string, @parameterDecorator age: number) {
+    console.log(`Hello, ${name}. You are ${age} years old.`);
+  }
+ 
+  @accessorDecorator
+  get greetMessage() {
+    return 'Hello, world!';
+  }
+}
+```
 
 ## 🔍 常见问题解答
 

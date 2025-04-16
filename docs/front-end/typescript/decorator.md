@@ -872,13 +872,356 @@ class Example {
 }
 ```
 
-## 🔍 常见问题解答
+## 依赖注入系统
 
-**Q: 装饰器和继承有什么区别？**
-A: 装饰器是一种非侵入式的方式来增强类的功能，而继承建立了一种 is-a 关系。装饰器更适合横切关注点的处理。
+依赖注入（Dependency Injection，简称 DI）是一种设计模式，它允许我们将一个类所依赖的对象（依赖项）从外部提供给它，而不是由类自己创建这些依赖项。这种模式遵循”控制反转”（Inversion of Control，IoC）原则，将对象的创建和管理责任从使用对象的代码转移到外部容器或框架。
 
-**Q: 装饰器会影响性能吗？**
-A: 装饰器主要在类定义时执行，对运行时性能影响较小。但过度使用装饰器可能影响启动性能。
+依赖注入的核心概念主要有以下几个方面：
 
-**Q: 如何调试装饰器？**
-A: 可以在装饰器函数中添加断点或日志，使用 TypeScript 的 sourceMap 功能辅助调试。
+- 依赖（Dependency）：依赖是指一个类或模块需要的外部资源或服务，通常是其他类或对象。例如，一个服务可能依赖于数据库连接或外部 API。依赖是类正常运行所必需的资源。
+- 注入（Injection）：注入是将外部依赖传递给目标类或对象的过程，通常通过构造函数、方法或属性进行。通过注入，目标类无需关心依赖的创建和管理，减少了类之间的耦合。
+- 控制反转（Inversion of Control, IoC）：控制反转是依赖注入的基础，它将类负责创建依赖的职责转移到外部容器。类只关注自己的逻辑，而容器负责提供和管理所有的依赖，增强了系统的- 灵活性和可扩展性。
+- 容器（DI Container）：容器是用于管理服务实例和它们的依赖关系的工具。它负责注册服务、解析依赖，并在需要时自动将依赖注入到目标类中，通常用于大型应用中来统一管理依赖。
+- 松耦合（Loose Coupling）：通过依赖注入，类之间不再直接依赖于彼此的实现，而是依赖于接口或抽象类。这种松耦合设计使得系统更容易扩展和维护，因为可以更容易地替换或修改依赖。
+- 可替换性（Substitutability）：依赖注入使得在运行时可以灵活替换服务的实现。例如，可以根据不同的环境或需求，替换数据库服务或日志记录服务，而不需要修改使用这些服务的类。
+- 服务（Service）：服务是提供特定功能的类或模块，通常用于处理业务逻辑、数据库访问等。服务作为依赖被注入到其他类中，减少了各类之间的耦合，便于复用和维护。
+
+下面我们将使用 TypeScript 的各种装饰器（类装饰器、属性装饰器、方法装饰器和参数装饰器）来实现一个完整的依赖注入系统。
+
+```typescript
+import 'reflect-metadata';
+ 
+// ==================== 1. 依赖注入容器 ====================
+ 
+// 服务生命周期类型
+enum Lifecycle {
+  TRANSIENT, // 每次请求创建新实例
+  SINGLETON, // 单例，全局共享一个实例
+  SCOPED, // 作用域内共享一个实例（简化起见，本例不实现）
+}
+
+// 服务依赖信息
+interface DependencyInfo {
+  token: symbol | string;
+}
+ 
+// 服务注册信息
+interface ServiceRegistration {
+  token: symbol | string; // 服务标识
+  type: any; // 服务类型
+  lifecycle: Lifecycle; // 生命周期
+  instance?: any; // 单例模式下的实例
+  factory?: () => any; // 自定义工厂函数
+  dependencies?: DependencyInfo[]; // 构造函数依赖
+}
+
+// 依赖注入容器
+class DIContainer {
+  private static instance: DIContainer;
+  private services: Map<string, ServiceRegistration> = new Map();
+
+  private constructor() { }
+
+  static getInstance(): DIContainer {
+    if (!DIContainer.instance) {
+      DIContainer.instance = new DIContainer();
+    }
+    return DIContainer.instance;
+  }
+
+  // 注册服务
+  register(token: symbol | string, type: any, lifecycle: Lifecycle = Lifecycle.TRANSIENT) {
+    // 获取构造函数的参数依赖
+    const dependencies = (Reflect as any).getMetadata?.('di:dependencies', type) || [];
+    this.services.set(token as string, { token, type, lifecycle, dependencies });
+    console.log(`服务注册: ${String(token)}, 生命周期: ${Lifecycle[lifecycle]}`);
+  }
+
+  // 注册自定义工厂
+  registerFactory(
+    token: symbol | string,
+    factory: () => any,
+    lifecycle: Lifecycle = Lifecycle.SINGLETON,
+  ): void {
+    this.services.set(token as string, { token, type: Object, lifecycle, factory });
+    console.log(`工厂注册: ${String(token)}, 生命周期: ${Lifecycle[lifecycle]}`);
+  }
+
+  // 解析服务
+  resolve<T>(token: symbol | string): T {
+    const registration = this.services.get(token as string);
+    if (!registration) {
+      throw new Error(`服务未注册: ${String(token)}`);
+    }
+
+    // 单例模式，返回已存在的实例
+    if (registration.lifecycle === Lifecycle.SINGLETON && registration.instance) {
+      return registration.instance;
+    }
+    let instance: T;
+    // 使用自定义工厂
+    if (registration.factory) {
+      instance = registration.factory() as T;
+    } else {
+      
+      // 解析构造函数依赖
+      const dependencies = (registration.dependencies || []).map((dep) => {
+        if (dep && dep.token) {
+          return this.resolve(dep.token);
+        }
+        return undefined;
+      });  
+      instance = new registration.type(...dependencies) as T;
+  
+    }
+    // 如果是单例，保存实例
+    if (registration.lifecycle === Lifecycle.SINGLETON) {
+      registration.instance = instance;
+    }
+    return instance;
+  }
+}
+// ==================== 2. 装饰器 ====================
+// 服务装饰器（类装饰器）
+function Service(token: symbol | string, lifecycle: Lifecycle = Lifecycle.TRANSIENT) {
+  return function<T extends new (...args: any[]) => any>(target: T) {
+    // 使用类名作为默认标识，如果没有提供token
+    const serviceToken = token || Symbol(target.name);
+    // 注册服务
+    const container = DIContainer.getInstance();
+    container.register(serviceToken, target, lifecycle);
+    // 保存标识，便于后续引用
+    (Reflect as any).defineMetadata?.('di:token', serviceToken, target);
+ 
+    return target;
+  };
+}
+function Inject(token: symbol | string) {
+  return function (target: any, propertyKey: string) {
+    // 获取属性类型
+    const type = (Reflect as any).getMetadata?.('design:type', target, propertyKey);
+    // 使用类型作为默认标识
+    const serviceToken =
+      token || (Reflect as any).getMetadata?.('di:token', type) || Symbol(propertyKey);
+ 
+    // 创建属性的 getter
+    Object.defineProperty(target, propertyKey, {
+      get: function () {
+        // 延迟解析，在属性被访问时才获取服务实例
+        const container = DIContainer.getInstance();
+        return container.resolve(serviceToken);
+      },
+      enumerable: true,
+      configurable: true,
+    });
+  }; 
+}
+
+ 
+// 构造函数参数注入装饰器（参数装饰器）
+function InjectParam(token: symbol | string = Symbol()) {
+  return function (
+    target: Object,
+    methodName: string | symbol | undefined,
+    parameterIndex: number,
+  ) {
+    // 处理构造函数的情况
+    const actualMethodName = methodName === undefined ? 'constructor' : methodName;
+    
+    // 获取现有依赖
+    const dependencies: DependencyInfo[] =
+    (Reflect as any).getMetadata?.('di:dependencies', target) || [];
+
+    // 设置依赖信息
+    dependencies[parameterIndex] = { token };
+    // 更新元数据
+    (Reflect as any).defineMetadata?.('di:dependencies', dependencies, target);
+    console.log(
+      `参数注入: ${
+        (target as any).constructor?.name || (target as any).name
+      }.${String(actualMethodName)}[${parameterIndex}] <- ${String(token)}`,
+    );
+  }
+}
+// 方法注入装饰器（方法装饰器）
+function InjectMethod() {
+  return function(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
+    const originalMethod = descriptor.value;
+
+    descriptor.value = function(...args: any[]) {
+      // 获取方法参数的注入信息
+      const methodDependencies: DependencyInfo[] =
+      (Reflect as any).getMetadata?.('di:method:dependencies', target, propertyKey) || [];
+
+      // 解析依赖并替换参数
+      const container = DIContainer.getInstance();
+      const newArgs = [...args];
+
+      for (let i = 0; i < methodDependencies.length; i++) {
+        const dep = methodDependencies[i];
+        if (dep && dep.token) {
+          newArgs[i] = container.resolve(dep.token);
+        }
+      }
+      return originalMethod.apply(this, args)
+    };
+
+    return descriptor;
+  }
+}
+// 方法参数注入装饰器（参数装饰器）
+function InjectMethodParam(token: symbol | string = Symbol()) {
+  return function (target: Object, methodName: string | symbol, parameterIndex: number) {
+    // 获取现有依赖
+    const dependencies: DependencyInfo[] =
+    (Reflect as any).getMetadata?.('di:method:dependencies', target, methodName as string) || [];
+    // 设置依赖信息
+    dependencies[parameterIndex] = { token };
+    (Reflect as any).defineMetadata?.('di:method:dependencies', dependencies, target, methodName as string);
+    console.log(
+      `方法参数注入: ${(target as any).constructor.name}.${String(
+        methodName,
+      )}[${parameterIndex}] <- ${String(token)}`,
+    );
+  }
+}
+  
+// ==================== 3. 示例服务 ====================
+// 服务标识符常量
+const SERVICE_TOKENS = {
+  LOGGER: Symbol('Logger'),
+  CONFIG: Symbol('Config'),
+  DATABASE: Symbol('Database'),
+  USER_SERVICE: Symbol('UserService'),
+  CURRENT_USER: Symbol('CurrentUser'),
+};
+// 日志服务接口
+interface ILogger {
+  log(message: string): void;
+  error(message: string): void;
+}
+ 
+// 日志服务实现
+@Service(SERVICE_TOKENS.LOGGER)
+export class Logger implements ILogger {
+  error(message: string): void {
+    console.error(`[ERROR] ${message}`);
+  }
+  log(message: string) {
+    console.log(`[INFO] ${message}`);
+  }
+}
+
+@Service(SERVICE_TOKENS.CONFIG)
+class ConfigService {
+  private config: Record<string, any> = {
+    apiUrl: 'https://api.moment.com',
+    timeout: 5000,
+    maxRetries: 3,
+  };
+ 
+  get(key: string): any {
+    return this.config[key];
+  }
+ 
+  set(key: string, value: any): void {
+    this.config[key] = value;
+  }
+}
+// 数据库服务
+@Service(SERVICE_TOKENS.DATABASE)
+class DatabaseService {
+  constructor(@InjectParam(SERVICE_TOKENS.CONFIG) private config: ConfigService) {
+    console.log(`数据库服务初始化，API URL: ${config.get('apiUrl')}`);
+  }
+ 
+  query(sql: string): any[] {
+    console.log(`执行查询: ${sql}`);
+    return [
+      { id: 1, name: 'Item 1' },
+      { id: 2, name: 'Item 2' },
+    ];
+  }
+ 
+  execute(sql: string): void {
+    console.log(`执行命令: ${sql}`);
+  }
+}
+// ==================== 4. 使用依赖注入的客户类 ====================
+@Service(SERVICE_TOKENS.USER_SERVICE)
+class UserService {
+  @Inject(SERVICE_TOKENS.LOGGER)
+  private logger!: ILogger;
+ 
+  @Inject(SERVICE_TOKENS.DATABASE)
+  private db!: DatabaseService;
+ 
+  constructor(@InjectParam(SERVICE_TOKENS.CONFIG) private config: ConfigService) {
+    console.log('用户服务初始化');
+  }
+  getUsers(): any[] {
+    this.logger.log('获取用户列表');
+    return this.db.query('SELECT * FROM users');
+  }
+ 
+  createUser(username: string, email: string): any {
+    this.logger.log(`创建用户: ${username}, ${email}`);
+    this.db.execute(`INSERT INTO users (username, email) VALUES ('${username}', '${email}')`);
+    return { id: 3, username, email };
+  }
+  @InjectMethod()
+  processUserData(data: any, @InjectMethodParam(SERVICE_TOKENS.LOGGER) logger?: ILogger): void {
+    logger?.log(`处理用户数据: ${JSON.stringify(data)}`);
+    // 处理逻辑...
+  }
+}
+class AppController {
+  @Inject(SERVICE_TOKENS.LOGGER)
+  private logger!: ILogger;
+  @Inject(SERVICE_TOKENS.USER_SERVICE)
+  private userService!: UserService;
+  initialize(): void {
+    this.logger.log('应用初始化');
+    // 获取用户
+    const users = this.userService.getUsers();
+    console.log('用户列表:', users);
+    // 创建用户
+    const newUser = this.userService.createUser('john_doe', 'john@example.com');
+    console.log('新用户:', newUser);
+
+    // 处理用户数据
+    this.userService.processUserData({ name: '处理数据' });
+  }
+}
+
+// ==================== 5. 运行示例 ====================
+ 
+// 注册自定义服务
+const container = DIContainer.getInstance();
+container.registerFactory(
+  SERVICE_TOKENS.CURRENT_USER,
+  () => {
+    return { id: 1, username: 'admin', roles: ['ADMIN'] };
+  },
+  Lifecycle.SINGLETON,
+);
+ 
+// 创建并初始化应用控制器
+const appController = new AppController();
+appController.initialize();
+
+```
+
+这个依赖注入系统使用 TypeScript 和 reflect-metadata 库，通过装饰器和容器模式实现服务的自动管理和依赖注入。容器 (DIContainer) 管理所有服务的注册和解析，支持三种生命周期：SINGLETON（单例）、TRANSIENT（每次创建新实例）和 SCOPED（在作用域内共享实例）。通过装饰器如 @Service、@Inject、@InjectParam 等，服务和依赖关系被标记并自动注入，避免了手动管理实例化和依赖关系的复杂性。
+
+服务注册时，容器会根据元数据和反射机制提取构造函数的依赖关系，并解析它们。服务可以是自定义工厂生成的实例，或者是普通的类实例。依赖注入的实现包括属性注入、构造函数注入、方法参数注入等，通过反射机制动态解析和注入依赖。
+
+这套系统使得服务的使用更加灵活，降低了服务之间的耦合性，便于扩展和测试。通过元数据反射和装饰器，开发者可以方便地管理复杂的依赖关系，确保代码的清晰和可维护性。
+
+最终输出额结果如下图所示：
+
+![alt text](images/simple-di.png)
+
+## 总结
+
+装饰器是 TypeScript 提供的一种元编程机制，允许我们在类、方法、属性和参数上动态添加功能或元数据。通过装饰器，开发者可以在不修改原始代码的情况下，为目标对象增加额外的行为，例如依赖注入、日志记录、权限验证等。常见的装饰器有类装饰器、方法装饰器、属性装饰器、参数装饰器和访问器装饰器，它们在类的不同成员上发挥作用。装饰器通常与反射和元数据机制结合使用，提供更灵活的开发方式。执行顺序通常是属性装饰器优先，参数装饰器和方法装饰器按顺序执行，类装饰器最后执行。装饰器的应用可以显著提高代码的可读性、可维护性和复用性。

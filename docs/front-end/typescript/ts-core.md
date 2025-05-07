@@ -220,3 +220,24 @@ TypeScript 支持类的继承，通过 extends 关键字可以继承父类的属
 ### 接口（Interfaces）
 
 接口定义了一组类必须实现的规范。接口只定义方法的签名，而不提供方法的具体实现。
+
+## + -修饰符
+
+- -修饰符可以添加或去掉readonly 和 ?，如
+
+```ts
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  age: number;
+  address?: string;
+}
+type RequireObj<T> = {
+  [K in keyof T]-?: T[K];
+};
+type OptionalObj<T> = {
+  [K in keyof T]+?: T[K];
+};
+type obj = RequireObj<User>; // 必填属性
+```

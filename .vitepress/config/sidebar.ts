@@ -1,7 +1,7 @@
 import { DefaultTheme } from 'vitepress'
 import glob from 'fast-glob'
 import { sidebarInterview,sidebarAlgorithm, sidebarPatterns, sidebarDesign,sidebarFlutter, sidebarArticle,sidebarTools, sidebarGo, sidebarSql,sidebarReg, sidebarOtherBe, sidebarFront, sidebarDevelops, sidebarReact, sidebarTypescript } from './sidebar/index'
-import { sidebarAndroid, sidebarElectron } from './sidebar/frontend'
+import { sidebarAndroid, sidebarElectron, sidebarThreeJS } from './sidebar/frontend'
 
 export function getSidebarsItems(path: string, rootPath: string = 'docs') {
   const links: DefaultTheme.SidebarItem[] = []
@@ -61,6 +61,7 @@ export default {
   '/docs/flutter': sidebarFlutter(),
   '/docs/electron': sidebarElectron(),
   '/docs/android': sidebarAndroid(),
+  '/docs/threejs': sidebarThreeJS(),
   // 面试
   '/docs/interview': sidebarInterview(),
   

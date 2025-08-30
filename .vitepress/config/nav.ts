@@ -42,6 +42,10 @@ export default [
         text: '📋typescript',
         link: '/docs/front-end/typescript/index',
       },
+      {
+        text: '📋threejs',
+        link: '/docs/threejs/index',
+      }
     ]
   },
   {

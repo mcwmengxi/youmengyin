@@ -317,3 +317,15 @@ export function sidebarAndroid(){
     },
   ]
 }
+
+export function sidebarThreeJS(){
+  return [
+    {
+      text: 'ThreeJS',
+      items: [
+        { text: 'index', link: '/docs/threejs/index' },
+        { text: '基础', link: '/docs/threejs/basic' },
+      ]
+    },
+  ]
+}

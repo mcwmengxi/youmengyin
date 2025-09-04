@@ -43,7 +43,27 @@ export default function sidebarInterview() {
             },
           ]
         },
-        
+        {
+          text: '手写',
+          items: [
+            {
+              text: '手写系列',
+              link: '/docs/interview/handwriting/index'
+            },
+            {
+              text: 'JS实现篇',
+              link: '/docs/interview/handwriting/js'
+            },
+            {
+              text: '基础应用篇',
+              link: '/docs/interview/handwriting/base'
+            },
+            {
+              text: '综合应用篇',
+              link: '/docs/interview/handwriting/enhance'
+            },
+          ]
+        },
         {
           text: '框架',
           items: [
@@ -60,6 +80,10 @@ export default function sidebarInterview() {
               text: 'Webpack面试题',
               link: '/docs/interview/webpack'
             },
+            {
+              text: 'Vite面试题',
+              link: '/docs/interview/vite'
+            },
           ]
         },
         {
@@ -72,6 +96,7 @@ export default function sidebarInterview() {
         { text: 'Css 相关', link: '/docs/interview/ques/ques-css' },
         { text: 'JavaScript 相关', link: '/docs/interview/ques/ques-javascript' },
         { text: 'Vue2 相关', link: '/docs/interview/ques/ques-vue2' },
+         { text: 'git', link: '/docs/interview/git' },
       ]
     },
     {

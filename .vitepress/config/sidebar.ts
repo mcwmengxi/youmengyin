@@ -33,6 +33,18 @@ export default {
           link: '/docs/resource/index',
         },
         {
+          text: 'book',
+          link: '/docs/resource/book',
+        },
+        {
+          text: 'book',
+          link: '/docs/resource/book',
+        },
+        {
+          text: 'tools',
+          link: '/docs/resource/tools',
+        },
+        {
           text: 'emojy',
           link: '/docs/resource/emojy',
         },

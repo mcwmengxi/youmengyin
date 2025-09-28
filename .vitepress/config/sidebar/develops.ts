@@ -15,7 +15,8 @@ const linux = [
   { text: 'linux', link: '/docs/devops/linux/linux' },
   { text: 'linux初体验', link: '/docs/devops/linux/linux1' },
   { text: '2025学习', link: '/docs/devops/linux/2025'},
-  { text: 'nginx', link: '/docs/devops/linux/nginx' }
+  { text: 'nginx', link: '/docs/devops/linux/nginx' },
+  { text: 'linux常用命令速查', link: '/docs/devops/linux/useful' },
 ]
 const docker = [
   { text: 'docker', link: '/docs/devops/docker/docker' },

@@ -1,6 +1,8 @@
 
 ## 一、下载mysql
+
 ## 二、安装mysql
+
 2.1、将文件解压到合适的目录下，个人比较喜欢放在D盘，文件夹路径最好纯英文，中文可能出现意想不到的问题
 
 2.2、配置my.ini文件，只需要配置basedir即可，根据自己解压路径配置。
@@ -24,6 +26,7 @@ max_connections=20
 # 创建新表时将使用的默认存储引擎
 default-storage-engine=INNODB
 ```
+
 2.3、以管理员身份打开命令行，将目录切换到你解压文件的bin目录。初始化Mysql，Mysql8.0之后自动生成data文件夹
 
 ```bash
@@ -34,6 +37,7 @@ mysqld  --initialize --console（不建议使用，在控制台生成一个随�
 ```
 
 2.4 安装 启动mysql
+
 ```bash
 //安装mysql服务
 mysqld install mysql
@@ -51,6 +55,7 @@ net start mysql
 
 mysql -uroot
 ```
+
 2.5 修改密码
 
 ```bash
@@ -72,9 +77,10 @@ exit
 // 重新登录数据库
 mysql -uroot -p
 ```
+
 2.6 配置PATH路径，任意位置打开cmd都可以连接Mysql
 
-三、Mysql8.0碰到的坑 
+三、Mysql8.0碰到的坑
 
 3.1、使用Navicate连接数据库可能会出现的问题
 
@@ -93,7 +99,7 @@ mysql8.0 引入了新特性 caching_sha2_password；这种密码加密方式客�
 
 caching_sha2_password作为首选身份验证插件
 
-官方文档：https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password
+官方文档：<https://dev.mysql.com/doc/refman/8.0/en/upgrading-from-previous-series.html#upgrade-caching-sha2-password>
 
 3.3、添加外网访问权限
 
@@ -110,12 +116,49 @@ flush privileges;
 
 3.4、创建用户waggag并授远程访问权限
 
-创建用户	
+创建用户
 create user 'waggag'@'%' identified by '225514';
-授予权限	
+授予权限
 GRANT ALL ON *.* TO 'waggag'@'%' WITH GRANT OPTION;
-刷新权限	
+刷新权限
 flush privileges;
 
 ## 四、Navicat
 
+## 五、mysql常用命令清单
+
+| 分类                | 命令                                                         | 说明                       |
+| :------------------ | :----------------------------------------------------------- | :------------------------- |
+| **连接与退出**      | `mysql -u 用户名 -p`                                         | 登录（输入密码）           |
+|                     | `mysql -u 用户名 -p 数据库名`                                | 直接进入指定数据库         |
+|                     | `exit;` / `quit;` / `\q`                                     | 退出 MySQL                 |
+| **数据库操作**      | `SHOW DATABASES;`                                            | 查看所有数据库             |
+|                     | `CREATE DATABASE db_name;`                                   | 创建数据库                 |
+|                     | `DROP DATABASE db_name;`                                     | 删除数据库                 |
+|                     | `USE db_name;`                                               | 切换数据库                 |
+|                     | `SELECT DATABASE();`                                         | 查看当前数据库             |
+| **表操作**          | `SHOW TABLES;`                                               | 查看当前数据库下所有表     |
+|                     | `DESCRIBE table_name;`                                       | 查看表结构（字段、类型等） |
+|                     | `SHOW CREATE TABLE table_name\G;`                            | 查看建表语句               |
+|                     | `CREATE TABLE table_name (id INT);`                          | 创建表（示例）             |
+|                     | `DROP TABLE table_name;`                                     | 删除表                     |
+|                     | `ALTER TABLE table_name ADD col INT;`                        | 添加列                     |
+|                     | `ALTER TABLE table_name DROP col;`                           | 删除列                     |
+| **数据操作 (CRUD)** | `INSERT INTO users (id, name) VALUES (1, 'Alice');`          | 插入数据                   |
+|                     | `SELECT * FROM users;`                                       | 查询所有数据               |
+|                     | `SELECT name FROM users WHERE id=1;`                         | 条件查询                   |
+|                     | `UPDATE users SET name='Bob' WHERE id=1;`                    | 更新数据                   |
+|                     | `DELETE FROM users WHERE id=1;`                              | 删除数据                   |
+| **用户与权限**      | `SELECT user, host FROM mysql.user;`                         | 查看用户                   |
+|                     | `CREATE USER 'username'@'localhost' IDENTIFIED BY 'pwd';`    | 创建用户                   |
+|                     | `GRANT ALL PRIVILEGES ON db_name.* TO 'username'@'localhost';` | 授权                       |
+|                     | `FLUSH PRIVILEGES;`                                          | 刷新权限                   |
+|                     | `DROP USER 'username'@'localhost';`                          | 删除用户                   |
+| **其他常用**        | `STATUS;`                                                    | 查看服务器状态             |
+|                     | `SHOW PROCESSLIST;`                                          | 查看当前连接               |
+|                     | `SHOW VARIABLES LIKE '%char%';`                              | 查看字符集相关设置         |
+|                     | `SOURCE /path/to/file.sql;`                                  | 执行 SQL 文件              |
+
+```
+ps:SQL关键字大小写不影响运行
+```

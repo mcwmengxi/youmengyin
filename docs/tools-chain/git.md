@@ -1,4 +1,4 @@
-****# Git 基础知识
+# Git 基础知识
 
 ## 常用命令
 
@@ -548,4 +548,48 @@ type = cat-file -t
 dump = cat-file -p
 lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
 
+```
+
+**自用的 `.gitconfig` 配置**
+
+``` bash
+
+[user]
+ email = nangongfairy@gmail.com
+ name = youmengyin
+[difftool "sourcetree"]
+ cmd = "'' "
+[mergetool "sourcetree"]
+ cmd = "'' "
+ trustExitCode = true
+[url "https://github.com/guansss/CubismWebFramework.git"]
+ insteadOf = git@github.com:guansss/CubismWebFramework.git
+[gui]
+  encoding = utf-8
+# 代码库统一使用utf-8
+[i18n]
+  commitencoding = utf-8
+# log编码
+[svn]
+  pathnameencoding = utf-8
+# 支持中文路径
+[core]
+  quotepath = false
+ # autocrlf = true
+[alias]
+  last = log -1 HEAD
+  latest = for-each-ref --sort=-committerdate --format=\"%(committername)@%(refname:short) [%(committerdate:short)] %(contents)\"
+  ls = log --pretty=format:\"%C(yellow)%h %C(blue)%ad %C(red)%d %C(reset)%s %C(green)[%cn]\" --decorate --date=short
+  hist = log --pretty=format:\"%C(yellow)%h %C(red)%d %C(reset)%s %C(green)[%an] %C(blue)%ad\" --topo-order --graph --date=short
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  lgs = log --color --graph --pretty=format:'%Cred%h%Creset %C(bold blue)<%an>%Creset %Cgreen(%ar) %C(yellow)%s%Creset'
+  # 撤销一个commit
+  undo = reset HEAD~1 --soft
+
+  personal = ! git config --global user.name youmengyin && git config --global user.email nangongfairy@gmail.com
+  company = ! git config --global user.name mochunwang && git config --global user.email mochunwang@company.com
+
+  lp = ! git config user.name youmengyin && git config user.email nangongfairy@gmail.com
+  lc = ! git config user.name mochunwang && git config user.email mochunwang@company.com
+  uns = ! git branch --unset-upstream
 ```

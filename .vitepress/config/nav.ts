@@ -45,6 +45,10 @@ export default [
       {
         text: '📋threejs',
         link: '/docs/threejs/index',
+      },
+      {
+        text: '📋Nestjs',
+        link: '/docs/nestjs/index',
       }
     ]
   },

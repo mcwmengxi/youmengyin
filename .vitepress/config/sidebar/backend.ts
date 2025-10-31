@@ -1,4 +1,4 @@
-import { getSidebarsItems } from "../sidebar"
+import { getSidebarsItems } from "../utils"
 
 const Go = [
   { text: '介绍', link: '/docs/backend/go/index' },

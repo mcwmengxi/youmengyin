@@ -1,4 +1,4 @@
-import { getSidebarsItems } from '../sidebar'
+import { getSidebarsItems } from '../utils'
 import { sidebarTypescript } from './typescript'
 
 export function sidebarFront() {

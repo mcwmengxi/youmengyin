@@ -1,4 +1,4 @@
-import { getSidebarsItems } from '../sidebar'
+import { getSidebarsItems } from '../utils'
 
 const devlops = [
   { text: 'index', link: '/docs/devops/index' },

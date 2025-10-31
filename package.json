@@ -22,8 +22,8 @@
     "sass": "^1.58.3",
     "unocss": "^0.58.4",
     "vite": "^5.0.12",
-    "vitepress": "^1.6.3",
-    "vue": "^3.4.15"
+    "vitepress": "^1.6.4",
+    "vue": "^3.5.22"
   },
   "pnpm": {
     "peerDependencyRules": {

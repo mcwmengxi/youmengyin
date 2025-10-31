@@ -15,8 +15,12 @@ const linux = [
   { text: 'linux', link: '/docs/devops/linux/linux' },
   { text: 'linux初体验', link: '/docs/devops/linux/linux1' },
   { text: '2025学习', link: '/docs/devops/linux/2025'},
-  { text: 'nginx', link: '/docs/devops/linux/nginx' },
   { text: 'linux常用命令速查', link: '/docs/devops/linux/useful' },
+]
+const nginx = [
+  { text: 'index', link: '/docs/devops/nginx/index' },
+  { text: 'nginx入门', link: '/docs/devops/nginx/basic' },
+  { text: 'https配置', link: '/docs/devops/nginx/https' },
 ]
 const docker = [
   { text: 'docker', link: '/docs/devops/docker/docker' },
@@ -28,6 +32,7 @@ function sidebarDevelops() {
   return [
     { text: 'devops', collapsed: false, items: devlops },
     { text: 'Linux', collapsed: false, items: linux },
+    { text: 'nginx', collapsed: false, items: nginx },
     { text: 'docker', collapsed: false, items: docker },
   ]
 }

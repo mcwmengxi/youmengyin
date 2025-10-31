@@ -1,5 +1,8 @@
 import DefaultTheme from 'vitepress/theme'
-import { App } from 'vue'
+import BlogTheme from '@sugarat/theme'
+import { inBrowser } from 'vitepress'
+import type { Theme } from 'vitepress'
+import busuanzi from 'busuanzi.pure.js'
 import 'uno.css'
 
 // 自定义 CSS
@@ -8,11 +11,20 @@ import 'uno.css'
 // import './style/code.css'
 // import './style/overrides.css'
 import './style/base.css'
+import { h } from 'vue'
+import LayoutBottom from './components/LayoutBottom.vue'
 
 export default {
-  ...DefaultTheme,
-  async enhanceApp({ app }: { app: App }) {
-    if (!import.meta.env.SSR) {
+  // ...DefaultTheme,
+  extends: BlogTheme,
+  // @ts-ignore
+  Layout: () => h(BlogTheme.Layout, null, {
+    //https://vitepress.dev/zh/guide/extending-default-theme#layout-slots全量插槽文档
+    'layout-bottom':() => h(LayoutBottom)
+  }),
+  async enhanceApp({ app, router }) {
+    if (inBrowser) {
+      // live2d
       const { loadOml2d } = await import('oh-my-live2d')
       loadOml2d({
         tips: {
@@ -23,6 +35,10 @@ export default {
           // path: 'https://cdn.jsdelivr.net/gh/Eikanya/Live2d-model/Live2D/Senko_Normals/senko.model3.json'
         ]
       })
+      //访问量统计
+      router.onAfterRouteChange = () => {
+        busuanzi.fetch()
+      }
     }
   },
-}
+} satisfies Theme

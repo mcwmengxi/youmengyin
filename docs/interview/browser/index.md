@@ -21,7 +21,9 @@ JS 是单线程的语言，只有一个执行栈，先执行当前任务，遇�
 
 - 渲染是下一个宏任务执行前 [https://zhuanlan.zhihu.com/p/78113300](https://zhuanlan.zhihu.com/p/78113300)
 
+```html
 <img src="./img/1654402275546-74fadbb4-590b-42cb-9079-9df66ae710ed.png"  width="200"  style="margin: 0 auto;" />
+```
 
 宏任务：script 标签 / 交互事件
 
@@ -168,8 +170,6 @@ ctrl+F5: `Cache-Control:no-cache;Pragma:no-cache`
 
 关键渲染路径（CRP）：创建 DOM 树/创建 CSSOM 树 - 生成渲染树 - 布局 - 绘制
 
-![img](./img/timg.76170e50.jpg)
-
 - 解析 HTML 和 CSS 分别生成 `DOM 树`和 `CSSOM 树`
 - 组装成 `render 树`，只添加可见的节点
 - `布局Layout` ：计算出 节点的布局信息（大小和位置）,生产布局树
@@ -189,5 +189,3 @@ ctrl+F5: `Cache-Control:no-cache;Pragma:no-cache`
 
 - `requestAnimationFrame`：告诉浏览器在下一次绘制之前执行
 - `requestIdleCallback`：在浏览器空闲的事件执行
-
-![](./img/1672830545319-0db35ee4-c45d-4dbf-9b95-31f5a19f0149.jpeg)

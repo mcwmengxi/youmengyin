@@ -2,7 +2,7 @@
 
 `npx tsx superTask.ts` 运行
 
-```tavascript
+```typescript
 export interface Task<T> {
   task: () => Promise<T>;
   resolve: (value: any) => void;

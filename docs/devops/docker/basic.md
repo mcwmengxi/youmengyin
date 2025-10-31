@@ -554,7 +554,7 @@ export const getYmlConfig = (key?: string) => {
 
 在 docker-compose.yml 文件所在的目录下创建一个 .env 文件，并在其中定义环境变量，例如我们在 mysql-container 和 redis-container 容器中使用的两个环境变量：
 
-```env
+```bash
 # .env
 MYSQL_ROOT_PASSWORD=xxxx
 REDIS_PASSWORD=xxxx
@@ -828,7 +828,7 @@ CMD ["nginx", "-g", "daemon off;"]
 
 这里唯一的区别就是接口代理的地址由 <http://服务器ip:端口> 变成了 <http://后端容器名:端口>;
 
-```conf
+```nginx
 user  nginx;
 worker_processes auto;
 pid /run/nginx.pid;

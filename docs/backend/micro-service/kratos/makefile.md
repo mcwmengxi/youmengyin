@@ -4,7 +4,7 @@
 
 <https://link.zhihu.com/?target=https%3A//gnuwin32.sourceforge.net/packages/make.htm>
 
-```zshrc
+```bash
 export PATH="/f/GnuWin32:/f/GnuWin32/bin$PATH"
 ```
 

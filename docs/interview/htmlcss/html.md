@@ -87,8 +87,6 @@ srcset: 根据设备屏幕大小和分辨率选择最合适的图像进行显示
 - scrollHeight/scrollWidth ：padding + 实际内容的尺寸
 - scrollTop/scrollLeft : DOM 内部元素滚动的距离
 
-![](./img/1620556246492-47ff64d3-9e0b-4531-a259-77eced186322.png)
-
 - window.innerHeight：**可视区域高度**
 - document.documentElement.clientHeight：**可视区域高度，**不包含滚动条
 - document.documentElement.scrollHeight：html 元素高度
@@ -98,7 +96,9 @@ srcset: 根据设备屏幕大小和分辨率选择最合适的图像进行显示
 
 返回 left、top、right、bottom、x、y、width 和 height 这几个以像素为单位的只读属性描述整个矩形的位置和大小。除了 width 和 height 以外的属性是相对于视图窗口的左上角来计算的。
 
+```html
 <img src="./img/1672803164426-2b23631f-6bb3-4d67-9557-69ab3be66560.png"  width="400"  style="margin: 0 auto;" />
+```
 
 ### property 和 attribute 区别
 

@@ -54,7 +54,7 @@ winget uninstall Git.Git --rainbow
 
 ## 2024-10-26
 
-<!-- 判断item是否在元组中 -->
+判断item是否在元组中
 
 ```typescript
 
@@ -96,6 +96,7 @@ export const postAccountUserDelete = <RNU extends (keyof AT_Doc)[] = [], NUDATA 
 ) => {
  return axios.post<U_I_NoNull<AT_Doc, RNU>>(`/api/admin/account/user/delete.ac`, data);
 };
+
 export declare interface AT_Doc {
  status: number;
  message: string;
@@ -140,11 +141,12 @@ export declare interface AT_UserVO {
  /*备注*/
  remark: string;
 }
+
 ```
 
 ## 2024-11-25
 
->Vue 文档指出，onActivated 和 onDeactivated 钩子不仅适用于 <KeepAlive> 缓存的根组件，也适用于缓存树中的后代组件。然而，我们面临的问题是 onActivated 没有在缓存组件的条件后代（用 v-if 切换的那些）上被调用。
+>Vue 文档指出，onActivated 和 onDeactivated 钩子不仅适用于 `<KeepAlive>` 缓存的根组件，也适用于缓存树中的后代组件。然而，我们面临的问题是 onActivated 没有在缓存组件的条件后代（用 v-if 切换的那些）上被调用。
 
 作为 v-if 更改后未在后代组件上调用 onActivated 的问题的潜在解决方法，可以考虑改用 v-show。这似乎解决了问题并确保了预期的行为，因为当使用 v-show 切换组件时，生命周期钩子会正确触发。
 

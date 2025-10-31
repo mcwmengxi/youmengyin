@@ -6,7 +6,7 @@
 
 方式一：ipcRenderer.send -> ipcMain.on（染进程发送消息至主进程，主进程监听）
 
-```纯文本
+```js
 ipcRenderer.send('my_channel', 'my_data');
 
 ipcMain.on('my_channel', (event, message) => {
@@ -19,7 +19,7 @@ ipcMain.on('my_channel', (event, message) => {
 
 方式一：await ipcRenderer.invoke发送消息等待ipcMain.handle返回结果
 
-```纯文本
+```js
 // 渲染进程
 const replyMessage = await ipcRenderer.invoke('my_channel', 'my_data');
 
@@ -33,7 +33,7 @@ ipcMain.handle('my_channel', async (event, message) => {
 
 方式二：ipcRenderer.send和ipcMain.on配合。这也是Electron 7没有 ipcRenderer.invoke 之前通过 IPC 进行异步双向通信的推荐方式。
 
-```纯文本
+```js
 渲染进程发送和监听返回事件
 ipcRenderer.on('asynchronous-reply', (_event, arg) => {
   console.log(arg) // 在 DevTools 控制台中打印“pong”
@@ -53,7 +53,7 @@ ipcMain.on('asynchronous-message', (event, arg) => {
 
 方式三：ipcRenderer.sendSync 向主进程发送消息，并同步等待响。同步特性意味着它将阻塞渲染器进程
 
-```纯文本
+```js
 渲染进程发送
 const result = ipcRenderer.sendSync('synchronous-message', 'ping')
 
@@ -69,7 +69,7 @@ ipcMain.on('synchronous-message', (event, arg) => {
 
 方式一：webContents.send，主进程使用BrowserWindow\.webContents.send 向渲染进程发送消息
 
-```纯文本
+```js
 const mainWindow = new BrowserWindow();
 mainWindow.webContents.send('messageToRenderer', 'Hello from Main!');
 
@@ -77,7 +77,7 @@ mainWindow.webContents.send('messageToRenderer', 'Hello from Main!');
 
 方式二：ipcMain 模块监听来自渲染进程事件，通过event.sender.send方法向渲染进程发送消息
 
-```纯文本
+```js
 ipcMain.on('messageFromMain', (event, arg) => {
   event.sender.send('messageToRenderer', 'Hello from Main!');
 });
@@ -87,7 +87,7 @@ ipcMain.on('messageFromMain', (event, arg) => {
 
 方式一：将主进程作为渲染器之间的消息代理
 
-```纯文本
+```js
 主进程监听渲染进程A消息，将消息发送给另一个渲染进程B
 ipcMain.on('win1-msg', (event, arg) => {
     // 这条消息来自 window 1

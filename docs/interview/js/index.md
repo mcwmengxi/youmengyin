@@ -185,7 +185,6 @@ Object.is = function (x, y) {
 
 变量环境是用来登记 var function 变量声明，词法环境是用来登记 let const class 等变量声明。块级作用域就是通过词法环境的栈结构来实现的，而变量提升是通过变量环境来实现。
 
-![image.png](./img/1660055913766-073ff578-64ec-419e-87f6-ff621cc318db.png)
 执行上下文是代码执行之前创建的。this 的指向是执行时确定的。
 
 ## 11.this
@@ -202,8 +201,6 @@ this 是和执行上下文绑定的，每个执行上下文都有一个 this，�
 
 5. 使用 call / apply / bind 指定 this
 
-   ![image.png](./img/1610595548981-f244a654-f57b-4c5b-a052-e7b68faf60cb.png)
-
 **关联知识**：call / apply / bind 实现
 
 ## 12.原型和原型链
@@ -219,11 +216,7 @@ this 是和执行上下文绑定的，每个执行上下文都有一个 this，�
 - 构造函数也是对象，构造函数的`__proto__`的属性指向构造函数 `Function.prototype`
 - `Function.prototype`对象，其`__proto__`属性指向构造函数 `Obejct.prototype`
 
-![img](img/1608636133475-77f18b71-1b7d-4d1f-bfd6-d1344d18ece2.webp)
-
 ## 13.继承的方式（todo）
-
-![image.png](./img/1625043301872-32a96c0d-9108-4e2c-9563-5cc933b9355a.png)
 
 > 简单叙述，详细请看手写实现
 

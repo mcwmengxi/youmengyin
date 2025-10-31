@@ -1,15 +1,14 @@
 # React开发环境搭建
+
 选择一个你喜欢的目录，然后运行以下命令：
 
 ```sh
 npm init vite
 ```
+
 - 执行完成之后会让你输入项目名称 例如 `react-demo`
 - 接下来会让你选择一个框架 这时候选择 `react`
 - 然后选择 `TypeScript + SWC` 如果你不会ts就选择js
-
-![alt text](./source/image.png)
-
 
 ## 目录介绍
 
@@ -29,7 +28,8 @@ npm init vite
 - tsconfig.node.json vite-ts配置文件
 - vite.config.ts vite配置文件
 
-### FAQ:
+### FAQ
+
 - **vite-env.d.ts中三斜线指令作用**
 
 答：vite-env.d.ts是一个 TypeScript 声明文件，它定义了一些全局变量和类型。这些全局变量和类型可以在 TypeScript 项目中使用，以在编译时提供类型检查和自动补全功能。
@@ -44,8 +44,6 @@ npm init vite
 - **为什么main.tsx的`document.getElementById('root')!`要加一个!**
 
 答：因为`document.getElementById('root')`返回可能为空，这时候就会报错。!是非空断言，告诉编辑器这个表达式不会为空。
-
-
 
 ## 命令介绍(package.json)
 

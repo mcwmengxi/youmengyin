@@ -12,7 +12,8 @@
 
 ## 浮动布局的场景模拟
 
-```xml
+```html
+
   <style>
     ul{
         font-size:0;
@@ -36,7 +37,7 @@
 
 由于两个li都为块级元素，如果想让它们都集中在一行，那么大家最先想到的方法肯定是给ul中的每一个子项li都添加上浮动属性，于是：
 
-```xml
+```html
 
   <style>
         ul{
@@ -59,7 +60,7 @@
 
 按照正常流程，在ul之下添加一个名为content的div来容纳这段文本:
 
-```xml
+```html
 <body>
     <ul>
         <li class="item"><img src="https://img1.baidu.com/it/u=4068347985,765153296&fm=253&fmt=auto&app=138&f=JPEG?w=658&h=370" alt=""></li>
@@ -93,19 +94,19 @@
 
 但如果我们将ul设置成BFC容器：在ul内添加上overflow:hidden这段代码，就可以解决这个问题。
 
-```xml
-   <style>
-        ul{
-            font-size:0;
-            overflow:hidden;
-        }
-        /* 图片宽度 */
-        img{
-            width: 300px;
-        }
-        .item{
-            float: left;
-        }
+```html
+  <style>
+    ul{
+        font-size:0;
+        overflow:hidden;
+    }
+    img{
+    /* 图片宽度 */
+        width: 300px;
+    }
+    .item{
+        float: left;
+    }
   </style>
 ```
 
@@ -122,7 +123,7 @@ BFC将浮动元素的高度计算在内，我们所期望的文本回到了它�
 
 ## 触发BFC的方式
 
-文档的根元素（<html>）。
+文档的根元素（`<html>`）。
 浮动元素（即 float 值不为 none 的元素）。
 绝对定位元素（position 值为 absolute 或 fixed 的元素）。
 行内块元素（display 值为 inline-block 的元素）。

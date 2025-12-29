@@ -22,7 +22,11 @@ JS 是单线程的语言，只有一个执行栈，先执行当前任务，遇�
 - 渲染是下一个宏任务执行前 [https://zhuanlan.zhihu.com/p/78113300](https://zhuanlan.zhihu.com/p/78113300)
 
 ```html
-<img src="./img/1654402275546-74fadbb4-590b-42cb-9079-9df66ae710ed.png"  width="200"  style="margin: 0 auto;" />
+<img
+  src="./img/1654402275546-74fadbb4-590b-42cb-9079-9df66ae710ed.png"
+  width="200"
+  style="margin: 0 auto;"
+/>
 ```
 
 宏任务：script 标签 / 交互事件
@@ -39,15 +43,15 @@ Node:
 
 ### 事件循环
 
-Node 的事件循环是由 libuv 实现的，每一轮的事件循环有6个阶段，每个阶段都有一个FIFO的执行回调的队列。
+Node 的事件循环是由 libuv 实现的，每一轮的事件循环有 6 个阶段，每个阶段都有一个 FIFO 的执行回调的队列。
 
 关键阶段：**timers**: setTimout/setInterval 、**poll**: 执行回调 / 检查定时器 、 **check**:setImmediate
 
-- Node11调整与浏览器结果一致，每执行完一个  timers类任务 就执行微任务
+- Node11 调整与浏览器结果一致，每执行完一个 timers 类任务 就执行微任务
 
   - 之前是：所有 timers 类任务 都执行完了，再执行微任务
 
-- process.nextTick 是一个单独的队列，每个阶段执行完 都会执行 process.nextTick 的队列，优先级大于Promise
+- process.nextTick 是一个单独的队列，每个阶段执行完 都会执行 process.nextTick 的队列，优先级大于 Promise
 
 - setImmediate 和 setTimeout
 
@@ -143,28 +147,40 @@ Access-Control-Request-Methods: POST,GET,OPTIONS
 - 正向代理
 - 反向代理
 
-## 5.浏览器缓存
+## 5.浏览器缓存策略
 
 浏览器缓存查找优先级：Service Worker / Memory Cache（浏览器自己控制） / Disk Cache（**HTTP 缓存**） / Push Cache（HTTP2）
 
-**HTTP 缓存**：
+### HTTP 缓存
+
 **强缓存**：
 
-- 1.0 响应头 `Expires`
+- 1.0 响应头 `Expires` 由客户端时间决定是否失效,不可取
 - `Pragma:nocache`
 - 1.1 `Cache-Control: max-age=120;no-store/no-cache;private/public`
 - 没有缓存，浏览器会启发式缓存，
 
 **协商缓存**：
 
-- `Last-modified / If-Modified-Since`
-- `Etag / If-None-Match`
+文件内容
+
+- 请求 `Etag`
+- 首次响应返回 `If-None-Match`
+
+  修改时间
+
+- 请求 `If-Modifief-Since`
+- 首次响应返回 `Last-Modified`
 
 F5: html 走`max-age=0`, 其他走缓存机制
 
 ctrl+F5: `Cache-Control:no-cache;Pragma:no-cache`
 
 `max-age=0`会走协商缓存，`no-cache` 重新请求
+
+### Service Worker
+
+> Service Worker 拦截请求资源, 并约定缓存请求的策略
 
 ## 6.浏览器渲染过程
 

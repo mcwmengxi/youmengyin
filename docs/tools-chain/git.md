@@ -593,3 +593,13 @@ lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s
   lc = ! git config user.name mochunwang && git config user.email mochunwang@company.com
   uns = ! git branch --unset-upstream
 ```
+
+### git stash clear/drop 后如何恢复
+
+```bash
+# 获取所有dangling commits
+git log --graph --oneline --decorate $( git fsck --no-reflog | awk '/dangling commit/ {print $3}' )
+
+# 最新的哈希值
+git stash apply efaba9de
+```

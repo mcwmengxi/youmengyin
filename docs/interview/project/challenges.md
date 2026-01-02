@@ -1,0 +1,460 @@
+﻿---
+title: 项目难点
+icon: markdown
+date: 2026-01-02
+description: 项目难点
+---
+
+## 事件循环
+
+- 事件循环是浏览器用于调度异步任务的机制：
+
+  - 浏览器主要的进程有：浏览器进程、网络进程、渲染进程。
+
+  - 渲染进程中又包含了多个线程：GUI 渲染线程、JS 引擎线程、事件触发线程、计时线程、渲染主线程。
+
+- 事件循环具体是什么？
+
+  浏览器的渲染进程启动后，会开启一个渲染主线程，它会进入一个无限循环，每一次循环都会检查任务队列中是否有任务存在。如果有，就取出第一个任务执行，执行完进入下一次循环；如果没有，则进入休眠状态。其他线程可以随时向任务队列添加任务：比如说计时线程，计时器时间到了，往里面加任务；比如说交互线程，监听到了用户点击，往里面加任务。加任务的时候一定是把它加到任务队列的末尾，先来的先执行，后来的排队。在添加新任务时，如果主线程处于休眠状态，会将其唤醒，继续循环执行任务。这个过程叫做事件循环。
+
+- 事件循环是实现异步的方式，那么异步又是什么？
+
+  JS 运行在浏览器的渲染主线程中，而渲染主线程只有一个，所以 JS 是单线程执行的。这是为了保证页面渲染的可靠性和一致性，防止多个线程同时修改 DOM 引起的问题。而渲染主线程需要做很多工作，比如解析 HTML、解析 CSS、计算样式、布局、执行全局 JS 代码。而在代码执行的过程中，会遇到一些无法立即处理的任务，比如：计时器回调、网络请求完成后需要执行的任务、用户操作后需要执行的任务。如果使用同步的方式，让渲染主线程等待这些任务的执行，就会导致主线程长期处于阻塞状态，从而导致任务队列中很多其他任务无法被执行。这样一来，一方面会导致主线程白白地消耗时间，另一方面也会导致页面无法及时更新，给用户造成卡死现象。而渲染主线程承担着极其重要的工作，无论如何都不能阻塞，所以浏览器采用异步的方式来解决这个问题。当某些任务发生时，比如计时器、网络请求、事件监听，主线程会将任务交给其他线程去处理。当其他线程完成时，会将事先传递的回调函数包装成任务，加入到任务队列的末尾排队，等待主线程调度。在这种异步模式下，浏览器永不阻塞，从而最大程度地保证了单线程的流畅运行。
+
+- JS 为什么会阻塞页面渲染？
+
+  在浏览器中，GUI 线程负责解析 HTML、CSS 并进行页面的绘制，JS 引擎线程负责执行 JS 代码。由于 GUI 渲染和 JS 执行共享同一个渲染主线程，所以它们是互斥的。当 GUI 渲染线程准备渲染页面时，如果遇到需要执行 JS 的情况，会等待 JS 引擎线程执行完毕后再继续渲染。这期间，渲染主线程处于阻塞状态，页面渲染暂停。
+
+- 任务队列的优先级：
+
+  任务是没有优先级的，在任务队列中先进先出。但是任务队列是有优先级的。根据 W3C 最新解释：每个任务都有一个任务类型，同一个类型的任务必须在一个队列，不同类型的任务属于不同的队列。在一次事件循环中，浏览器可以根据实际情况从不同的队列中取出任务执行。浏览器必须准备一个微队列，微队列中的任务优先所有其他任务执行。随着浏览器复杂度急剧提升，W3C 不再使用宏队列的说法。在目前谷歌浏览器的实现中，至少包含了：延时队列，用于存放计时器的回调任务；交互队列，用于存放用户操作后产生的任务；网络队列，用于存放网络请求完成后产生的任务；微队列，也称为 vip 队列，优先级最高。在延时队列、交互队列、网络队列中，交互队列的优先级更高，因为浏览器认为用户的交互更加重要。
+
+- JS 中的计时器能精确计时吗？
+
+  不能，因为计时器回调需要在任务队列中排队，而在它前面可能有其他任务正在排队，所以需要等待它前面的任务执行完，所以还应该算上它前面那些任务的执行时间。而且，按照 W3C 标准，浏览器实现计时器时，如果嵌套层级超过 5 层，会带有 4 毫秒的最少时间，如果计时时间少于 4 毫秒时，会带来偏差。我们用的计时器函数例如 setTimeout 和 setInterval 其实最终调用的是操作系统的函数，而操作系统的计时函数本身就有少量偏差，并且不同操作系统，它的实现不一样，Windows 和 Mac 就不一样，谷歌浏览器实际上是针对 Windows 和 Mac 都做了不同的实现，调的是不同的函数，所以 JS 的计时器就携带了这些偏差。
+
+- 总结：
+
+  单线程是异步产生的原因。事件循环是异步的实现方式。异步的实现可以解决主线程阻塞的问题，有了异步之后，线程永不阻塞。
+
+## 取消重复请求
+
+创建一个请求列表，记录正在发送的请求。Key 为请求参数拼接成的字符串标识，Value 为取消请求的方法。
+
+发送请求时，判断请求列表中是否存在重复请求。如果存在的话，就取消请求列表中的请求，并将它从请求列表中删除；如果不存在，就把当前请求添加到请求列表中。请求发送完成后，将当前请求从请求列表中删除。
+
+:::tip 怎么判断两个请求相同？
+
+判断它们的请求方式、请求地址、请求头、请求体、携带参数是否一致。
+
+:::
+
+```ts
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios'
+
+/**
+ * 请求列表
+ * @description 记录正在发送的请求
+ */
+const requestsMap = new Map()
+
+/**
+ * 生成请求标识（请求参数拼接成的字符串）
+ * @param {AxiosRequestConfig} config
+ * @description 判断两个请求是否相同，就是判断它们的 请求方式、请求地址、请求头、请求体、携带参数 是否一致
+ */
+function getRequestKey(config: AxiosRequestConfig) {
+  const { url, method, params = {}, data = {} } = config
+  // 将请求参数拼接成字符串，方便比较
+  return [url, method, JSON.stringify(params), JSON.stringify(data)].join('&')
+}
+
+/**
+ * 添加请求
+ * @param {AxiosRequestConfig} config
+ */
+function addRequestKey(config: AxiosRequestConfig) {
+  const requestKey = getRequestKey(config)
+  config.cancelToken = new axios.CancelToken((cancel) => {
+    // 判断请求列表中是否 **不存在** 该请求
+    // 也就是判断该请求是否 **不是** 重复的请求
+    // 如果不是重复的请求，就要将它添加到请求列表中
+    if (!requestsMap.has(requestKey)) {
+      // 向请求列表中添加一个请求，Key 为请求参数拼接成的字符串标识，Value 为取消请求的方法
+      requestsMap.set(requestKey, cancel)
+    }
+  })
+}
+
+/**
+ * 删除请求
+ * @param {AxiosRequestConfig} config
+ */
+function delRequestKey(config: AxiosRequestConfig) {
+  const requestKey = getRequestKey(config)
+  // 判断请求列表中是否存在该请求
+  // 也就是判断该请求是否是重复的请求
+  // 如果是重复的请求，就要取消请求列表中的请求，并将它从请求列表中删除
+  if (requestsMap.has(requestKey)) {
+    const cancel = requestsMap.get(requestKey)
+    // 取消请求列表中的请求
+    cancel()
+    // 将请求从请求列表中删除
+    requestsMap.delete(requestKey)
+  }
+}
+
+instance.interceptors.request.use(
+  (config) => {
+    const token = storage.get('token')
+    if (token) config.headers.token = token
+
+    delRequestKey(config) // 检查当前请求是不是重复请求
+    addRequestKey(config) // 将当前请求添加到请求列表中
+
+    return config
+  },
+  (error) => Promise.reject(error)
+)
+
+instance.interceptors.response.use(
+  async (response: AxiosResponse<ResponseResult>) => {
+    delRequestKey(response.config) // 请求完成，将当前请求从请求列表中删除
+
+    // ...
+
+    return response
+  },
+  (error) => {
+    error.config && delRequestKey(error.config)
+    return Promise.reject(error)
+  }
+)
+```
+
+## 取消上一页请求
+
+添加 `{requestKey: cancel}` 的同时，添加当前页面路径。
+
+在导航守卫中对请求列表中的所有请求进行判断，如果不是当前页面的请求，就取消该请求，并将其删除。
+
+::: tabs 取消上一页请求
+
+@tab <Ts /> request.ts
+
+```ts
+// 请求列表
+export const requestsMap = new Map()
+
+// 生成请求标识
+function getRequestKey(config: AxiosRequestConfig) {
+  const { url, method, params = {}, data = {} } = config
+  return [url, method, JSON.stringify(params), JSON.stringify(data)].join('&')
+}
+
+// 添加请求
+function addRequestKey(config: AxiosRequestConfig) {
+  const requestKey = getRequestKey(config)
+  config.cancelToken = new axios.CancelToken((cancel) => {
+    if (!requestsMap.has(requestKey)) {
+      requestsMap.set(requestKey, {
+        cancel,
+        pathname: window.location.pathname,
+      })
+    }
+  })
+}
+
+// 删除请求
+function delRequestKey(config: AxiosRequestConfig) {
+  const requestKey = getRequestKey(config)
+  if (requestsMap.has(requestKey)) {
+    const { cancel } = requestsMap.get(requestKey)
+    cancel()
+    requestsMap.delete(requestKey)
+  }
+}
+```
+
+@tab <Ts /> auth.ts
+
+```ts
+import { requestsMap } from './request'
+
+router.beforeEach((to, _form, next) => {
+  requestsMap.forEach(({ cancel, pathname }, key) => {
+    // 如果不是当前页面的请求
+    if (pathname !== to.path) {
+      // 取消请求
+      cancel()
+      // 从请求列表中删除
+      requestsMap.delete(key)
+    }
+  })
+})
+```
+
+:::
+
+## 无感刷新
+
+后端返回 AccessToken 和 RefreshToken。AccessToken 用于请求数据，有效期很短；RefreshToken 用来获取新的 AccessToken，有效期较长。
+
+请求数据时，携带 AccessToken，如果 AccessToken 失效了，就需要携带 RefreshToken 去请求最新的 AccessToken，然后携带新的 AccessToken 重新请求数据。
+
+每隔一段时间，请求一次 AccessToken，这样确保用户停留在页面的时候，双 Token 一直存在。
+
+```ts
+import { apiLogin, apiResource, apiAccessToken } from '@/api/login'
+import {
+  setAccessToken,
+  setRefreshToken,
+  removeAccessToken,
+  removeRefreshToken,
+} from '@/utils/token'
+
+async function login() {
+  try {
+    const { accessToken, refreshToken } = await apiLogin()
+
+    setAccessToken(accessToken)
+    setRefreshToken(refreshToken)
+  } catch {
+    // 登录失败
+    removeAccessToken()
+    removeRefreshToken()
+  }
+}
+
+async function getResource() {
+  try {
+    const { data } = await apiResource()
+  } catch {
+    // AccessToken 过期了
+    removeAccessToken()
+  }
+}
+
+async function refreshToken() {
+  try {
+    const { accessToken } = await apiAccessToken()
+
+    setAccessToken(accessToken) // 更新 AccessToken
+  } catch {
+    // RefreshToken 也过期了
+    removeRefreshToken()
+  }
+}
+
+function logout() {
+  removeAccessToken()
+  removeRefreshToken()
+}
+```
+
+## 虚拟列表
+
+:::tip 心跳监测
+
+客户端每隔一分钟向服务器发送一个 "ping" 信号；服务器要立即返回一个 "pong" 信号。客户端需要检测在 5 秒内是否收到信号，如果客户端收到了信号，说明连接没问题，开始下一次心跳检测；如果没有收到信号，说明连接有问题，进行重连。
+
+:::
+
+::: tabs#VirtualList
+
+@tab <Ts /> useSocket.ts
+
+```ts
+class Socket {
+  success = false // 心跳检测是否成功
+
+  reconnectTimes = 0 // 当前重连次数
+  reconnectId?: NodeJS.Timeout
+
+  url: string
+  ws: WebSocket
+
+  callbacks: ((data: any) => void)[] = []
+
+  constructor(url: string) {
+    this.url = url
+    this.ws = this.initSocket()
+  }
+
+  initSocket() {
+    const ws = new WebSocket(this.url)
+
+    // WebSocket 连接成功
+    ws.addEventListener('open', () => {
+      this.ws.addEventListener('message', (event) => {
+        if (event.data === 'pong') {
+          this.success = true
+        }
+      })
+
+      this.keepAlive() // 心跳检测
+      this.reconnectTimes = 0 // 重置重连次数
+    })
+
+    // WebSocket 断开连接
+    ws.addEventListener('close', this.reconnect) // 开始重连
+
+    ws.addEventListener('message', (event) => {
+      if (event.data === 'pong') return
+      this.callbacks.forEach((cb) => cb(JSON.parse(event.data)))
+    })
+
+    return ws
+  }
+
+  // 接收消息
+  onMessage<T>(cb: (data: T) => void) {
+    this.callbacks.push(cb)
+  }
+
+  // 心跳检测
+  keepAlive() {
+    setTimeout(() => {
+      // 向服务器发送 ping 信号
+      this.ws.send('ping')
+
+      // 在 5s 内检测是否接收到 pong 信号
+      setTimeout(() => {
+        if (this.success) {
+          this.success = false
+          this.keepAlive() // 开始下一次心跳检测
+        } else {
+          this.ws.close() // 关闭 WebSocket
+          this.reconnect() // 开始重连
+        }
+      }, 5000 /* 心跳检测接收服务器信号时间 */)
+    }, 1000 /* 心跳检测间隔时间 */)
+  }
+
+  // 断线重连
+  reconnect() {
+    // 超过次数限制，就不重连了
+    if (this.reconnectTimes >= 5 /* 最大重连次数 */) return
+
+    clearTimeout(this.reconnectId)
+    this.reconnectId = setTimeout(() => {
+      this.reconnectTimes++
+      this.ws = this.initSocket()
+    }, 30000 /* 断线重连间隔时间 */)
+  }
+}
+
+export default function useSocket(url: string) {
+  return new Socket(url)
+}
+```
+
+@tab <Vue /> VirtualList.vue
+
+```ts
+import { ref, computed, onBeforeUnmount } from 'vue'
+import useSocket from './useSocket.ts'
+
+const virtualList = ref<VirtualItem[]>([])
+
+const startIndex = ref(0)
+
+const endIndex = ref(20)
+
+const realList = computed(() =>
+  virtualList.value.slice(startIndex.value, endIndex.value)
+)
+
+const socket = useSocket('ws://localhost:3000')
+
+socket.onMessage((data: VirtualItem[]) => {
+  virtualList.value.push(...data)
+  start()
+})
+
+const top = ref(0)
+
+const timer = ref<NodeJS.Timeout>(null)
+
+const isMouseEnter = ref(false)
+
+const start = () => {
+  if (virtualList.value.length <= 20 || isMouseEnter.value) return
+
+  clearInterval(timer.value)
+  timer.value = setInterval(() => {
+    top.value -= 0.6
+
+    startIndex.value = Math.abs(Math.ceil(top.value / 30))
+    endIndex.value = startIndex.value + 20
+  }, 1000 / 60)
+}
+
+onBeforeUnmount(() => {
+  clearInterval(timer.value)
+})
+
+const onEnter = () => {
+  isMouseEnter.value = true
+  clearInterval(timer.value)
+}
+
+const onLeave = () => {
+  isMouseEnter.value = false
+  start()
+}
+```
+
+:::
+
+## 大屏适配
+
+监听窗口尺寸变化，计算缩放系数，等比例缩放根元素。
+
+```vue
+<script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue'
+import { useDebounceFn } from '@vueuse/core'
+
+onMounted(() => {
+  resize()
+  addEventListener('resize', resize)
+})
+
+onBeforeUnmount(() => {
+  removeEventListener('resize', resize)
+})
+
+const scale = ref(1)
+
+const designWidth = 1920
+const designHeight = 1080
+
+const resize = useDebounceFn(() => {
+  const scaleX = window.innerWidth / designWidth
+  const scaleY = window.innerHeight / designHeight
+
+  scale.value = Math.min(scaleX, scaleY) // 完全显示图片，可能有空白
+  // Math.max(scaleX, scaleY) // 不留空白，内容可能超出容器
+}, 300)
+</script>
+
+<template>
+  <div class="root" :style="{ transform: `scale(${scale}) translate(-50%)` }">
+    <!-- content -->
+  </div>
+</template>
+
+<style scoped lang="scss">
+.root {
+  width: 1920px;
+  height: 1080px;
+
+  /* 适配代码 */
+  position: fixed;
+  transform-origin: 0 0;
+  left: 50%;
+  transition: 0.3s;
+}
+</style>
+```

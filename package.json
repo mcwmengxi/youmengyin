@@ -30,12 +30,16 @@
       "ignoreMissing": [
         "@algolia/client-search"
       ]
+    },
+    "patchedDependencies": {
+      "vite-plugin-markdown-preview": "patches/vite-plugin-markdown-preview.patch"
     }
   },
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "@sugarat/theme": "^0.5.4",
     "element-plus": "^2.9.4",
-    "oh-my-live2d": "^0.19.3"
+    "oh-my-live2d": "^0.19.3",
+    "vite-plugin-markdown-preview": "^1.1.1"
   }
 }

@@ -1,10 +1,18 @@
+---
+tags:
+ - 模板
+title: markdown 测试页
+date: 2023/03/07
+---
+
+
 #
 
 ## 🍦 前言
 
 ## 🦚
 
-## 🚀  
+## 🚀
 
 ## 🛰️
 
@@ -19,11 +27,11 @@
 ## markdown 语法
 
 - [ ] 代办
-- [X] 已完成
+- [x] 已完成
 
 _斜体_ _斜体_
 
->**粗体**
+> **粗体**
 
 **_粗斜体_**
 
@@ -93,3 +101,59 @@ sout<<"我也是代码";
 ---
 
 `俺是深色方块`
+
+## 功能测试页
+
+### 鼠标划过 - 边框高亮
+
+<BorderHover />
+
+### vite-plugin-markdown-preview
+
+```vue preview
+<template>
+  <div class="flex-row-center rounded-lg w-full h-40 bg-blue-500">vue 组件预览测试</div>
+</template>
+```
+
+### 时间线
+
+::: timeline 2023-05-24
+
+- **do some thing1**
+- do some thing2
+- 23
+
+:::
+
+::: timeline 2023-05-23
+
+- ![测试图片](https://zx-picture-bed.oss-cn-beijing.aliyuncs.com/images/CodeSnap.png)
+- do some thing4
+
+:::
+
+### 代办
+
+- [ ] 模型资源预览
+- [ ] 博客概览信息（文章数，网站运行天数，字数，访问量等等）,参考 Hexo 系列主题
+- [x] 文章支持短链
+
+近期完成：
+
+::: details 详情
+
+- [x] 推荐文章支持隐藏日期和序号的展示
+- [x] 自定义主题色，防止展示时页面颜色闪烁
+- [x] 标签和友链标题支持定制
+
+:::
+
+<br/>
+
+::: details 待办事项选用
+
+- [ ] &nbsp;&nbsp;markdown-it-task-checkbox
+- [x] &nbsp;&nbsp;emoji
+
+:::

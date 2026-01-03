@@ -1,5 +1,6 @@
 ---
 layout: home
+layoutClass: 'm-home-layout'
 # title: '青萱织梦人的个人博客，记录随笔、开发经验和学习笔记'
 # titleTemplate: Vite & Vue powered static site generator
 # head:
@@ -15,9 +16,11 @@ blog:
   motto: 记录日常和知识分享
   inspiring:
     - 没能留住你，也不曾忘记你
+    - 人生就是不断取舍的过程，你可以拥有很多，但终究要放弃很多
   # 设置 inspiringTimeout 可以实现自动切换
   inspiringTimeout: 5000
   pageSize: 6
+# pagefind-indexed: false
 # hero:
 #   name: YMY
 #   text: 笔记专区
@@ -46,7 +49,8 @@ blog:
 #     details: 暂时以 golang 为主、涉及接口实现、运维部署、nginx/docker/CI、CD 等
 ---
 <Home/>
-
+<!-- 纸屑效果 -->
+<Confetti />
 <script setup>
 import { onMounted } from 'vue'
 import { addReleaseTag } from './.vitepress/utils/addReleaseTag.js'
@@ -54,5 +58,21 @@ import Home from '@theme/index.vue'
 onMounted(() => {
   addReleaseTag()
 })
-
 </script>
+<style>
+/*爱的魔力转圈圈*/
+.m-home-layout .image-src:hover {
+  transform: translate(-50%, -50%) rotate(666turn);
+  transition: transform 59s 1s cubic-bezier(0.3, 0, 0.8, 1);
+}
+
+.m-home-layout .details small {
+  opacity: 0.8;
+}
+
+.m-home-layout .bottom-small {
+  display: block;
+  margin-top: 2em;
+  text-align: right;
+}
+</style>

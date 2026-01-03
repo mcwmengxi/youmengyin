@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/node": "^25.0.3",
     "busuanzi.pure.js": "^1.0.3",
     "dayjs": "^1.11.13",
     "fast-glob": "^3.3.2",
@@ -36,10 +37,17 @@
     }
   },
   "dependencies": {
+    "@antv/g2plot": "^2.4.35",
     "@element-plus/icons-vue": "^2.3.1",
-    "@sugarat/theme": "^0.5.4",
+    "@mdit-vue/shared": "^3.0.2",
+    "@sugarat/theme": "^0.5.12",
+    "canvas-confetti": "^1.9.4",
     "element-plus": "^2.9.4",
+    "gray-matter": "^4.0.3",
+    "markdown-it-task-checkbox": "^1.0.6",
     "oh-my-live2d": "^0.19.3",
-    "vite-plugin-markdown-preview": "^1.1.1"
+    "vite-plugin-markdown-preview": "^1.1.1",
+    "vitepress-markdown-timeline": "^1.2.2",
+    "vitepress-plugin-pagefind": "^0.4.18"
   }
 }

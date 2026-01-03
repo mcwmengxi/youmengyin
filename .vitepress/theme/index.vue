@@ -5,7 +5,7 @@ const { frontmatter } = useData()
 </script>
 
 <template>
-  <div align="center" style="margin-top: 50px">
+  <div align="center" style="margin-top: 10px">
     <!-- <img
       src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&size=30&pause=1000&center=true&vCenter=true&width=435&lines=%E6%84%BF%E6%88%91%E5%A6%82%E9%95%BF%E9%A3%8E%EF%BC%8C%E6%B8%A1%E5%90%9B%E8%A1%8C%E4%B8%87%E9%87%8C%E3%80%82"
     /> -->

@@ -7,16 +7,17 @@ export default [
     activeMatch: '/article/',
     link: '/article/milepost/milepost-2023',
   },
+  { text: '导航网站', link: '/docs/nav/', activeMatch: '^/docs/nav/' },
   {
     text: '📚 学习笔记',
     items: [
       { text: '📋 开发', link: '/docs/devops/index' },
       { text: '🔧 工具链', link: '/docs/tools-chain/' },
-      { text: '⭐资源导航', link: '/docs/resource/',},
+      { text: '⭐资源导航', link: '/docs/resource/' },
     ],
   },
   {
-    text: '📋 前端',
+    text: '📋 前端物语',
     items: [
       {
         text: '📋前端基础',
@@ -49,8 +50,8 @@ export default [
       {
         text: '📋Nestjs',
         link: '/docs/nestjs/index',
-      }
-    ]
+      },
+    ],
   },
   {
     text: '💻后端',
@@ -58,13 +59,16 @@ export default [
       { text: '⭐ GoLang基础', link: '/docs/backend/go/index' },
       {
         text: '📃 Python基础',
-        link: '/views/after-end/python/PandasCodeSnippet'
+        link: '/views/after-end/python/PandasCodeSnippet',
       },
       { text: '📃 Java基础', link: '/views/after-end/java/basic/extend' },
       { text: '📃SQL常用语句', link: '/views/sql/common-sql' },
       { text: '📃 正则基础', link: '/views/regexp/reg01' },
-      { text: '📃 构建工具', link: '/views/after-end/build-tools/gradle-basic' },
-    ]
+      {
+        text: '📃 构建工具',
+        link: '/views/after-end/build-tools/gradle-basic',
+      },
+    ],
   },
   {
     text: '🔥 专栏',

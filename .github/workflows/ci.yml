@@ -1,10 +1,19 @@
 name: Build and Deploy
+# 权限设置
 permissions:
   contents: write
+# 触发条件，push到master分支或者pull request到master分支
 on:
   push:
     branches:
       - master
+  pull_request:
+    branches: [main]
+  # 支持手动在工作流上触发
+  workflow_dispatch:
+# 设置时区
+env:
+  TZ: Asia/Shanghai
 jobs:
   deploy:
     concurrency: ci-${{ github.ref }}
@@ -16,7 +25,7 @@ jobs:
       - name: Setup node
         uses: actions/setup-node@v2
         with:
-          node-version: "18.18.1"
+          node-version: '18.18.1'
           registry-url: https://registry.npmjs.com/
 
       - name: Setup pnpm

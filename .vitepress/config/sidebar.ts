@@ -1,10 +1,29 @@
-import { sidebarInterview,sidebarAlgorithm, sidebarPatterns, sidebarDesign,sidebarFlutter, sidebarArticle,sidebarTools, sidebarGo, sidebarSql,sidebarReg, sidebarOtherBe, sidebarFront, sidebarDevelops, sidebarReact, sidebarTypescript } from './sidebar/index'
-import { sidebarAndroid, sidebarElectron, sidebarThreeJS } from './sidebar/frontend'
+import {
+  sidebarInterview,
+  sidebarAlgorithm,
+  sidebarPatterns,
+  sidebarDesign,
+  sidebarFlutter,
+  sidebarArticle,
+  sidebarTools,
+  sidebarGo,
+  sidebarSql,
+  sidebarReg,
+  sidebarOtherBe,
+  sidebarFront,
+  sidebarDevelops,
+  sidebarReact,
+  sidebarTypescript,
+} from './sidebar/index'
+import {
+  sidebarAndroid,
+  sidebarElectron,
+  sidebarThreeJS,
+} from './sidebar/frontend'
 import { autoGenerateSidebarNestjsItems } from './sidebar/nestjs'
 
-
 export default {
-  '/docs/devops/' : sidebarDevelops(),
+  '/docs/devops/': sidebarDevelops(),
   '/docs/tools-chain/': sidebarTools(),
   '/docs/resource/': [
     {
@@ -60,7 +79,7 @@ export default {
   '/docs/nestjs': autoGenerateSidebarNestjsItems(),
   // 面试
   '/docs/interview': sidebarInterview(),
-  
+
   // 后端
   '/views/after-end': sidebarOtherBe(),
   // GoLang
@@ -76,4 +95,10 @@ export default {
   '/article/vue-design/': sidebarDesign(),
 
   '/article/': sidebarArticle(),
+  '/views/tag': [
+    {
+      text: 'tag',
+      link: '/views/tag',
+    },
+  ],
 }

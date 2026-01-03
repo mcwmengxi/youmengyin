@@ -1,10 +1,19 @@
+import { getSidebarsItems } from '../utils'
+const pit = getSidebarsItems('/pit', 'article')
+
 function sidebarArticle() {
   return [
+    {
+      text: '踩坑记录',
+      items: pit,
+      collapsible: false,
+      collapsed: false,
+    },
     {
       text: '里程碑',
       items: [
         { text: '里程碑 2023', link: '/article/milepost/milepost-2023' },
-        { text: '里程碑 2024', link: '/article/milepost/milepost-2024' }
+        { text: '里程碑 2024', link: '/article/milepost/milepost-2024' },
       ],
     },
     {
@@ -25,7 +34,7 @@ function sidebarArticle() {
         { text: '模板', link: '/article/article/template' },
         { text: 'github学习项目', link: '/article/article/awesome-project' },
       ],
-    }
+    },
   ]
 }
 

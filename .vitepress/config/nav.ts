@@ -3,9 +3,19 @@ import { DefaultTheme } from 'vitepress'
 // 导航栏配置
 export default [
   {
-    text: '🏆文章记录',
-    activeMatch: '/article/',
-    link: '/article/milepost/milepost-2023',
+    text: '日常记录',
+    items: [
+      {
+        text: '踩坑记录',
+        link: '/article/pit/npm',
+        activeMatch: '^/article/pit',
+      },
+      {
+        text: '🏆文章记录',
+        activeMatch: '^/article/milepost',
+        link: '/article/milepost/milepost-2023',
+      },
+    ],
   },
   { text: '导航网站', link: '/docs/nav/', activeMatch: '^/docs/nav/' },
   {
@@ -79,4 +89,4 @@ export default [
       { text: '🔥 vue源码实现', link: '/article/vue-design/page-1' },
     ],
   },
-] as DefaultTheme.NavItem[]
+] as DefaultTheme.Config['nav']

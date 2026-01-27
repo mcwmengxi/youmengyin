@@ -1,7 +1,7 @@
 
-
 容器没有vim环境,通过cat命令追加实现修改效果
-我的是debian 11.x (bullseye),具体参见https://developer.aliyun.com/mirror/debian
+我的是debian 11.x (bullseye),具体参见<https://developer.aliyun.com/mirror/debian>
+
 ```shell
 cat >/etc/apt/sources.list <<EOF
 deb https://mirrors.aliyun.com/debian/ bullseye main non-free contrib
@@ -32,11 +32,11 @@ source /etc/profile
 验证
 node -v npm -v
 
-
 查看nginx目录
-ps -ef | grep nginx 
+ps -ef | grep nginx
 
 ### 防火墙
+
 查看防火墙端口开放
 `firewall-cmd --zone=public --list-ports`
 `firewall-cmd --list-all`
@@ -61,7 +61,23 @@ netstat -lnpt |grep 8888
 查看进程的详细信息
 ps 8888
 
+```bash
+# 根据端口号查找对应的进程
+netstat -tuln
+netstat -tuln | grep 8080
 
+# 方法2
+ss -tuln
+ss -tuln | grep 8080
+
+# 方法3
+lsof -i -P -n | grep LISTEN
+lsof -i :80
+
+# 方法4
+fuser 80/tcp
+
+```
 
 ### 查阅命令帮助信息
 
@@ -72,6 +88,7 @@ ls --help
 
 man ls
 ```
+
 >使用 man 时的操作键
 
 | 操作键 | 功能           |
@@ -85,20 +102,21 @@ man ls
 
 ### 常用Linux命令的基本使用
 
-|序号 | 命令 |	对应英文 |作用 |
+|序号 | 命令 | 对应英文 |作用 |
 | :----: | :------------: | :----: | :------------: |
-|01 | ls |	list |	查看当前文件夹下的内容|
-|02 | pwd |	print work directory |	查看当前所在文件夹|
-|03 | cd[目录名] |	changge directory| 切换文件夹|
-|04 | touch[文件名] |	touch |	如果文件不存在，新建文件|
-|05 | mkdir[目录名] |	make | directory |
-|06 | rm[文件名]	| remove | 删除指定文件|
-|07 | clear |	clear| 清屏 |
+|01 | ls | list | 查看当前文件夹下的内容|
+|02 | pwd | print work directory | 查看当前所在文件夹|
+|03 | cd[目录名] | changge directory| 切换文件夹|
+|04 | touch[文件名] | touch | 如果文件不存在，新建文件|
+|05 | mkdir[目录名] | make | directory |
+|06 | rm[文件名] | remove | 删除指定文件|
+|07 | clear | clear| 清屏 |
 
 ### 查找文件find
 
 `find [路径] -name “*.py”`
 省略路径，表示在当前文件夹下查找, 可以使用通配符
+
 ```bash
 find -name '/*.exe'
 ```
@@ -106,6 +124,7 @@ find -name '/*.exe'
 ### 软链接
 
 `ln -s 被链接的源文件 链接文件`
+
 1. 建立文件的软链接，类似于 Windows 的快捷方式
 2. 没有 -s 选项建立的是一个硬链接文件
 3. 源文件要使用绝对路径，不能使用相对路径，这样可以方便移动链接文件后，仍然能够正常使用
@@ -114,10 +133,10 @@ find -name '/*.exe'
 
 | 选项| 含义 |
 | :-:|:---:|
-| c|	生成档案文件，创建打包文件|
-| x|	解开档案文件|
-| v|	列出归档解档的详细过程，显示进度|
-| f|	指定档案文件名称，f 后面一定是 .tar 文件，所以必须放选项最后|
+| c| 生成档案文件，创建打包文件|
+| x| 解开档案文件|
+| v| 列出归档解档的详细过程，显示进度|
+| f| 指定档案文件名称，f 后面一定是 .tar 文件，所以必须放选项最后|
 
 **打包文件**
 
@@ -143,6 +162,7 @@ tar -zxvf 打包文件.tar.gz
 tar -zxvf 打包文件.tar.gz -C 目标路径(要解压缩的目录必须存在)
 
 ```
+
 **bzip2**
 
 在 tar 命令中有一个选项 -j 可以调用 bzip2 ，从而可以方便的实现压缩和解压缩
@@ -166,6 +186,7 @@ $ sudo apt remove 软件名
 $ sudo apt upgrade
 
 ```
+
 ## 文件和目录常用命令
 
 ### 查看目录内容 ls
@@ -190,10 +211,7 @@ $ sudo apt upgrade
 
 ps: 以 . 开头的文件为隐藏文件，需要用 -a 参数才能显示
 
-
 ### 切换目录 cd
-
-
 
 | 命令 | 含义                                   |
 | ---- | -------------------------------------- |
@@ -207,8 +225,6 @@ ps: 以 . 开头的文件为隐藏文件，需要用 -a 参数才能显示
 
 - 相对路径 在输入路径时，最前面不是 / 或者 ~，表示相对 当前目录 所在的目录位置。
 - 绝对路径 在输入路径时，最前面是 / 或者 ~，表示从 **根目录/home目录** 开始的具体目录位置
-
-
 
 ### 创建和删除操作
 
@@ -270,8 +286,6 @@ ps: 新建目录的名称 不能与当前目录中已有的目录或文件同名
 | 选项 | 含义           |
 | ---- | -------------- |
 | -i   | 覆盖文件前提示 |
-
-
 
 #### 查看文件内容
 
@@ -349,11 +363,9 @@ Linux 允许将 一个命令的输出 可以通过管道做为另一个命令的
 
 ## 目录管理
 
-
 ## 文件管理
 
 ## 用户管理
-
 
 ```bash
 // 创建用户

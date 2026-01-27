@@ -1,6 +1,7 @@
-import { getSidebarsItems } from '../sidebar'
+import { getSidebarsItems } from '../utils'
+import { sidebarTypescript } from './typescript'
 
-function sidebarFront() {
+export function sidebarFront() {
   return [
     {
       text: '前端',
@@ -30,6 +31,7 @@ function sidebarFront() {
             { text: '生成器', link: '/docs/front-end/javascript/generator' },
             { text: 'proxy 代理', link: '/docs/front-end/javascript/proxy' },
             { text: '事件循环', link: '/docs/front-end/javascript/event-loop' },
+            { text: '网页的各种距离', link: '/docs/front-end/javascript/distance' },
           ],
         }, 
         {
@@ -101,6 +103,15 @@ function sidebarFront() {
                   link: '/docs/front-end/modules/webpack/plugins'
                 },
               ]
+            },
+            {
+              text: 'Vite',
+              items: [
+                {
+                  text: 'vite基础',
+                  link: '/docs/front-end/modules/vite/basic'
+                },
+              ]
             }
           ]
         },
@@ -133,21 +144,7 @@ function sidebarFront() {
         {
           text: 'typescript',
           collapsed: true,
-          items: [
-            {
-              text: '介绍',
-              link: '/docs/front-end/typescript/index'
-            },
-            {
-              text: '基础入门',
-              link: '/docs/front-end/typescript/base'
-            },
-            { text: '基础', collapsed: true, items: new Array(10).fill({}).map((item, idx) => ({ text: `基础-${idx+1}`, link: `/docs/front-end/typescript/base/base-${idx+1}` })) },
-            { text: 'ts基础', link: '/docs/front-end/typescript/basic' },
-            { text: '类型', link: '/docs/front-end/typescript/type' },
-            { text: '其它', link: '/docs/front-end/typescript/other' },
-            { text: 'TS最佳实践', link: '/docs/front-end/typescript/ts-best-practice' }
-          ]
+          items: sidebarTypescript()
         },
         {
           text: 'threeJS',
@@ -247,19 +244,88 @@ function sidebarFront() {
             },
           ]
         },
+        {
+          text: '前端代码规范和约束',
+          collapsed: true,
+          items: [
+            {
+              text: '代码检查',
+              link: '/docs/front-end/tooling/code-specification'
+            },
+            {
+              text: '提交校验',
+              link: '/docs/front-end/tooling/submit-specification'
+            },
+            
+          ]
+        },
       ]
     },
   ]
 }
-function sidebarFlutter(){
+
+export function sidebarReact() {
+  return [
+    {
+      text: '入门',
+      items: [
+        { text: 'React基本介绍', link: '/docs/front-end/react/basic/introduce' },
+        { text: 'React开发环境搭建', link: '/docs/front-end/react/basic/development' },
+        { text: 'tsx语法入门', link: '/docs/front-end/react/basic/tsx' },
+      ]
+    },
+    {
+      text: '工具',
+      items: [
+        { text: 'Babel', link: '/docs/front-end/react/tools/babel' },
+        { text: 'Swc', link: '/docs/front-end/react/tools/swc' },
+        { text: '简易版Vdom', link: '/docs/front-end/react/tools/vdom' }
+      ]
+    },
+  ]
+}
+export function sidebarFlutter(){
   return [
     {
       text: 'flutter基础',
       items: [
-        { text: 'index', link: '/views/flutter/index' },
-        { text: '基础入门', link: '/views/flutter/base'},
+        { text: 'index', link: '/docs/flutter/index' },
+        { text: '基础入门', link: '/docs/flutter/base'},
+        { text: 'dart基础语法', link: '/docs/flutter/dart'},
       ]
     },
   ]
 }
-export { sidebarFront, sidebarFlutter }
+export function sidebarElectron(){
+  return [
+    {
+      text: 'Electron',
+      items: [
+        { text: 'index', link: '/docs/electron/index' },
+      ]
+    },
+  ]
+}
+export function sidebarAndroid(){
+  return [
+    {
+      text: 'Android',
+      items: [
+        { text: 'index', link: '/docs/android/index' },
+        { text: '基础', link: '/docs/android/basic' },
+      ]
+    },
+  ]
+}
+
+export function sidebarThreeJS(){
+  return [
+    {
+      text: 'ThreeJS',
+      items: [
+        { text: 'index', link: '/docs/threejs/index' },
+        { text: '基础', link: '/docs/threejs/basic' },
+      ]
+    },
+  ]
+}

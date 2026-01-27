@@ -18,7 +18,6 @@
 | git reset --hard 版本号   | 获取历史版本                  |
 | git remote add origin xxx | 关联远程仓库                  |
 
-
 ## 基本操作
 
 ```bash
@@ -87,6 +86,7 @@ git restore --staged filename
 # 第二步，撤销暂存区的修改
 git restore filename
 ```
+
 ## 分支管理
 
 创建和切换
@@ -148,9 +148,27 @@ git switch -c newBranchName
 ```
 
 **合并其它分支的某个commit到当前分支**
+
 ```bash
+# 单个commit的cherry-pick
 git cherry-pick commit_id
+
+# 多个连续commit的cherry-pick（不包含first_commit_ID）
+git cherry-pick first_commit_ID..last_commit_ID
+
+# 多个连续commit的cherry-pick（包含first_commit_ID）
+git cherry-pick first_commit_ID^..last_commit_ID
+
+# 多个不连续commit的cherry-pick
+git cherry-pick commit_id_1 commit_id_2 commit_id_3
 ```
+
+如果在cherry-pick过程中遇到冲突：
+
+1. 解决冲突
+2. 使用 `git add` 添加解决冲突后的文件
+3. 使用 `git cherry-pick --continue` 继续执行
+4. 如果想要放弃cherry-pick，使用 `git cherry-pick --abort`
 
 **变基**
 >rebase操作可以把本地未push的分叉提交历史整理成直线
@@ -189,7 +207,7 @@ git push -f
 ssh-keygen -t rsa -b 4096 -C "邮箱"
 ```
 
-连续敲击 3 次回车，即可 `/c/Users/` 当前用户` /.ssh/` 目录中生成 `id_rsa` 和 `id_rsa.pub` 两个文件
+连续敲击 3 次回车，即可 `/c/Users/` 当前用户`/.ssh/` 目录中生成 `id_rsa` 和 `id_rsa.pub` 两个文件
 
 ## 远程仓库
 
@@ -283,6 +301,7 @@ git tag
 # 将本地的tag提交到远程仓库
 git push --tag
 ```
+
 ## 修改用户名和邮箱
 
 输入命令：
@@ -292,9 +311,7 @@ git config --global user.name 'xxxxx'
 git config --global user.email 'xxxxx@qq.com'
 ```
 
-
 ## 合并两个没有共同历史提交记录的分支
-
 
 某个git仓库原有master分支，后面自己本地新建了一个项目，然后把新建的这个推到了这个仓库的另外一个分支temp
 直接合并报错`fatal: refusing to merge unrelated histories`
@@ -310,7 +327,6 @@ git config --global user.email 'xxxxx@qq.com'
 2.执行`git rebase --onto temp`进行变基操作
 ![](https://img-blog.csdnimg.cn/32c39134241b44d9bfa92adcc67dea45.png)
 
-
 3.在该分支上拉取允许不相关历史的操作,然后手动解决冲突
 
 `git pull --allow-unrelated-histories`
@@ -318,7 +334,6 @@ git config --global user.email 'xxxxx@qq.com'
 ![](https://img-blog.csdnimg.cn/e8ec89309aaf4844a74889efab64fde6.png)
 
 4.解决冲突，提交推送到远程
-
 
 ```bash
 npm config set registry http://registry.npmmirror.com
@@ -329,7 +344,7 @@ https://registry.npmjs.org
 
 **ssh**
 
-` ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
+`ssh-keygen -t ed25519 -C "1395568275@qq.com" -f ~/.ssh/id_ed25519_mcwmengxi`
 
 config
 
@@ -347,7 +362,6 @@ Port 443
 sourcetree添加ssh秘钥
 `ssh -T git@github.com`
 
-
 解除ssh验证
 
 `git config --global http.sslVerify false`
@@ -355,7 +369,6 @@ sourcetree添加ssh秘钥
 ## 用户账号管理
 
 >如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
-
 
 **管理同一目录下的配置**
 
@@ -368,12 +381,14 @@ sourcetree添加ssh秘钥
 ```
 
 修改git的全局配置文件.gitconfig,把当前目录添加全局配置文件中
+
 ```bash
 [includeIf "gitdir:D:/project/"]
   path = D:/project/.gitconfig
 ```
 
 **单独配置项目用户名**
+
 ```bash
 git config user.name mcwmengxi 
 git config user.email 1395568275@qq.com 
@@ -382,14 +397,16 @@ git config user.email 1395568275@qq.com
 ## git代理
 
 `.gitconfig`文件开启代理,访问`github,git`仓库走`ssh`
+
 ```
 [http]
   proxy = http://127.0.0.1:26501
   sslverify = false # 禁用 SSL 安全证书检查
 ```
 
+## 实际场景使用git
 
-sourceTree无法使用 https://zhuanlan.zhihu.com/p/637566727
+[**sourceTree无法打开**](https://zhuanlan.zhihu.com/p/637566727)
 
 ```bash
 ERROR [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - Unable to load MEF components
@@ -399,3 +416,190 @@ ERROR [1] [Sourcetree.Composition.VSMef.Net48.VSMefCompositionManager] [Log] - U
 
 `C:\Users\mengxi\AppData\Local\Atlassian\SourceTree.exe_Url_fop3hzd4ikr21gr5nqmqd4tnru2hl5kn\3.4.12.0`
 
+**移除本地分支与远程的关联**
+
+```bash
+# 1.查看分支的远程关联
+git branch -vv
+
+# 2.移除远程关联
+git branch --unset-upstream
+
+git branch -vv
+```
+
+**多个提交合并成一个**
+
+```bash
+# 1.查看提交记录
+git log -8 --oneline
+
+# 2.选择合并范围 假设你想要合并最近的四个commits
+git rebase -i HEAD~4
+
+# 3.进行交互式变基 在打开的编辑器中，你会看到一列commit列表，每个commit前都有一个命令提示符，默认是pick。要将多个commits合并为一个，你需要将除了第一个commit之外的其他commit前的pick改为squash或者s。这告诉Git要将这些commits与前一个commit合并。
+
+# 4.按esc退出编译模式，按大写ZZ保存并关闭编辑器，Git会开始rebase的过程。如果有需要，它会停下来让你解决合并期间产生的冲突。
+
+# 5.编辑合并后的提交信息 Git将会打开一个新的编辑器窗口，让你编辑最终的提交信息。
+
+# 6.查看合并后日志并推送到远程
+git log --oneline
+git push --force 
+```
+
+**风险代码合入回滚**
+
+1.风险代码提交了 Commit ，但未推至远程
+
+```bash
+# 1.撤销提交到暂存区
+git log
+git reset --soft xxx
+
+# 2.直接撤销
+git reset --hard xxx
+```
+
+2.风险代码已经推送至远程分支，但未合入
+
+```bash
+# 风险代码提交推送到远程
+git commit -m "xxxx"
+git push
+
+# 直接修复，并覆盖 上次commit
+git commit --amend
+git push --force-with-lease origin git-reset-test
+```
+
+```bash
+# fatal: The current branch git-reset-test has no upstream branch.
+# 该分支没有设置上游分支
+git push --set-upstream origin git-reset-test
+# 如果您希望 Git 在将来自动为没有跟踪上游的分支设置远程分支，可以配置 push.autoSetupRemote 选项
+git config --global push.autoSetupRemote true
+```
+
+ps: 需要注意的是，这里的强推需要避免使用 git push -f，在多人合作场景下，push -f可能会覆盖其他人的代码，而 push --force-with-lease 是一种更安全的强推做法，如果强推阶段的本地 git tree 落后于远端 git tree，push --force-with-lease会禁止强推，并引导你完成本地内容的同步后再进行后续操作。
+
+**存在风险代码的远程分支合入了主分支**
+
+>如果存在风险的代码分支已经合入了主分支，这种需要第一时间进行回滚止损。与非主分支的回滚不同，主分支应该禁用直接的强推操作，我们需要使用 revert 完成分支的回滚。
+
+```bash
+git log
+# 与reset回滚不同的是，revert会创建一个新的commit用来撤销之前变更的内容，常用于主分支的回滚场景。
+git revert xxx
+```
+
+**git rebase 让你的提交记录更加清晰可读**
+
+1.git rebase 的使用
+
+假设我们现在有2条分支，一个为 master，一个为 feat/1.0.1，他们都基于初始的一个提交 add readme 进行检出分支，之后，master 分支增加了 3.js 和 4.js 的文件，分别进行了2次提交，feat/1.0.1 也增加了 1.js 和 2.js 的文件，分别对应以下2条提交记录。
+
+此时，切换到 feature/1 分支下，执行 git rebase master，成功之后，通过 `git log` 查看记录。以 `master` 分支最后的提交作为基点，再逐个应用 `feat/1.0.1` 的每个更改。
+
+![](./images/git-rebase.png)
+
+大部分情况下，rebase 的过程中会产生冲突的，此时，就需要手动解决冲突，然后使用依次 `git add`  、`git rebase --continue`  的方式来处理冲突，完成 rebase 的过程，如果不想要某次 `rebase` 的结果，那么需要使用 `git rebase --skip`  来跳过这次 rebase 操作。
+
+`git cherry-pick` 冲突时的解决方法也与此类似
+
+2.git rebase 交互模式
+
+合并本地多个重复功能提交, 使git提交记录更简洁
+
+`git rebase -i ac18084`
+
+想要合并这一堆更改，我们要使用 Squash 策略进行合并，即把当前的 commit 和它的上一个 commit 内容进行合并， 大概可以表示为下面这样，在交互模式的 rebase 下，至少保留一个 pick，否则命令会执行失败。
+
+```bash
+pick  ... ...
+s     ... ... 
+s     ... ... 
+s     ... ... 
+
+```
+
+修改文件后 按下 : 然后 wq 保存退出，此时又会弹出一个编辑页面，这个页面是用来编辑提交的信息，修改为 feat: 更正，最后保存一下
+
+**配置 `git alias` 提升工作效率**
+
+更新你全局的 .gitconfig 文件，该文件用来保存全局的 git 配置，vim ~/.gitconfig
+
+```bash
+
+[alias]
+st = status -sb
+co = checkout
+br = branch
+mg = merge
+ci = commit
+ds = diff --staged
+dt = difftool
+mt = mergetool
+last = log -1 HEAD
+latest = for-each-ref --sort=-committerdate --format=\"%(committername)@%(refname:short) [%(committerdate:short)] %(contents)\"
+ls = log --pretty=format:\"%C(yellow)%h %C(blue)%ad %C(red)%d %C(reset)%s %C(green)[%cn]\" --decorate --date=short
+hist = log --pretty=format:\"%C(yellow)%h %C(red)%d %C(reset)%s %C(green)[%an] %C(blue)%ad\" --topo-order --graph --date=short
+type = cat-file -t
+dump = cat-file -p
+lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+
+```
+
+**自用的 `.gitconfig` 配置**
+
+``` bash
+
+[user]
+ email = nangongfairy@gmail.com
+ name = youmengyin
+[difftool "sourcetree"]
+ cmd = "'' "
+[mergetool "sourcetree"]
+ cmd = "'' "
+ trustExitCode = true
+[url "https://github.com/guansss/CubismWebFramework.git"]
+ insteadOf = git@github.com:guansss/CubismWebFramework.git
+[gui]
+  encoding = utf-8
+# 代码库统一使用utf-8
+[i18n]
+  commitencoding = utf-8
+# log编码
+[svn]
+  pathnameencoding = utf-8
+# 支持中文路径
+[core]
+  quotepath = false
+ # autocrlf = true
+[alias]
+  last = log -1 HEAD
+  latest = for-each-ref --sort=-committerdate --format=\"%(committername)@%(refname:short) [%(committerdate:short)] %(contents)\"
+  ls = log --pretty=format:\"%C(yellow)%h %C(blue)%ad %C(red)%d %C(reset)%s %C(green)[%cn]\" --decorate --date=short
+  hist = log --pretty=format:\"%C(yellow)%h %C(red)%d %C(reset)%s %C(green)[%an] %C(blue)%ad\" --topo-order --graph --date=short
+  lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s %Cgreen(%cr) %C(bold blue)<%an>%Creset' --abbrev-commit
+  lgs = log --color --graph --pretty=format:'%Cred%h%Creset %C(bold blue)<%an>%Creset %Cgreen(%ar) %C(yellow)%s%Creset'
+  # 撤销一个commit
+  undo = reset HEAD~1 --soft
+
+  personal = ! git config --global user.name youmengyin && git config --global user.email nangongfairy@gmail.com
+  company = ! git config --global user.name mochunwang && git config --global user.email mochunwang@company.com
+
+  lp = ! git config user.name youmengyin && git config user.email nangongfairy@gmail.com
+  lc = ! git config user.name mochunwang && git config user.email mochunwang@company.com
+  uns = ! git branch --unset-upstream
+```
+
+### git stash clear/drop 后如何恢复
+
+```bash
+# 获取所有dangling commits
+git log --graph --oneline --decorate $( git fsck --no-reflog | awk '/dangling commit/ {print $3}' )
+
+# 最新的哈希值
+git stash apply efaba9de
+```

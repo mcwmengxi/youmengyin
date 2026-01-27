@@ -23,7 +23,6 @@ export default [
     items: [
       { text: '📋 开发', link: '/docs/devops/index' },
       { text: '🔧 工具链', link: '/docs/tools-chain/' },
-      { text: '⭐资源导航', link: '/docs/resource/' },
     ],
   },
   {
@@ -88,5 +87,25 @@ export default [
       { text: '📋 面试大全', link: '/docs/interview/' },
       { text: '🔥 vue源码实现', link: '/article/vue-design/page-1' },
     ],
+  },
+  {
+    text: '⚡提效工具',
+    items: [
+      {
+        text: '🔧 软件资源与配置',
+        items: [
+          { text: 'Windows 平台', link: '/docs/resource/software/windows' },
+          { text: '浏览器设置与扩展', link: '/docs/resource/software/browser' },
+          {
+            text: 'Visual Studio Code 配置',
+            link: '/docs/resource/software/vscode',
+          },
+        ],
+      },
+      { text: '📚 资源导航', link: '/docs/resource/index' },
+      { text: '🌐 在线工具', link: '/docs/resource/online-tools' },
+      // { text: '🔖 书签脚本', link: '/docs/resource/bookmark-scripts' },
+    ],
+    activeMatch: '^/docs/resource',
   },
 ] as DefaultTheme.Config['nav']

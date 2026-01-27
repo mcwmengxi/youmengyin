@@ -14,6 +14,7 @@ import {
   sidebarDevelops,
   sidebarReact,
   sidebarTypescript,
+  sidebarResource,
 } from './sidebar/index'
 import {
   sidebarAndroid,
@@ -27,23 +28,15 @@ export default {
   '/docs/tools-chain/': sidebarTools(),
   '/docs/resource/': [
     {
-      text: '资源分享',
+      text: '📚 资源导航',
       items: [
         {
           text: 'index',
           link: '/docs/resource/index',
         },
         {
-          text: 'book',
-          link: '/docs/resource/book',
-        },
-        {
-          text: 'book',
-          link: '/docs/resource/book',
-        },
-        {
           text: 'tools',
-          link: '/docs/resource/tools',
+          link: '/docs/resource/smalltools',
         },
         {
           text: 'emojy',
@@ -54,16 +47,14 @@ export default {
           link: '/docs/resource/program-share',
         },
         {
-          text: '浏览器',
-          link: '/docs/resource/program-share',
-        },
-        {
           text: '编程实用工具',
           link: '/docs/resource/ProgrammingUtilitySharing',
         },
         { text: 'vue3生态', link: '/docs/resource/Vue3UtilitySharing' },
       ],
     },
+    ...sidebarResource(),
+    { text: '🌐在线工具', link: '/docs/resource/online-tools' },
   ],
 
   // 前端

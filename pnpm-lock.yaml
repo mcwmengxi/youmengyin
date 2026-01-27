@@ -40,6 +40,9 @@ importers:
       oh-my-live2d:
         specifier: ^0.19.3
         version: 0.19.3
+      pagefind:
+        specifier: ^1.4.0
+        version: 1.4.0
       vite-plugin-markdown-preview:
         specifier: ^1.1.1
         version: 1.1.1(patch_hash=5f3eb82963a8ca0a21edd3420c0672111c54c519a7359b701642f2b4d58623e1)

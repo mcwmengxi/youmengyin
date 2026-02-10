@@ -25,7 +25,7 @@ git init
 
 ## 跟踪文件｜将改动放入暂存区
 # 当前目录下的所有，不包括.gitignore中的文件或目录
-git add . 
+git add .
 # 指定目录
 git add dirPath
 # 指定文件
@@ -128,7 +128,8 @@ git merge --abort
 ```
 
 **更改分支名**
->checkout 既可以切换分支又可以撤销修改，容易造成歧义，所以切换分支可以使用switch
+
+> checkout 既可以切换分支又可以撤销修改，容易造成歧义，所以切换分支可以使用switch
 
 ```shell
 # 修改本地分支名称：
@@ -171,7 +172,8 @@ git cherry-pick commit_id_1 commit_id_2 commit_id_3
 4. 如果想要放弃cherry-pick，使用 `git cherry-pick --abort`
 
 **变基**
->rebase操作可以把本地未push的分叉提交历史整理成直线
+
+> rebase操作可以把本地未push的分叉提交历史整理成直线
 
 ```bash
 git rebase branchName
@@ -239,7 +241,7 @@ git push remoteName branchName
 **设置上游分支**
 
 ```shell
-git push -u remoteName branchName 
+git push -u remoteName branchName
 # 设置上游分支后
 # 本地在push的时候就可以直接执行
 git push
@@ -262,7 +264,7 @@ git pull remoteName branchName
 
 ## stash
 
->将工作区未提交的内容先存储起来
+> 将工作区未提交的内容先存储起来
 
 ```bash
 # flagName 用于标示每次的stash操作
@@ -283,7 +285,7 @@ git stash apply stash_id
 
 ## 标签
 
->给指定的commit打上一个标签，便于寻找关键的commit
+> 给指定的commit打上一个标签，便于寻找关键的commit
 
 ```bash
 # 默认为最新的commit打上tag
@@ -368,7 +370,7 @@ sourcetree添加ssh秘钥
 
 ## 用户账号管理
 
->如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
+> 如果在项目自己的配置文件中已经有了用户名的配置，则优先使用项目自己的配置。如果项目没有单独配置，则再根据当前根路径是否指定了配置文件去获取对应的配置信息
 
 **管理同一目录下的配置**
 
@@ -390,8 +392,8 @@ sourcetree添加ssh秘钥
 **单独配置项目用户名**
 
 ```bash
-git config user.name mcwmengxi 
-git config user.email 1395568275@qq.com 
+git config user.name mcwmengxi
+git config user.email 1395568275@qq.com
 ```
 
 ## git代理
@@ -445,7 +447,7 @@ git rebase -i HEAD~4
 
 # 6.查看合并后日志并推送到远程
 git log --oneline
-git push --force 
+git push --force
 ```
 
 **风险代码合入回滚**
@@ -485,7 +487,7 @@ ps: 需要注意的是，这里的强推需要避免使用 git push -f，在多�
 
 **存在风险代码的远程分支合入了主分支**
 
->如果存在风险的代码分支已经合入了主分支，这种需要第一时间进行回滚止损。与非主分支的回滚不同，主分支应该禁用直接的强推操作，我们需要使用 revert 完成分支的回滚。
+> 如果存在风险的代码分支已经合入了主分支，这种需要第一时间进行回滚止损。与非主分支的回滚不同，主分支应该禁用直接的强推操作，我们需要使用 revert 完成分支的回滚。
 
 ```bash
 git log
@@ -503,7 +505,7 @@ git revert xxx
 
 ![](./images/git-rebase.png)
 
-大部分情况下，rebase 的过程中会产生冲突的，此时，就需要手动解决冲突，然后使用依次 `git add`  、`git rebase --continue`  的方式来处理冲突，完成 rebase 的过程，如果不想要某次 `rebase` 的结果，那么需要使用 `git rebase --skip`  来跳过这次 rebase 操作。
+大部分情况下，rebase 的过程中会产生冲突的，此时，就需要手动解决冲突，然后使用依次 `git add` 、`git rebase --continue` 的方式来处理冲突，完成 rebase 的过程，如果不想要某次 `rebase` 的结果，那么需要使用 `git rebase --skip` 来跳过这次 rebase 操作。
 
 `git cherry-pick` 冲突时的解决方法也与此类似
 
@@ -517,9 +519,9 @@ git revert xxx
 
 ```bash
 pick  ... ...
-s     ... ... 
-s     ... ... 
-s     ... ... 
+s     ... ...
+s     ... ...
+s     ... ...
 
 ```
 
@@ -552,7 +554,7 @@ lg = log --color --graph --pretty=format:'%Cred%h%Creset -%C(yellow)%d%Creset %s
 
 **自用的 `.gitconfig` 配置**
 
-``` bash
+```bash
 
 [user]
  email = nangongfairy@gmail.com
@@ -602,4 +604,26 @@ git log --graph --oneline --decorate $( git fsck --no-reflog | awk '/dangling co
 
 # 最新的哈希值
 git stash apply efaba9de
+```
+
+**方法2**
+
+> 检查是否还有 stash 引用（最有效）
+
+```bash
+# 查看所有 stash 记录，包括已删除的
+git fsck --no-reflog | awk '/dangling commit/ {print $3}'
+
+# 或者查找所有悬空对象
+git fsck --full
+```
+
+如果找到类似 `stash@{0}` 的悬空提交，可以：
+
+```bash
+# 列出所有悬空提交
+git log --oneline $(git fsck --no-reflog | awk '/dangling commit/ {print $3}')
+
+# 恢复特定的悬空提交
+git stash apply <commit-hash>
 ```

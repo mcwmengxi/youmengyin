@@ -14,6 +14,7 @@ function sidebarArticle() {
       items: [
         { text: '里程碑 2023', link: '/article/milepost/milepost-2023' },
         { text: '里程碑 2024', link: '/article/milepost/milepost-2024' },
+        { text: '里程碑 2026', link: '/article/milepost/milepost-2026' },
       ],
     },
     {

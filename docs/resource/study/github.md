@@ -11,6 +11,8 @@
 ## flutter
 
 [flutter 个人模板项目](https://github.com/shang1219178163/flutter_templet_project)
+(https://github.com/AmisKwok/vibe-music-app)
+(https://github.com/Danielqiuf/ink_flutter)
 
 ## react-native
 
@@ -32,6 +34,11 @@
 
 [blog](https://github.com/learnGitH/distributed-demo.git)
 
+## ai
+
+[ai-agents-for-beginners](https://github.com/microsoft/ai-agents-for-beginners)
+
 ## blog
 
+[xiaolin-docs](https://github.com/xiaolinstar/xiaolin-docs)
 [docker_practice](https://github.com/yeasy/docker_practice)

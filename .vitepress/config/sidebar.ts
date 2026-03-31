@@ -15,6 +15,7 @@ import {
   sidebarReact,
   sidebarTypescript,
   sidebarResource,
+  sidebarAi,
 } from './sidebar/index'
 import {
   sidebarAndroid,
@@ -70,6 +71,7 @@ export default {
   '/docs/nestjs': autoGenerateSidebarNestjsItems(),
   // 面试
   '/docs/interview': sidebarInterview(),
+  'docs/ai': sidebarAi(),
 
   // 后端
   '/views/after-end': sidebarOtherBe(),

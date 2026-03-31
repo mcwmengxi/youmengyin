@@ -60,6 +60,10 @@ export default [
         text: '📋Nestjs',
         link: '/docs/nestjs/index',
       },
+      {
+        text: '📋 AI',
+        link: '/docs/ai/index',
+      },
     ],
   },
   {

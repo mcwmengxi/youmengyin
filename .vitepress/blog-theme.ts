@@ -31,10 +31,10 @@ const blogTheme = getThemeConfig({
         avatar: 'https://notes.fe-mm.com/logo.png',
       },
       {
-        nickname: '技术茶馆',
-        url: 'https://teazg.top/',
-        avatar: 'https://teazg.top/index_logo.png',
-        des: '张工的技术茶馆，分享技术札记、实战经验、源码剖析与效率工具',
+        url: 'https://teek.seasir.top/',
+        avatar: 'https://teek.seasir.top/favicon.ico',
+        des: '人心中的成见是一座大山',
+        nickname: 'Hyde',
       },
       {
         url: 'https://relaxing.top/',
@@ -43,10 +43,28 @@ const blogTheme = getThemeConfig({
         des: '放的博客',
       },
       {
+        nickname: '冴羽',
+        des: '冴羽的博客',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/mqyqingfeng.png',
+        url: 'https://yayujs.com/',
+      },
+      {
+        nickname: '技术茶馆',
+        url: 'https://teazg.top/',
+        avatar: 'https://teazg.top/index_logo.png',
+        des: '张工的技术茶馆，分享技术札记、实战经验、源码剖析与效率工具',
+      },
+      {
         nickname: '七仔的博客',
         des: '记录自己在写程序过程中的发现、问题、成果',
         url: 'https://www.baby7blog.com',
         avatar: 'https://www.baby7blog.com/favicon.ico',
+      },
+      {
+        nickname: '花喵电台      ',
+        des: '曹豪侠和余湾湾还有两只猫的生活记录~',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/fmcat.jpeg',
+        url: 'https://www.fmcat.top',
       },
       {
         nickname: '李年糕',
@@ -55,30 +73,8 @@ const blogTheme = getThemeConfig({
           'https://cdn.upyun.sugarat.top/mdImg/sugar/617be739258b761b7dfed4fa0869326c',
         url: 'https://rimochiko.github.io/',
       },
-      {
-        nickname: '冴羽',
-        des: '冴羽的博客',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/mqyqingfeng.png',
-        url: 'https://yayujs.com/',
-      },
-      {
-        nickname: 'Linbudu',
-        des: '未来的不可知，是前进的原动力',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/linbudu.jfif',
-        url: 'https://linbudu.top/',
-      },
-      {
-        nickname: '小九',
-        des: '日益努力，而后风生水起',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/jiangly.png',
-        url: 'https://jiangly.com/',
-      },
-      {
-        nickname: '花喵电台      ',
-        des: '曹豪侠和余湾湾还有两只猫的生活记录~',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/fmcat.jpeg',
-        url: 'https://www.fmcat.top',
-      },
+
+      // 技术关联性不强
       {
         nickname: '张成威的网络日志',
         des: '知不足而奋进，望远山而前行',
@@ -92,22 +88,10 @@ const blogTheme = getThemeConfig({
         nickname: 'LEEDAISEN',
       },
       {
-        url: 'https://next.blackcell.fun/',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/blackcell.jpeg',
-        des: '物以类聚 人以群分',
-        nickname: 'BlackCell',
-      },
-      {
         url: 'https://tenyon.cn',
         avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/tenyon.webp',
         des: '工夫为艺，笃志成技',
         nickname: "Yovvis's Blog",
-      },
-      {
-        nickname: '强少来了',
-        des: '互联网产品经理',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/fengxiaoqiang.png',
-        url: 'https://fengxiaoqiang.com/',
       },
       {
         nickname: '博友圈',
@@ -115,12 +99,6 @@ const blogTheme = getThemeConfig({
         avatar:
           'https://cdn.upyun.sugarat.top/mdImg/sugar/bdee5d11a1e036ca3634943d34469f59',
         url: 'https://www.boyouquan.com/home',
-      },
-      {
-        nickname: 'Simon He',
-        des: '除了coding，我什么都不会',
-        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/simonme.png',
-        url: 'https://simonme.netlify.app/',
       },
       {
         nickname: 'laiky',
@@ -135,22 +113,41 @@ const blogTheme = getThemeConfig({
         url: 'https://note.noxussj.top/?s=y8',
       },
       {
+        avatar: 'https://onedayxyy.cn/favicon.ico',
+        des: '明心静性，爱自己',
+        nickname: 'One',
+        url: 'https://onedayxyy.cn/',
+      },
+      // 失效
+      {
+        url: 'https://next.blackcell.fun/',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/blackcell.jpeg',
+        des: '物以类聚 人以群分',
+        nickname: 'BlackCell',
+      },
+      {
+        nickname: 'Simon He',
+        des: '除了coding，我什么都不会',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/simonme.png',
+        url: 'https://simonme.netlify.app/',
+      },
+      {
         nickname: 'Hacxy Blog',
         des: '指尖改变命运😋',
         avatar: 'https://hacxy.cn/logo.png',
         url: 'https://hacxy.cn',
       },
       {
-        avatar: 'https://onedayxyy.cn/favicon.ico',
-        des: '明心静性，爱自己',
-        nickname: 'One',
-        url: 'https://onedayxyy.cn/',
+        nickname: 'Linbudu',
+        des: '未来的不可知，是前进的原动力',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/linbudu.jfif',
+        url: 'https://linbudu.top/',
       },
       {
-        url: 'https://teek.seasir.top/',
-        avatar: 'https://teek.seasir.top/favicon.ico',
-        des: '人心中的成见是一座大山',
-        nickname: 'Hyde',
+        nickname: '小九',
+        des: '日益努力，而后风生水起',
+        avatar: 'https://cdn.upyun.sugarat.top/avatar/blog/jiangly.png',
+        url: 'https://jiangly.com/',
       },
     ].map((v) => {
       if (v.avatar.includes('//cdn.upyun.sugarat.top')) {

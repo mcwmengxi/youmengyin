@@ -34,6 +34,56 @@ brew install --cask claude-code
 npm install -g @anthropic-ai/claude-code
 ```
 
+## 配置(替换大模型)
+
+替换大模型-阿里千问（Qwen3）
+
+### 方法1.环境变量配置
+
+```bash
+ANTHROPIC_BASE_URL=https://dashscope.aliyuncs.com/apps/anthropic
+ANTHROPIC_AUTH_TOKEN=YOUR_DASHSCOPE_API_KEY   # 用百炼 API KEY 替换 YOUR_DASHSCOPE_API_KEY
+ANTHROPIC_MODEL=qwen3-coder-plus # 可按需替换为其他支持的模型。
+```
+
+### 方法2.配置系统配置文件
+
+windows 系统配置文件目录：C:\Users[用户名].claude\settings.json
+
+<!-- qwen3-coder-plus -->
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://dashscope.aliyuncs.com/apps/anthropic",
+    "ANTHROPIC_AUTH_TOKEN": "xxxxx",
+    "ANTHROPIC_MODEL": "qwen3-coder-plus",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+```
+
+<!-- claude模型 -->
+
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://htsajwyhqfzijtujsfnefjhfegtu.func.edgecloudapp.com/v1/155f884022127beda83e7ed36ec143c3/webding-ai",
+    "ANTHROPIC_AUTH_TOKEN": "xxxxxx",
+    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  }
+}
+```
+
+## 多个模型如何能快速切换
+
+[CC Switch](https://github.com/farion1231/cc-switch)
+
+## VSCode中使用Claude Code
+
+>安装claude code 插件
+
 ## 基本命令
 
 | 命令                          | 说明                     |
@@ -145,7 +195,7 @@ git diff main --name-only | claude -p "review for security issues"
 
 在项目根目录创建 `CLAUDE.md` 文件来设置编码规范：
 
-```markdown
+````
 # Project Guidelines
 
 ## Coding Standards
@@ -182,36 +232,6 @@ git diff main --name-only | claude -p "review for security issues"
 # 选择 "Create New subagent"
 ```
 
-## 配置
-
-windows 系统配置文件目录：C:\Users[用户名].claude\settings.json
-
-<!-- qwen3-coder-plus -->
-
-```json
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://dashscope.aliyuncs.com/apps/anthropic",
-    "ANTHROPIC_AUTH_TOKEN": "xxxxx",
-    "ANTHROPIC_MODEL": "qwen3-coder-plus",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  }
-}
-```
-
-<!-- claude模型 -->
-
-```json
-{
-  "env": {
-    "ANTHROPIC_BASE_URL": "https://htsajwyhqfzijtujsfnefjhfegtu.func.edgecloudapp.com/v1/155f884022127beda83e7ed36ec143c3/webding-ai",
-    "ANTHROPIC_AUTH_TOKEN": "xxxxxx",
-    "ANTHROPIC_MODEL": "claude-sonnet-4-6",
-    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
-  }
-}
-```
-
 ## MCP 集成
 
 Model Context Protocol 用于连接外部数据源：
@@ -226,6 +246,10 @@ claude mcp
 - Slack
 - 自定义工具
 ```
+
+**📚 扩展阅读：**
+- [🔌 插件功能完全指南](./plugins.md) - 学习如何创建和使用插件扩展能力
+- [MCP 协议文档](https://modelcontextprotocol.io/)
 
 ## 最佳实践
 
@@ -259,10 +283,10 @@ claude --debug "!statsig,!file"
 
 ## 资源
 
-- 文档: https://code.claude.com/docs
-- CLI 参考: https://code.claude.com/docs/en/cli-reference
-- 最佳实践: https://code.claude.com/docs/en/best-practices
-- claude code 最佳实践:https://zhuanlan.zhihu.com/p/2009744974980331332
+- 文档: <https://code.claude.com/docs>
+- CLI 参考: <https://code.claude.com/docs/en/cli-reference>
+- 最佳实践: <https://code.claude.com/docs/en/best-practices>
+- claude code 最佳实践:<https://zhuanlan.zhihu.com/p/2009744974980331332>
 
 [Claude Code 消耗监控统计神器](https://cloud.tencent.com/developer/article/2623892)
 [CCUsage](https://sspai.com/post/101733)

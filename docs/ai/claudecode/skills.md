@@ -17,7 +17,12 @@ outline: [2, 3, 4]
 
 ---
 
-## 🔥 Omni-Skills 集成
+## 🔥 Skills 集成
+
+```bsah
+npx skills add vuejs-ai/skills
+
+```
 
 ## 🔥 Omni-Skills 集成
 
@@ -42,14 +47,14 @@ npx awesome-omni-skills --claude --bundle design
 
 #### 可用技能包
 
-| 技能包 | 描述 | 安装命令 |
-|--------|------|---------|
-| `design` | UI/UX 设计技能 | `npx awesome-omni-skills --claude --bundle design` |
-| `frontend` | 前端开发技能 | `npx awesome-omni-skills --claude --bundle frontend` |
-| `backend` | 后端架构技能 | `npx awesome-omni-skills --claude --bundle backend` |
-| `devops` | 运维和部署技能 | `npx awesome-omni-skills --claude --bundle devops` |
-| `security` | 安全审计技能 | `npx awesome-omni-skills --claude --bundle security` |
-| `testing` | 测试编写技能 | `npx awesome-omni-skills --claude --bundle testing` |
+| 技能包     | 描述           | 安装命令                                             |
+| ---------- | -------------- | ---------------------------------------------------- |
+| `design`   | UI/UX 设计技能 | `npx awesome-omni-skills --claude --bundle design`   |
+| `frontend` | 前端开发技能   | `npx awesome-omni-skills --claude --bundle frontend` |
+| `backend`  | 后端架构技能   | `npx awesome-omni-skills --claude --bundle backend`  |
+| `devops`   | 运维和部署技能 | `npx awesome-omni-skills --claude --bundle devops`   |
+| `security` | 安全审计技能   | `npx awesome-omni-skills --claude --bundle security` |
+| `testing`  | 测试编写技能   | `npx awesome-omni-skills --claude --bundle testing`  |
 
 #### 技能源地址
 
@@ -202,7 +207,7 @@ for file in $FILES; do
     - Security vulnerabilities
     - Performance concerns
     - Style guide violations
-    
+
     File: $file"
   fi
 done
@@ -260,12 +265,15 @@ echo "✅ Documentation generated!"
 
 ```markdown
 ## Context
+
 - **Error**: {error message}
 - **Location**: {file:line}
 - **When**: {reproduction steps}
 
 ## Request
+
 Please help me:
+
 1. Diagnose the root cause
 2. Suggest 2-3 possible fixes
 3. Implement the recommended fix
@@ -276,15 +284,18 @@ Please help me:
 
 ```markdown
 ## Issue Description
+
 The {feature} is not working correctly.
 
 **Expected**: {what should happen}
 **Actual**: {what actually happens}
 
 ## Code Context
+
 {relevant code snippet}
 
 ## Analysis Needed
+
 - What could cause this behavior?
 - How to fix it without breaking other features?
 - What edge cases should we consider?
@@ -296,19 +307,23 @@ The {feature} is not working correctly.
 
 ```markdown
 ## Goal
+
 Optimize the performance of {function/module}.
 
 ## Current Issues
+
 - Slow execution time: {metrics}
 - High memory usage: {metrics}
 - Bottleneck: {suspected area}
 
 ## Requirements
+
 - Maintain backward compatibility
 - Keep code readable
 - Add performance tests
 
 ## Success Criteria
+
 - Response time < {target}
 - Memory usage < {target}
 ```
@@ -317,9 +332,11 @@ Optimize the performance of {function/module}.
 
 ```markdown
 ## Refactoring Task
+
 Clean up and modernize {module/file}.
 
 ## Focus Areas
+
 - Remove deprecated APIs
 - Fix code smells
 - Apply SOLID principles
@@ -328,6 +345,7 @@ Clean up and modernize {module/file}.
 - Add TypeScript types
 
 ## Constraints
+
 - Don't change public API
 - Maintain test coverage
 - Keep documentation updated
@@ -339,9 +357,11 @@ Clean up and modernize {module/file}.
 
 ```markdown
 ## Testing Task
+
 Write comprehensive unit tests for {module}.
 
 ## Test Scenarios
+
 ✓ Happy path
 ✓ Edge cases
 ✓ Error handling
@@ -349,6 +369,7 @@ Write comprehensive unit tests for {module}.
 ✓ Concurrent operations
 
 ## Requirements
+
 - Use {test framework}
 - Mock external dependencies
 - Achieve >90% coverage
@@ -359,15 +380,18 @@ Write comprehensive unit tests for {module}.
 
 ```markdown
 ## Integration Testing
+
 Create integration tests for {feature/workflow}.
 
 ## Test Flow
+
 1. Setup test data
 2. Execute workflow
 3. Verify results
 4. Cleanup
 
 ## Assertions
+
 - Database state
 - API responses
 - Side effects
@@ -380,9 +404,11 @@ Create integration tests for {feature/workflow}.
 
 ```markdown
 ## Documentation Need
+
 Generate API documentation for {endpoint/service}.
 
 ## Include
+
 - Endpoint URL and method
 - Request parameters
 - Request body schema
@@ -397,9 +423,11 @@ Generate API documentation for {endpoint/service}.
 
 ```markdown
 ## Design Document
+
 Create a technical design document for {feature}.
 
 ## Sections
+
 1. Overview and goals
 2. Architecture diagram
 3. Component design
@@ -548,40 +576,40 @@ claude -r "session-name" "Continue working on {task}"
 
 ## 🔧 自定义技能配置
 
-### Skills的存放位置
+### Skills 的存放位置
 
 | 级别       | 路径                                     | 使用范围         | 版本控制   |
 | :--------- | :--------------------------------------- | :--------------- | :--------- |
 | Enterprise | 由管理员配置（Managed Settings）         | 组织内所有用户   | 集中管理   |
 | Personal   | `~/.claude/skills/<skill-name>/SKILL.md` | 你所有的项目     | 个人本地   |
-| Project    | `.claude/skills/<skill-name>/SKILL.md`   | 当前项目         | 提交到Git  |
+| Project    | `.claude/skills/<skill-name>/SKILL.md`   | 当前项目         | 提交到 Git |
 | Plugin     | `<plugin>/skills/<skill-name>/SKILL.md`  | 启用该插件的项目 | 随插件分发 |
 
-同名优先级：Enterprise > Personal > Project。Plugin Skills 使用  plugin-name:skill-name  命名空间，不与其他级别冲突。
+同名优先级：Enterprise > Personal > Project。Plugin Skills 使用 plugin-name:skill-name 命名空间，不与其他级别冲突。
 
-### 两大类型的Skills：参考型和任务型
+### 两大类型的 Skills：参考型和任务型
 
->从工程角度，Skill 内容分为两类，参考型和任务型。参考型 Skill 影响“怎么做”，任务型 Skill 决定“做什么”。前者是语义环境，后者是具体行动。
+> 从工程角度，Skill 内容分为两类，参考型和任务型。参考型 Skill 影响“怎么做”，任务型 Skill 决定“做什么”。前者是语义环境，后者是具体行动。
 
-| 类型                | 特征                             | 重点                                           | 典型列子                     |
-| :------------------ | :------------------------------- | :--------------------------------------------- | :--------------------------- |
-| 参考型（Reference） | 提供知识、Claude在当前对话中应用 | 强调“在什么场景下应用这些知识”                 | API规范、代码风格、领域知识  |
-| 任务型(Task)        | 执行具体操作步骤                 | 强调“这个操作做什么”，常斜杠命令使用`/command` | 部署流程、提交规范、代码生成 |
+| 类型                | 特征                              | 重点                                           | 典型列子                     |
+| :------------------ | :-------------------------------- | :--------------------------------------------- | :--------------------------- |
+| 参考型（Reference） | 提供知识、Claude 在当前对话中应用 | 强调“在什么场景下应用这些知识”                 | API 规范、代码风格、领域知识 |
+| 任务型(Task)        | 执行具体操作步骤                  | 强调“这个操作做什么”，常斜杠命令使用`/command` | 部署流程、提交规范、代码生成 |
 
-**参考型Skill**
+**参考型 Skill**
 
-- 没有执行步骤：不是先做A，再做B，而是“遵循这些规范”。
-- 没有输出模版：不要求Claude输出固定格式的报告。
-- 没有设disable-model-invocation:Claude 可以自动判断何时需要。
+- 没有执行步骤：不是先做 A，再做 B，而是“遵循这些规范”。
+- 没有输出模版：不要求 Claude 输出固定格式的报告。
+- 没有设 disable-model-invocation:Claude 可以自动判断何时需要。
 - 只读工具：allowed-tools 限制为 Read/Grep/Glob，因为规范查阅不需要修改代码。
 
 description = [做什么] + [怎么做] + [什么时候用]
 
-**任务型Skill**
+**任务型 Skill**
 
-任务型Skill需要设置disable-model-invocation:true（禁用模型调用）
+任务型 Skill 需要设置 disable-model-invocation:true（禁用模型调用）
 
-### 创建个人skill文件
+### 创建个人 skill 文件
 
 在 `~/.claude/skills/` 目录下创建个人技能：
 
@@ -589,13 +617,15 @@ description = [做什么] + [怎么做] + [什么时候用]
 
 创建 `~/.claude/skills/vue3-expert.md`：
 
-```markdown
+````markdown
 # Skill: Vue 3 Expert
 
 ## Role
+
 You are a Vue 3 expert specializing in Composition API and modern Vue ecosystem.
 
 ## Expertise
+
 - Vue 3 Composition API
 - Pinia state management
 - Vue Router 4
@@ -604,6 +634,7 @@ You are a Vue 3 expert specializing in Composition API and modern Vue ecosystem.
 - Vue Test Utils
 
 ## Guidelines
+
 - Always use `<script setup>` syntax
 - Prefer Composition API over Options API
 - Use TypeScript for all components
@@ -614,6 +645,7 @@ You are a Vue 3 expert specializing in Composition API and modern Vue ecosystem.
 ## Common Patterns
 
 ### Component Structure
+
     ```vue
     <script setup lang="ts">
     import { ref, computed, watch } from 'vue'
@@ -668,19 +700,20 @@ You are a Vue 3 expert specializing in Composition API and modern Vue ecosystem.
       }
     })
     ```
-
-```
+````
 
 #### 任务型技能
 
 ```markdown
-.claude/skills/gitpush/     # skill 目录，名称即 skill 名
-└── SKILL.md                        # 主文件（必需）
+.claude/skills/gitpush/ # skill 目录，名称即 skill 名
+└── SKILL.md # 主文件（必需）
 
 ---
+
 name: gitpush
 description: 自动用 git 提交代码并推送到远程仓库。当用户输入 `/gitpush` 时触发此技能。功能包括：自动暂存所有更改、自动生成提交信息、自动提交到本地仓库、自动推送到远程分支。成功后报告提交状态、文件数量和耗时。
 disable-model-invocation:true
+
 ---
 
 # GitPush 技能
@@ -690,21 +723,27 @@ disable-model-invocation:true
 ## 执行步骤
 
 ### 1. 检查 git 状态
+
 使用 `git status` 检查当前仓库状态，确认是否有可提交的内容。
 
 ### 2. 暂存更改
+
 如果有待提交的文件，执行 `git add -A` 暂存所有更改。
 
 ### 3. 生成提交信息
+
 执行 `git diff --cached --stat` 获取暂存的变更统计，然后：
+
 - 如果有新增文件，提取新增文件的文件名
 - 如果有修改文件，提取修改的文件名
 - 根据变更内容生成简洁的提交信息，格式：`feat: 描述` / `fix: 描述` / `docs: 描述` / `chore: 描述`
 
 ### 4. 执行提交
+
 使用生成的提交信息执行 `git commit -m "提交信息"`
 
 ### 5. 推送到远程
+
 执行 `git push` 推送到远程仓库。如果当前分支没有上游跟踪，执行 `git push -u origin master` 设置上游并推送。
 
 ## 输出格式
@@ -712,11 +751,11 @@ disable-model-invocation:true
 ### 成功时
 
 ✓ 提交成功！
+
 - 提交信息: xxx
 - 变更文件: x 个新增, x 个修改, x 个删除
 - 耗时: x 秒
 - 远程推送: 已完成
-
 
 ### 失败时
 
@@ -724,11 +763,11 @@ disable-model-invocation:true
 原因: [具体错误信息]
 
 可能的原因：
+
 - 无可提交的内容（工作区干净）
 - 未连接到远程仓库
 - 远程仓库拒绝推送（权限问题或冲突）
 - 网络连接失败
-
 
 ### 无需提交时
 

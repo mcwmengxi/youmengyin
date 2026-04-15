@@ -38,6 +38,9 @@
 
 [ai-agents-for-beginners](https://github.com/microsoft/ai-agents-for-beginners)
 
+[AI 知识大全，包含 skills、claude code、cursor 工具和学习路径](https://github.com/qdleader/Awesome-AI-Pedia)
+[AI 爆款文章创作器](https://github.com/yuyuanweb/ai-passage-creator)
+
 ## blog
 
 [xiaolin-docs](https://github.com/xiaolinstar/xiaolin-docs)

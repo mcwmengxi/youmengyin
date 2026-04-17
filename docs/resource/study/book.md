@@ -14,3 +14,9 @@
 ## 免费视频
 
 - [React](https://www.bilibili.com/video/BV1rC4y187Vw)
+
+## ai
+
+[Claude Code 的 skills 源码解析](https://juejin.cn/post/7625838952655912994)
+
+[Skills + MCP](https://aicoding.juejin.cn/post/7620060655607857178)

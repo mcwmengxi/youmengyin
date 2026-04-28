@@ -311,8 +311,27 @@ export function sidebarAndroid(){
     {
       text: 'Android',
       items: [
-        { text: 'index', link: '/docs/android/index' },
-        { text: '基础', link: '/docs/android/basic' },
+        { text: '学习路线', link: '/docs/android/index' },
+        { text: '基础组件', link: '/docs/android/basic' },
+        { text: 'UI 开发', link: '/docs/android/ui' },
+        { text: '数据存储', link: '/docs/android/data-storage' },
+        { text: '网络编程', link: '/docs/android/network' },
+        { text: '架构设计', link: '/docs/android/architecture' },
+        { text: '进阶主题', link: '/docs/android/advanced' },
+      ]
+    },
+    {
+      text: 'Kotlin',
+      collapsed: true,
+      items: [
+        { text: '入门指南', link: '/docs/android/kotlin/kotlin' },
+        { text: '学习路线图', link: '/docs/android/kotlin/kotlin-roadmap' },
+        { text: '简介与环境搭建', link: '/docs/android/kotlin/kotlin-introduction' },
+        { text: '基本语法与数据类型', link: '/docs/android/kotlin/kotlin-basics' },
+        { text: '控制流程与范围函数', link: '/docs/android/kotlin/kotlin-control-flow' },
+        { text: '函数与高阶函数', link: '/docs/android/kotlin/kotlin-functions' },
+        { text: '面向对象编程', link: '/docs/android/kotlin/kotlin-oop' },
+        { text: '空安全机制', link: '/docs/android/kotlin/kotlin-null-safety' },
       ]
     },
   ]

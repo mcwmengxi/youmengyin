@@ -37,8 +37,9 @@ export default [
         link: '/docs/front-end/react/basic/introduce',
       },
       {
-        text: '📋Flutter ',
+        text: '📋Flutter',
         link: '/docs/flutter/index',
+        activeMatch: '^/docs/flutter',
       },
       {
         text: '📋Electron',
@@ -90,6 +91,11 @@ export default [
       { text: '🔥 设计模式', link: '/docs/patterns/guide/' },
       { text: '📋 面试大全', link: '/docs/interview/' },
       { text: '🔥 vue源码实现', link: '/article/vue-design/page-1' },
+      { 
+        text: '🚀 Flutter 实战进阶', 
+        link: '/docs/flutter/json-serialization',
+        activeMatch: '^/docs/flutter/(json-serialization|practical-project)',
+      },
     ],
   },
   {

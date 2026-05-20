@@ -3,7 +3,6 @@ import {
   sidebarAlgorithm,
   sidebarPatterns,
   sidebarDesign,
-  sidebarFlutter,
   sidebarArticle,
   sidebarTools,
   sidebarGo,
@@ -16,6 +15,7 @@ import {
   sidebarTypescript,
   sidebarResource,
   sidebarAi,
+  sidebarFlutter,
 } from './sidebar/index'
 import {
   sidebarAndroid,
@@ -63,7 +63,7 @@ export default {
   '/docs/front-end/react/': sidebarReact(),
   '/docs/front-end/typescript/': sidebarTypescript(),
   // flutter
-  '/docs/flutter': sidebarFlutter(),
+  '/docs/flutter/': sidebarFlutter(),
   '/docs/electron': sidebarElectron(),
   '/docs/android': sidebarAndroid(),
   '/docs/threejs': sidebarThreeJS(),

@@ -2,7 +2,7 @@
 
 ## 最佳实践
 
-### eslint中ts插件规则
+### eslint 中 ts 插件规则
 
 [@typescript-eslint/eslint-plugin](https://github.com/typescript-eslint/typescript-eslint)（12k star）包含超过 100 条规则，用于检测专门针对 TS 代码的最佳实践违规、错误或风格问题。
 
@@ -41,20 +41,20 @@ const userInfo: xxInfoType = { ... }
 import type { Ref } from 'vue' // import Ref 类型
 ```
 
-更多细节参考：[import 和 import type的区别](https://juejin.cn/post/7111203210542448671)
+更多细节参考：[import 和 import type 的区别](https://juejin.cn/post/7111203210542448671)
 
 ### 常规类型使用 TS 类型而非 JS 类型
 
-不要使用以下 JS 类:  Number, String, Boolean, Symbol 和 Object。
+不要使用以下 JS 类: Number, String, Boolean, Symbol 和 Object。
 
 应该使用 number, string, boolean 和 symbol 类型。
 
 ```ts
 /* 错误 */
-function reverse(s: String) : String;
+function reverse(s: String): String
 
 /* 正确 */
-function reverse(s: string): string;
+function reverse(s: string): string
 ```
 
 ### 使用 Record<string, unknown> 代替 object
@@ -67,13 +67,13 @@ function reverse(s: string): string;
 
 ```ts
 /* 错误 */
-function fn(x: () => any) { 
-    x();
+function fn(x: () => any) {
+  x()
 }
 
 /* 正确 */
-function fn(x: () => void) { 
-    x();
+function fn(x: () => void) {
+  x()
 }
 ```
 
@@ -82,7 +82,7 @@ function fn(x: () => void) {
 当你的函数，接口或类，需要使用到很多类型的时候，当我们需要一个 id 参数，函数的参数可以是任何值，返回值就是将参数原样返回，并且其只能接受一个参数，在 js 时代我们会很轻易的使用一行
 
 ```js
-const id = arg => arg
+const id = (arg) => arg
 ```
 
 由于其可以接受任意值，也就是说入参和返回值可以是任意类型，如果不使用泛型，只能重复的进行定义
@@ -97,11 +97,11 @@ type idString = (arg: string) => string
 
 ```ts
 function id<T>(arg: T): T {
-    return arg
+  return arg
 }
 // 或
-const id1: <T>(arg: T) => T = arg => {
-    return arg
+const id1: <T>(arg: T) => T = (arg) => {
+  return arg
 }
 ```
 
@@ -112,6 +112,78 @@ const id1: <T>(arg: T) => T = arg => {
 - type 类型不能二次编辑，而 interface 可以随时扩展
 
 参考：[2021-TypeScript + React 最佳实践](https://juejin.cn/post/7012496703488000037)
+
+### 使用 Record<never, never> & string 实现字符串字面量类型的扩展
+
+在定义组件名称或枚举值时，经常需要允许预定义的固定值，同时又能支持用户传入自定义的字符串值。这种模式在前端组件库开发中非常常见：
+
+```typescript
+export type BaseComponentType =
+  | 'VInput'
+  | 'VInputPassword'
+  | 'VPinInput'
+  | 'VSelect'
+  | (Record<never, never> & string)
+```
+
+**核心原理：**
+
+1. **前四个选项**：`'VInput'`、`'VInputPassword'`、`'VPinInput'`、`'VSelect'` 是具体的字符串字面量类型
+2. **`Record<never, never>`**：表示一个空对象类型（没有任何属性）
+3. **`Record<never, never> & string`**：空对象与 string 的交叉类型，结果仍然是 `string`
+4. **联合类型效果**：既允许预定义的字面量值，也允许任意其他字符串
+
+**为什么不用 `string` 直接？**
+
+如果直接写 `| string`，TypeScript 会将整个类型简化为 `string`（因为 string 是所有字面量类型的父类型），这样就失去了对特定值的约束。
+
+而使用 `Record<never, never> & string` 可以：
+
+- ✅ 保持字面量类型的自动补全提示
+- ✅ 允许传入其他自定义字符串
+- ✅ 类型检查时仍然知道这是字符串类型
+- ✅ 避免类型被完全泛化为 string
+
+**实际应用示例：**
+
+```typescript
+// 定义组件注册表
+const componentMap: Record<BaseComponentType, Component> = {
+  VInput: InputComponent,
+  VInputPassword: PasswordComponent,
+  VPinInput: PinInputComponent,
+  VSelect: SelectComponent,
+}
+
+// 使用时既有类型提示，又灵活
+function getComponent(type: BaseComponentType) {
+  // type 可以是预定义的组件名
+  return componentMap[type]
+}
+
+// 调用示例
+getComponent('VInput') // ✅ 有自动补全
+getComponent('VButton') // ✅ 也允许（运行时可动态扩展）
+```
+
+**类似的其他实现方式：**
+
+```typescript
+// 方式2：使用模板字面量（TS 4.1+）
+type ExtensibleString<T extends string> = T | (string & {})
+
+// 方式3：使用 branded type
+type BrandedString = string & { __brand: 'extensible' }
+
+// 推荐方式：Record<never, never> & string（最简洁且兼容性好）
+```
+
+这种模式特别适合：
+
+- 组件库的组件名注册表
+- API 端点路径定义
+- 事件名称列表
+- 任何需要"预设值 + 可扩展"的场景
 
 ## TS 常见问题处理
 
@@ -124,16 +196,16 @@ const id1: <T>(arg: T) => T = arg => {
 ```vue
 <script lang="ts" setup>
 interface ConfigProps {
-    link: Record<string, unknown>
+  link: Record<string, unknown>
 }
-const urlName = (process.env?.CONFIG as ConfigProps).link.XXXX_NAME;
+const urlName = (process.env?.CONFIG as ConfigProps).link.XXXX_NAME
 </script>
 ```
 
 解决方法：为非重叠类型添加 unknown 转换
 
 ```ts
-const urlName = (process.env?.CONFIG as unknown as ConfigProps).link.XXXX_NAME;
+const urlName = (process.env?.CONFIG as unknown as ConfigProps).link.XXXX_NAME
 ```
 
 ### echarts 变量 - window 下新增属性报错问题
@@ -143,7 +215,7 @@ const urlName = (process.env?.CONFIG as unknown as ConfigProps).link.XXXX_NAME;
 ```ts
 // src/global.d.t
 export interface CustomWindow extends Window {
-    echarts?: any;
+  echarts?: any
 }
 ```
 
@@ -189,10 +261,10 @@ const res: any = await api.xxx()
 import type { AxiosResponse, AxiosRequestConfig } from 'axios-response'
 
 interface AxiosRequestConfigCustom extends AxiosRequestConfig {
-    noToastErr: boolean;
+  noToastErr: boolean
 }
 
-ajax.get('xxx', { params, noToastErr: true} as AxiosRequestConfigCustom);
+ajax.get('xxx', { params, noToastErr: true } as AxiosRequestConfigCustom)
 ```
 
 ### arguments 函数参数变量报错问题
@@ -203,12 +275,12 @@ ajax.get('xxx', { params, noToastErr: true} as AxiosRequestConfigCustom);
 
 ```ts
 function extend() {
-    const result = {}
-    // eslint-disable-next-line prefer-rest-params
-    for(let i = 0; i < arguments.length; i++) {
-        const attr = arguments[i];
-        // ....
-    }
+  const result = {}
+  // eslint-disable-next-line prefer-rest-params
+  for (let i = 0; i < arguments.length; i++) {
+    const attr = arguments[i]
+    // ....
+  }
 }
 ```
 
@@ -216,15 +288,15 @@ function extend() {
 
 ```ts
 function extend(...params) {
-    const result = {}
-    for(let i = 0; i < params.length; i++) {
-        const attr = params[i];
-        // ....
-    }
+  const result = {}
+  for (let i = 0; i < params.length; i++) {
+    const attr = params[i]
+    // ....
+  }
 }
 ```
 
-### 函数有3个参数，只传了1个, 参数个数不匹配问题
+### 函数有 3 个参数，只传了 1 个, 参数个数不匹配问题
 
 指定函数出入参类型，使用 ?: 可选参数
 
@@ -237,7 +309,7 @@ css(ele)
 
 ```js
 const css: (el: any, prop?: any, val?: any) => any = (el, prop, val) => {
-    // ..
+  // ..
 }
 ```
 
@@ -262,7 +334,7 @@ let curInfo: Record<string, unknown> | null = null
 const num: Ref<number | string> = ref('')
 
 // 使用时
-num as number 
+num as number
 ```
 
 如果还是报错，使用 num as unknown as number
@@ -273,7 +345,7 @@ Argument of type `Record<string, unknown>` is not assignable to parameter of typ
 
 ```ts
 const dayInfo = ref([])
-dayInfo.push(curInfo);
+dayInfo.push(curInfo)
 ```
 
 修改
@@ -299,9 +371,9 @@ const dayInfo: any = ref([])
 ## 参考
 
 - [TS 官网 - handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
-- [Microsoft - TypeScript官网 wiki - FAQ](https://github.com/microsoft/TypeScript/wiki/FAQ)
+- [Microsoft - TypeScript 官网 wiki - FAQ](https://github.com/microsoft/TypeScript/wiki/FAQ)
 - [TS 类型练习 type-challenges](https://github.com/type-challenges/type-challenges)
-- [总结TS在项目开发中的应用实践体会 - 掘金](https://juejin.cn/post/6970841540776329224)
+- [总结 TS 在项目开发中的应用实践体会 - 掘金](https://juejin.cn/post/6970841540776329224)
 - [2021-TS + React 最佳实践 - 掘金](https://juejin.cn/post/7012496703488000037)
 - [最佳实践 - TypeScript 手册](https://bosens-china.github.io/Typescript-manual/download/zh/declaration-files/do-s-and-don-ts.html)
 - [TypeScript 中高级应用与最佳实践 - 腾讯 AlloyTeam](http://www.alloyteam.com/2019/07/13796/)

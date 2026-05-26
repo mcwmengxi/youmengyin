@@ -1,211 +1,212 @@
-# 混合渲染策略
+# 混合渲染策略与 routeRules
 
-> 本章讲解如何在 Nuxt 中实现混合渲染，为不同页面或路由设置不同的渲染模式。
+> 本章深入 Nuxt 4 的混合渲染策略，讲解如何在同一个应用中按路由粒度使用不同的渲染模式。
 
-## 一、路由级别配置
+## 一、混合渲染概念
 
-### 1.1 `routeRules` 语法
+混合渲染允许同一 Nuxt 4 应用的不同路由使用不同的渲染模式：
 
-`nuxt.config.ts` 中的 `routeRules` 允许按路由路径设置不同的渲染策略：
+```
+/            → SSR（服务端渲染，SEO 优先）
+/about       → SSG（构建时预渲染，纯静态）
+/products/*  → ISR（增量静态再生成，定期更新）
+/search/*    → SWR（缓存 + 后台更新）
+/admin/*     → SPA（纯客户端，无需 SEO）
+```
+
+**核心工具**：`nuxt.config.ts` 中的 `routeRules`。
+
+---
+
+## 二、routeRules 完整配置
+
+### 2.1 支持的所有规则
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
   routeRules: {
-    // 精确匹配
-    '/': { ssr: true },
+    '/specific-page': {
+      // 渲染模式
+      ssr: true,            // SSR（默认）
+      prerender: true,      // SSG 预渲染
+      isr: 600,             // ISR，秒为单位
+      swr: 300,             // SWR，秒为单位
 
-    // 通配符匹配
-    '/blog/**': { swr: 3600 },
+      // 重定向
+      redirect: '/new-path',          // 永久重定向
+      redirect: { to: '/new-path', statusCode: 301 },
 
-    // 动态路由匹配
-    '/products/**': { isr: 600 },
+      // 响应头
+      headers: {
+        'X-Custom-Header': 'value',
+        'Cache-Control': 'max-age=3600',
+      },
 
-    // 前缀匹配
-    '/admin/**': { ssr: false },
-  },
-})
-```
+      // CORS
+      cors: true,
 
-### 1.2 routeRules 支持的选项
+      // 代理（Nitro 3 增强）
+      proxy: { to: 'https://api.external.com/**' },
 
-| 选项            | 值        | 说明                 |
-| --------------- | --------- | -------------------- |
-| `ssr`           | `boolean` | 是否启用服务端渲染   |
-| `isr`           | `number`  | ISR 缓存时间（秒）   |
-| `swr`           | `number`  | SWR 缓存时间（秒）   |
-| `prerender`     | `boolean` | 是否在构建时预渲染   |
-| `redirect`      | `string`  | 重定向目标 URL       |
-| `headers`       | `object`  | 自定义响应头         |
-| `cors`          | `boolean` | 是否启用 CORS        |
-| `appMiddleware` | `boolean` | 是否运行客户端中间件 |
-
-### 1.3 通配符规则
-
-```ts
-routeRules: {
-  '/blog/**': { swr: 3600 },     // /blog 及其所有子路由
-  '/blog/*': { swr: 3600 },      // /blog 的一级子路由（/blog/foo 但不含 /blog/foo/bar）
-  '/products/[id]': { isr: 600 } // 匹配 /products/123 但不含 /products/abc/def
-}
-```
-
----
-
-## 二、混合渲染规则
-
-### 2.1 典型混合站点配置
-
-```ts
-export default defineNuxtConfig({
-  routeRules: {
-    // 首页 — SSR（SEO + 实时数据）
-    '/': { ssr: true },
-
-    // 博客文章 — SWR（用户立即看到内容，后台更新）
-    '/blog/**': { swr: 3600 },
-
-    // 商品详情 — ISR（定期更新）
-    '/products/**': { isr: 1800 },
-
-    // 静态页面 — 预渲染（构建时生成）
-    '/about': { prerender: true },
-    '/faq': { prerender: true },
-
-    // 后台管理 — 纯 SPA（无需 SEO）
-    '/admin/**': { ssr: false },
-
-    // 重定向旧链接
-    '/old-about': { redirect: '/about' },
-
-    // API 代理 — 自定义响应头
-    '/api/external/**': {
-      proxy: 'https://api.example.com/**',
-      headers: { 'X-Custom': 'value' },
+      // 实验性：边缘渲染
+      experimentalNoScripts: false,
     },
   },
 })
 ```
 
-### 2.2 合并层级配置
+### 2.2 路由匹配语法
 
-同一路由可能被多条规则匹配，Nuxt 会按优先级合并：
-
-```ts
-routeRules: {
-  '/blog/**': { swr: 3600 },            // 全局博客缓存
-  '/blog/breaking/**': { ssr: true }     // 突发新闻实时渲染（覆盖 SWR）
-}
-```
-
-匹配 `/blog/breaking/article-x` 时，`ssr: true` 会覆盖 `swr: 3600`。
+| 模式               | 匹配                              |
+| ------------------ | --------------------------------- |
+| `/`                | 仅首页                            |
+| `/about`           | 仅 /about                         |
+| `/blog/*`          | /blog 及其所有子路由                        |
+| `/blog/**`         | /blog 及其所有子路由（深度匹配）  |
+| `/posts/:id`       | /posts/1、/posts/abc 等           |
 
 ---
 
-## 三、客户端渲染 (SPA)
+## 三、实战混合配置
 
-### 3.1 全局 SPA 模式
-
-```ts
-export default defineNuxtConfig({
-  ssr: false, // 全局关闭 SSR，变为纯 SPA
-})
-```
-
-### 3.2 路由级 SPA
-
-```ts
-export default defineNuxtConfig({
-  routeRules: {
-    '/admin/**': { ssr: false },
-  },
-})
-```
-
-### 3.3 SPA 模式的特点
-
-- 所有渲染在客户端完成
-- 首屏加载慢（需等 JS 加载执行）
-- **不利于 SEO**
-- 适合需要登录的后台系统、仪表盘
-
----
-
-## 四、边缘渲染
-
-### 4.1 什么是边缘渲染？
-
-**边缘渲染（Edge Rendering）**：在 CDN 边缘节点上运行 Nuxt 服务端渲染，用户请求由离其最近的节点处理。
+### 3.1 电商网站示例
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  nitro: {
-    preset: 'cloudflare-pages', // 或 'vercel-edge'、'netlify-edge'
+  future: { compatibilityVersion: 4 },
+  routeRules: {
+    // 首页 — SSR，实时内容
+    '/': { ssr: true },
+
+    // 静态信息页 — 完全预渲染
+    '/about': { prerender: true },
+    '/faq': { prerender: true },
+    '/terms': { prerender: true },
+
+    // 产品列表 — ISR 10 分钟
+    '/products/**': { isr: 600 },
+
+    // 产品详情 — ISR 30 分钟
+    '/products/*': { isr: 1800 },
+
+    // 搜索结果 — SWR 60 秒（允许短暂过期）
+    '/search/**': { swr: 60 },
+
+    // 用户个人中心 — SPA
+    '/account/**': { ssr: false },
+
+    // 管理后台 — SPA
+    '/admin/**': { ssr: false },
+
+    // 博客 — ISR 1 小时
+    '/blog/**': { isr: 3600 },
+
+    // API 路由
+    '/api/public/**': { cors: true },
+    '/api/private/**': { cors: false },
   },
 })
 ```
 
-### 4.2 支持的边缘平台
+### 3.2 使用 `__NUXT_ISR_TIMESTAMP` 控制 ISR 刷新
 
-| 平台               | Nitro Preset                             |
-| ------------------ | ---------------------------------------- |
-| Cloudflare Workers | `cloudflare-pages` / `cloudflare-module` |
-| Vercel Edge        | `vercel-edge`                            |
-| Netlify Edge       | `netlify-edge`                           |
-| Deno Deploy        | `deno-deploy`                            |
+```vue
+<!-- app/pages/products/[id].vue -->
+<script setup lang="ts">
+// Nuxt 4 自动在 ISR 路由中注入此时间戳
+const isrTimestamp = useState('__NUXT_ISR_TIMESTAMP', () => Date.now())
+</script>
+```
 
-### 4.3 边缘渲染的限制
+### 3.3 动态 routeRules
 
-- 无法访问 Node.js 文件系统（`fs`、`path`）
-- 受限的运行时 API
-- 某些 Node 原生模块不可用（需 polyfill）
-
-### 4.4 组合策略示例
+Nuxt 4 支持运行时动态更新路由规则（通过 Nitro 3）：
 
 ```ts
+// server/api/cache/clear.get.ts
+export default defineEventHandler(async (event) => {
+  // 清除特定路由的 ISR 缓存
+  await useStorage('cache:nitro').removeItem('_ prerender_/products/123')
+  return { success: true }
+})
+```
+
+---
+
+## 四、预渲染配置详解
+
+### 4.1 自动爬取
+
+```ts
+// nuxt.config.ts
 export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
   nitro: {
-    preset: 'vercel', // 默认 Node.js 部署
+    prerender: {
+      crawlLinks: true,      // 自动爬取 <NuxtLink> 链接
+      routes: ['/'],         // 入口路由
+      ignore: ['/admin/**'], // 忽略的路由
+    },
   },
-  routeRules: {
-    // 大部分页面使用 Node.js SSR
-    '/**': { ssr: true },
+})
+```
 
-    // 高流量页面使用 ISR 缓存
-    '/trending/**': { isr: 600 },
+### 4.2 动态生成预渲染路由
 
-    // 静态内容预渲染
-    '/docs/**': { prerender: true },
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+  nitro: {
+    prerender: {
+      routes: async () => {
+        const response = await fetch('https://api.example.com/posts')
+        const posts = await response.json()
+        return [
+          '/',
+          '/about',
+          ...posts.map((p: any) => `/posts/${p.slug}`),
+        ]
+      },
+    },
   },
 })
 ```
 
 ---
 
-## 五、选择决策流程
+## 五、性能监控
 
-```
-是否需要 SEO？
-├── 是 → 需要 SSR / SSG / ISR
-│   ├── 内容更新频率？
-│   │   ├── 极少更新 → SSG（构建时生成）
-│   │   ├── 偶尔更新 → ISR（定时缓存再生）
-│   │   └── 频繁更新 → SSR（每次请求渲染）
-│   └── 性能要求？
-│       ├── 极致性能 → SSG / ISR
-│       └── 可接受 → SSR
-│
-└── 否 → SPA（客户端渲染）
-    └── 示例：后台管理系统、内部工具
+### 5.1 查看渲染模式
+
+```vue
+<script setup lang="ts">
+const route = useRoute()
+
+// 检查当前路由是否预渲染
+const isPrerendered = import.meta.prerender
+const isSSR = !import.meta.client
+</script>
 ```
 
-### 5.1 快速参考
+### 5.2 Nuxt 4 DevTools 渲染分析
 
-| 你的站点类型 | 推荐渲染策略                            |
-| ------------ | --------------------------------------- |
-| 个人博客     | SSG（全站预渲染）或 SWR                 |
-| 企业官网     | SSG（静态页）+ SSR（动态内容）          |
-| 电商平台     | SSR（首页）+ ISR（商品页）+ SPA（后台） |
-| SaaS 产品    | SSR（营销页）+ SPA（应用内）            |
-| 内容站/新闻  | SWR（文章页）+ SSR（首页）              |
+Nuxt 4 内置 DevTools v2，提供：
+- **路由性能面板**：查看每条路由的渲染模式
+- **数据获取时间线**：追踪 `useFetch` 的执行时间
+- **缓存命中率**：ISR/SWR 缓存的命中统计
+
+---
+
+## 六、混合渲染最佳实践
+
+- **首页/着陆页 → SSR**，确保 SEO 和首屏速度
+- **静态内容 → SSG（prerender）**，零服务器开销
+- **动态但变化不频繁 → ISR**，兼顾性能和实时性
+- **实时性强但可容忍短暂不一致 → SWR**，用户体验好
+- **后台管理 → SPA**，无需 SEO
+- **全局启用 `crawlLinks`**，自动发现需要预渲染的页面
+- **监控 ISR 缓存**，必要时手动清除过期缓存

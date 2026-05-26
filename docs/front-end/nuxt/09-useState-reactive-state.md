@@ -1,231 +1,213 @@
 # useState 响应式状态
 
-> 本章讲解 Nuxt 内置的 `useState` 组合式函数，实现跨组件的响应式状态共享。
+> 本章讲解 Nuxt 4 中 `useState` 的用法、SSR 安全的状态共享以及服务端状态序列化。
 
 ## 一、useState 基础
 
 ### 1.1 什么是 useState？
 
-`useState` 是 Nuxt 3 内置的 SSR 友好状态管理函数，用于在**组件间共享响应式状态**，并在 SSR 序列化期间保持状态一致性。
+`useState` 是 Nuxt 内置的 SSR 友好型状态管理工具。它替代 Vue 3 的 `ref`，在服务端渲染后能将状态序列化到客户端。
 
 ```vue
-<script setup>
-// 定义共享状态
+<script setup lang="ts">
+// 创建或访问一个 SSR 安全的状态
 const counter = useState('counter', () => 0)
-//                              key      初始化函数
 
-// 在其他组件中直接读取同一个 key
-const counter = useState('counter') // 获取同一个状态
-</script>
-```
-
-### 1.2 基本示例
-
-```vue
-<!-- components/Counter.vue -->
-<script setup>
-const count = useState('count', () => 0)
-
+// 修改状态
 function increment() {
-  count.value++
+  counter.value++
 }
 </script>
 
 <template>
-  <div>
-    <p>{{ count }}</p>
-    <button @click="increment">+1</button>
-  </div>
+  <button @click="increment">{{ counter }}</button>
 </template>
 ```
 
+**第一个参数是唯一 key**，同一个 key 在整个应用中共享同一份状态。
+
+### 1.2 为什么不用 `ref`？
+
+|          | `ref`           | `useState`      |
+| -------- | --------------- | --------------- |
+| SSR 安全 | 否              | 是              |
+| 跨组件共享 | 否              | 是（同 key）    |
+| 服务端初始化 | 每次渲染重置 | 保持在内存中 |
+| 客户端水合 | 可能不一致    | 自动同步        |
+
+服务端用 `ref` 可能导致 hydration mismatch（服务端和客户端渲染结果不一致）。
+
+---
+
+## 二、useState 共享模式
+
+### 2.1 跨组件共享
+
 ```vue
-<!-- components/CounterDisplay.vue -->
-<script setup>
-// 不传第二个参数，直接获取已存在的状态
-const count = useState('count')
+<!-- app/components/Counter.vue -->
+<script setup lang="ts">
+const count = useState('counter', () => 0)
 </script>
 
 <template>
-  <p>当前计数：{{ count }}</p>
+  <button @click="count++">{{ count }}</button>
 </template>
 ```
 
-两个组件共享同一个 `count` 状态，互相同步。
+```vue
+<!-- app/components/Display.vue -->
+<script setup lang="ts">
+const count = useState('counter', () => 0)
+// 无需 props，自动共享 Counter 的 counter 状态
+</script>
 
-### 1.3 useState 签名
+<template>
+  <p>当前值: {{ count }}</p>
+</template>
+```
+
+### 2.2 跨页面共享
 
 ```ts
-useState<T>(key: string, init?: () => T | Ref<T>): Ref<T>
-```
+// app/composables/useCart.ts
+export const useCart = () => {
+  const items = useState<CartItem[]>('cart-items', () => [])
 
-- `key`：全局唯一键，用于标识和共享状态
-- `init`：可选的工厂函数，仅在服务端或状态不存在时执行
-
----
-
-## 二、与 ref/reactive 的区别
-
-| 特性       | `ref`                  | `useState`            |
-| ---------- | ---------------------- | --------------------- |
-| 作用域     | 当前组件               | 全局（通过 key 共享） |
-| SSR 安全   | 否（hydration 不匹配） | 是（自动序列化）      |
-| 跨组件共享 | 需要 provide/inject    | 直接通过 key 访问     |
-| 适用场景   | 组件内部状态           | 全局/跨组件状态       |
-
-### 2.1 SSR 水合问题
-
-```vue
-<!-- ❌ 错误做法 — SSR 水合不匹配 -->
-<script setup>
-const count = ref(Math.random()) // 服务端和客户端值不同
-</script>
-
-<!-- ✅ 正确做法 — 使用 useState -->
-<script setup>
-const count = useState('random', () => Math.random()) // 服务端生成，客户端复用
-</script>
-```
-
----
-
-## 三、SSR 状态序列化
-
-### 3.1 序列化原理
-
-Nuxt 在服务端渲染时，将 `useState` 的值序列化为 JSON 嵌入 HTML；客户端 hydration 时直接恢复，避免重复计算。
-
-```
-<!-- 服务端渲染的 HTML -->
-<script>
-window.__NUXT__ = {
-  state: {
-    count: 0,
-    user: { id: 1, name: "Alice" }
-  }
-}
-</script>
-```
-
-### 3.2 可序列化的数据
-
-```vue
-<script setup>
-// ✅ 可安全序列化 — 基本类型、普通对象、数组
-const user = useState('user', () => ({
-  id: 1,
-  name: 'Alice',
-  roles: ['admin'],
-}))
-
-const list = useState('list', () => [1, 2, 3])
-
-// ❌ 不能序列化 — 函数、类实例、Symbol、循环引用
-const fn = useState('fn', () => () => {}) // 函数不行
-const date = useState('date', () => new Date()) // 需要手动转换
-</script>
-```
-
-### 3.3 自定义序列化
-
-```vue
-<script setup>
-// 对于需要特殊处理的数据（如 Date），在 useAsyncData 的 transform 中处理
-const { data } = await useFetch('/api/posts', {
-  transform: (response) => {
-    return response.posts.map((p) => ({
-      ...p,
-      createdAt: new Date(p.createdAt), // 字符串 → Date
-    }))
-  },
-})
-</script>
-```
-
----
-
-## 四、使用场景与注意事项
-
-### 4.1 适合同步的场景
-
-```ts
-// composables/useToast.ts
-export function useToast() {
-  const toasts = useState('toasts', () => [])
-
-  function show(message: string) {
-    toasts.value.push({ id: Date.now(), message })
+  const addItem = (item: CartItem) => {
+    items.value.push(item)
   }
 
-  function remove(id: number) {
-    toasts.value = toasts.value.filter((t) => t.id !== id)
-  }
+  const total = computed(() =>
+    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  )
 
-  return { toasts, show, remove }
+  return { items, addItem, total }
 }
 ```
 
-这样在任意组件中调用 `useToast().show('操作成功')` 即可。
-
-### 4.2 适合异步数据的场景
-
 ```vue
-<script setup>
-// ❌ 不推荐 — 用 useState 管理异步数据（失去 SSR 去重优化）
-const posts = useState('posts', () => [])
-const data = await $fetch('/api/posts')
-posts.value = data
-
-// ✅ 推荐 — 直接用 useFetch（自动享有 SSR 优化）
-const { data: posts } = await useFetch('/api/posts')
+<!-- 在任意页面或组件中使用 -->
+<script setup lang="ts">
+const { items, addItem, total } = useCart()
 </script>
 ```
 
-### 4.3 用户登录状态
+---
+
+## 三、useState 与 Composable 结合（推荐模式）
+
+将 `useState` 封装在 Composable 中是 Nuxt 4 推荐的最佳实践：
 
 ```ts
-// composables/useAuth.ts
-export function useAuth() {
-  const user = useState('user', () => null)
+// app/composables/useAuth.ts
+interface User {
+  id: number
+  name: string
+  email: string
+}
 
-  async function login(credentials: { email: string; password: string }) {
-    user.value = await $fetch('/api/login', {
+export const useAuth = () => {
+  const user = useState<User | null>('auth-user', () => null)
+  const token = useCookie<string | null>('auth-token')
+
+  const isLoggedIn = computed(() => !!user.value)
+
+  async function login(email: string, password: string) {
+    const response = await $fetch<{ user: User; token: string }>('/api/login', {
       method: 'POST',
-      body: credentials,
+      body: { email, password },
     })
+    user.value = response.user
+    token.value = response.token
   }
 
   function logout() {
     user.value = null
+    token.value = null
     navigateTo('/login')
   }
 
-  const isLoggedIn = computed(() => !!user.value)
-
-  return { user, isLoggedIn, login, logout }
+  return { user, token, isLoggedIn, login, logout }
 }
-
-// 任意页面使用
-const { user, isLoggedIn } = useAuth()
 ```
 
-### 4.4 注意事项
+---
 
-| 注意点                   | 说明                                                             |
-| ------------------------ | ---------------------------------------------------------------- |
-| **key 全局唯一**         | 同一 key 在整个应用中只有一个实例，注意命名冲突                  |
-| **仅在顶层使用**         | 不要在回调、条件、循环中调用 `useState`（同 Vue 组合式函数规则） |
-| **初始化函数只执行一次** | `init` 函数仅在服务端或首次未初始化时执行                        |
-| **避免存储大量数据**     | 所有 useState 数据都会在 SSR 时序列化到页面，影响性能            |
-| **不替代 Pinia**         | useState 适合轻量状态，复杂状态管理仍推荐 Pinia                  |
+## 四、Nuxt 4 useState 增强
 
-### 4.5 useState vs Pinia 选择指南
+### 4.1 类型推断优化
 
-| 场景                           | 推荐         |
-| ------------------------------ | ------------ |
-| 少数几个全局状态（主题、语言） | `useState`   |
-| 用户认证信息                   | `useState`   |
-| 复杂业务状态（购物车、订单）   | Pinia        |
-| 需要 getters / actions 结构化  | Pinia        |
-| 需要 DevTools 调试             | Pinia        |
-| 跨页面持久化                   | Pinia + 插件 |
+Nuxt 4 的 TypeScript 隔离让 `useState` 的类型推断更加精准：
+
+```ts
+// Nuxt 4：自动推断类型
+const user = useState('user', () => ({ id: 1, name: 'Alice' }))
+// user 类型自动推断为 Ref<{ id: number, name: string }>
+
+// 也可以显式指定更宽泛的类型
+const user = useState<User | null>('user', () => null)
+```
+
+### 4.2 配合 Nuxt 4 数据层
+
+```ts
+// app/composables/usePosts.ts
+export const usePosts = () => {
+  const posts = useState<Post[]>('posts', () => [])
+
+  // useState 可以与 useFetch 结合使用
+  async function fetchPosts() {
+    const { data } = await useFetch('/api/posts', { key: 'posts-list' })
+    posts.value = data.value ?? []
+  }
+
+  return { posts, fetchPosts }
+}
+```
+
+---
+
+## 五、注意事项与最佳实践
+
+### 5.1 命名规范
+
+```ts
+// ✅ 好的命名：有意义的唯一 key
+useState('auth-user', () => null)
+useState('cart-items', () => [])
+useState('theme-preference', () => 'light')
+
+// ❌ 避免：太简单的 key 容易冲突
+useState('data', () => null)
+```
+
+### 5.2 避免在工厂函数中使用浏览器 API
+
+```ts
+// ❌ 错误：工厂函数在服务端也会执行
+const width = useState('window-width', () => window.innerWidth)
+
+// ✅ 正确：在客户端再初始化
+const width = useState('window-width', () => 0)
+onMounted(() => {
+  width.value = window.innerWidth
+})
+```
+
+### 5.3 无需手动序列化
+
+Nuxt 自动处理 `useState` 的数据从服务端到客户端的序列化：
+
+```ts
+// toRef、Date、Map、Set 等都能正确序列化
+const items = useState('items', () => new Map<string, number>())
+const createdAt = useState('created', () => new Date())
+```
+
+### 5.4 Nuxt 4 最佳实践
+
+- **用 Composable 封装 `useState`**，不直接在组件中调用
+- **给 key 加上有意义的前缀**，避免命名冲突
+- **工厂函数保持纯净**，不依赖浏览器 API
+- **跨页面状态用 `useState`**，局部状态用 `ref`
+- **复杂状态管理用 Pinia**（下一章），`useState` 适合轻量级场景

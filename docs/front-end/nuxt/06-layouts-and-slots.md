@@ -1,15 +1,15 @@
 # 布局系统与插槽
 
-> 本章讲解 Nuxt 的布局系统、命名布局以及插槽的使用方式。
+> 本章讲解 Nuxt 4 的布局系统（`app/layouts/`）、命名布局及插槽使用。
 
 ## 一、默认布局
 
-### 1.1 `layouts/default.vue`
+### 1.1 `app/layouts/default.vue`
 
-`layouts/` 目录下的 `default.vue` 是 Nuxt 的默认布局文件，所有页面默认使用它：
+`app/layouts/` 目录下的 `default.vue` 是所有页面默认使用的布局：
 
 ```vue
-<!-- layouts/default.vue -->
+<!-- app/layouts/default.vue -->
 <template>
   <div>
     <AppHeader />
@@ -22,12 +22,12 @@
 </template>
 ```
 
-`<slot />` 是页面内容的渲染出口，必须保留。
+`<slot />` 是页面内容的渲染出口，**必须保留**。
 
-### 1.2 `app.vue` 中使用布局
+### 1.2 `app/app.vue` 中使用布局
 
 ```vue
-<!-- app.vue -->
+<!-- app/app.vue -->
 <template>
   <NuxtLayout>
     <NuxtPage />
@@ -36,7 +36,7 @@
 ```
 
 - `<NuxtLayout>` 自动应用默认布局
-- 如果不存在 `layouts/default.vue`，`<NuxtLayout>` 仅渲染 `<NuxtPage />` 内容
+- 如果不存在 `app/layouts/default.vue`，`<NuxtLayout>` 仅渲染 `<NuxtPage />` 内容
 
 ---
 
@@ -45,22 +45,15 @@
 ### 2.1 创建自定义布局
 
 ```vue
-<!-- layouts/admin.vue -->
+<!-- app/layouts/admin.vue -->
 <template>
   <div class="admin-layout">
-    <AdminSidebar />
-    <div class="admin-content">
+    <aside class="sidebar">
+      <AdminNav />
+    </aside>
+    <main class="content">
       <slot />
-    </div>
-  </div>
-</template>
-```
-
-```vue
-<!-- layouts/blank.vue -->
-<template>
-  <div>
-    <slot />
+    </main>
   </div>
 </template>
 ```
@@ -68,179 +61,194 @@
 ### 2.2 页面指定布局
 
 ```vue
-<!-- pages/admin/dashboard.vue -->
-<script setup>
+<!-- app/pages/admin/dashboard.vue -->
+<script setup lang="ts">
 definePageMeta({
-  layout: 'admin', // 使用 layouts/admin.vue
+  layout: 'admin',
 })
 </script>
+
+<template>
+  <div>欢迎来到管理后台</div>
+</template>
 ```
 
-```vue
-<!-- pages/login.vue -->
-<script setup>
-definePageMeta({
-  layout: 'blank', // 使用空白布局
-})
-</script>
-```
-
-### 2.3 禁用布局
+### 2.3 动态切换布局
 
 ```vue
-<script setup>
-definePageMeta({
-  layout: false, // 不套用任何布局
-})
-</script>
-```
-
----
-
-## 三、动态切换布局
-
-### 3.1 根据路由动态切换
-
-```vue
-<!-- app.vue -->
-<script setup>
+<script setup lang="ts">
 const route = useRoute()
-
-// 根据路径前缀决定布局
-const layout = computed(() => {
-  if (route.path.startsWith('/admin')) return 'admin'
-  if (route.path === '/login') return 'blank'
-  return 'default'
+// Nuxt 4 中可在路由守卫中动态切换
+definePageMeta({
+  layout: computed(() => route.meta.requiresAuth ? 'admin' : 'default')
 })
 </script>
+```
 
+### 2.4 使用 `<NuxtLayout>` 的 `name` 属性
+
+```vue
+<!-- app/app.vue -->
 <template>
   <NuxtLayout :name="layout">
     <NuxtPage />
   </NuxtLayout>
 </template>
+
+<script setup lang="ts">
+const route = useRoute()
+const layout = computed(() => route.meta.layout ?? 'default')
+</script>
 ```
 
-### 3.2 布局中使用路由信息
+---
+
+## 三、布局插槽
+
+### 3.1 命名插槽
+
+布局文件可以定义多个插槽，页面通过 `<template #slotName>` 填充：
 
 ```vue
-<!-- layouts/default.vue -->
-<script setup>
-const route = useRoute()
-const pageTitle = computed(() => route.meta.title || '默认标题')
+<!-- app/layouts/docs.vue -->
+<template>
+  <div class="docs-layout">
+    <aside>
+      <slot name="sidebar">
+        <!-- 默认侧边栏内容 -->
+        <DocsNav />
+      </slot>
+    </aside>
+    <main>
+      <slot />
+      <!-- 默认插槽：页面主内容 -->
+    </main>
+  </div>
+</template>
+```
+
+```vue
+<!-- app/pages/docs/guide.vue -->
+<template>
+  <div>
+    <!-- 主内容（默认插槽） -->
+    <h1>使用指南</h1>
+    <p>这里是文档内容...</p>
+  </div>
+</template>
+```
+
+### 3.2 在布局中使用插槽 Props
+
+```vue
+<!-- app/layouts/user.vue -->
+<script setup lang="ts">
+const user = await useFetch('/api/me')  // Nuxt 4 智能数据获取
 </script>
 
 <template>
   <div>
     <header>
-      <h1>{{ pageTitle }}</h1>
+      <slot name="header" :user="user" />
     </header>
     <slot />
   </div>
 </template>
 ```
 
----
-
-## 四、插槽机制
-
-### 4.1 `<NuxtLayout>` 的具名插槽
-
-布局中可以定义多个具名插槽，页面通过 `<NuxtLayout>` 的属性传递：
-
 ```vue
-<!-- layouts/default.vue -->
+<!-- 页面中使用布局的插槽 props -->
 <template>
   <div>
-    <header>
-      <slot name="header">默认头部</slot>
-    </header>
-    <main>
-      <slot />
-    </main>
-    <aside>
-      <slot name="sidebar">默认侧边栏</slot>
-    </aside>
+    <template #header="{ user }">
+      <h1>{{ user?.name }} 的个人主页</h1>
+    </template>
+
+    <p>主页内容...</p>
   </div>
 </template>
 ```
 
-在 `app.vue` 中使用：
+---
+
+## 四、布局嵌套
+
+### 4.1 多级布局
+
+```
+app/layouts/
+├── default.vue       # 基础布局（头部 + 底部）
+├── docs.vue          # 文档布局（基础 + 侧边栏）
+└── admin.vue         # 管理布局（基础 + 管理菜单）
+```
+
+### 4.2 布局内使用 `<NuxtLayout>`
 
 ```vue
-<!-- app.vue -->
+<!-- app/layouts/docs.vue -->
+<script setup lang="ts">
+const layout = 'default'
+</script>
+
 <template>
-  <NuxtLayout>
-    <!-- #header 填充布局的 header 插槽 -->
-    <template #header>
-      <AppHeader />
-    </template>
-
-    <!-- #sidebar 填充布局的 sidebar 插槽 -->
-    <template #sidebar>
-      <AppSidebar />
-    </template>
-
-    <!-- 默认插槽 → <NuxtPage /> -->
-    <NuxtPage />
+  <NuxtLayout :name="layout">
+    <div class="docs-wrapper">
+      <aside><!-- 侧边栏 --></aside>
+      <main><slot /></main>
+    </div>
   </NuxtLayout>
 </template>
 ```
 
-### 4.2 页面级插槽注入
-
-也可以通过 `definePageMeta` + `app.vue` 配合实现页面级插槽控制：
-
-```vue
-<!-- pages/admin/dashboard.vue -->
-<script setup>
-definePageMeta({
-  layout: 'admin',
-  title: '仪表盘',
-})
-</script>
-```
-
-```vue
-<!-- layouts/admin.vue -->
-<script setup>
-const route = useRoute()
-</script>
-<template>
-  <div>
-    <AdminHeader :title="route.meta.title" />
-    <slot />
-  </div>
-</template>
-```
-
-### 4.3 插槽与 Teleport 配合
-
-```vue
-<!-- layouts/default.vue -->
-<template>
-  <div>
-    <div id="modal-container" />
-    <slot />
-  </div>
-</template>
-
-<!-- 任意子组件 -->
-<template>
-  <Teleport to="#modal-container">
-    <div class="modal">弹窗内容</div>
-  </Teleport>
-</template>
-```
+> 注：Nuxt 4 推荐使用 `<NuxtLayout>` 嵌套而不是深层布局继承，性能和调试体验更好。
 
 ---
 
-## 五、布局最佳实践
+## 五、布局过渡动画
 
-| 实践              | 说明                                                          |
-| ----------------- | ------------------------------------------------------------- |
-| 保持布局简洁      | 布局只放结构性框架（导航、侧栏、底部），不写业务逻辑          |
-| 按场景拆分        | `default`、`admin`、`auth`、`blank` 各司其职                  |
-| 利用 `route.meta` | 在 `definePageMeta` 中传递标题、描述等元信息到布局            |
-| 嵌套使用          | 布局中可使用 `<NuxtLayout>` 实现嵌套（如全局布局 + 二级布局） |
-| SSR 安全          | 布局中的交互逻辑（如 `onMounted`）注意 SSR 兼容               |
+Nuxt 4 内置 `<NuxtPage>` 的 `transition` 属性：
+
+```vue
+<!-- app/app.vue -->
+<template>
+  <NuxtLayout>
+    <NuxtPage :transition="{ name: 'page', mode: 'out-in' }" />
+  </NuxtLayout>
+</template>
+
+<style>
+.page-enter-active,
+.page-leave-active {
+  transition: opacity 0.3s ease;
+}
+.page-enter-from,
+.page-leave-to {
+  opacity: 0;
+}
+</style>
+```
+
+### 自定义特定布局的过渡：
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+  app: {
+    pageTransition: { name: 'page', mode: 'out-in' },
+    layoutTransition: { name: 'layout', mode: 'out-in' },
+  },
+})
+```
+
+对应的 CSS 类名为 `layout-enter-active`、`layout-leave-active` 等。
+
+---
+
+## 六、Nuxt 4 布局最佳实践
+
+- **布局文件放在 `app/layouts/`**，`default.vue` 作为基础布局
+- **使用命名插槽**为不同页面定制布局区域（顶部栏、侧边栏等）
+- **用 `definePageMeta({ layout: 'xxx' })` 选择布局**，不要在 `app.vue` 中硬编码
+- **布局间数据传递用插槽 Props**，不要尝试跨布局 `provide/inject`（布局作用域隔离）
+- **布局嵌套用 `<NuxtLayout :name="">`**，比深层继承更清晰

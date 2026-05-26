@@ -1,22 +1,32 @@
-# useFetch 与 useAsyncData
+# useFetch 与 useAsyncData — Nuxt 4 智能数据层
 
-> 本章详细讲解 Nuxt 3 中最核心的两个数据获取组合式函数：`useFetch` 和 `useAsyncData`。
+> Nuxt 4 对数据获取层进行了重大升级。本章详细讲解 `useFetch` 和 `useAsyncData` 在 Nuxt 4 中的新特性：智能共享、自动清理和响应式 key 联动。
 
-## 一、useFetch
+## 一、Nuxt 4 数据层核心变化
 
-### 1.1 基本用法
+| 特性             | Nuxt 3                                | Nuxt 4                                |
+| ---------------- | ------------------------------------- | ------------------------------------- |
+| **数据共享**     | 手动传递或重复请求                    | 同 key 自动跨组件共享                 |
+| **数据清理**     | 手动管理，可能内存泄漏                | 组件卸载时自动清理                    |
+| **缓存控制**     | 基础 `getCachedData`                  | 增强的 `staleTime`、缓存策略          |
+| **响应式 key**   | 需手动 `watch` 再调用 `refresh`       | `key` 支持函数，变化时自动重新获取    |
+| **默认行为**     | `data` 初始为 `null`                  | 可配置 `resetAsyncDataToUndefined` 等 |
 
-`useFetch` 是 Nuxt 3 中**最常用**的数据获取方式，封装了 `$fetch` 和 `useAsyncData`：
+---
+
+## 二、useFetch
+
+### 2.1 基本用法
 
 ```vue
-<script setup>
-// 最简单的用法
-const { data, pending, error, refresh } = await useFetch('/api/posts')
+<script setup lang="ts">
+// 最简单的用法 — Nuxt 4 自动处理生命周期
+const { data, pending, error, refresh, status } = await useFetch('/api/posts')
 </script>
 
 <template>
   <div>
-    <p v-if="pending">加载中...</p>
+    <p v-if="status === 'pending'">加载中...</p>
     <p v-else-if="error">出错了: {{ error.message }}</p>
     <ul v-else>
       <li v-for="post in data" :key="post.id">{{ post.title }}</li>
@@ -25,363 +35,209 @@ const { data, pending, error, refresh } = await useFetch('/api/posts')
 </template>
 ```
 
-### 1.2 返回值详解
+### 2.2 返回值详解
 
-| 属性 | 类型 | 说明 |
-|------|------|------|
-| `data` | `Ref<T \| null>` | 请求返回的数据，初始为 `null` |
-| `pending` | `Ref<boolean>` | 请求是否进行中 |
-| `error` | `Ref<Error \| null>` | 请求错误对象 |
-| `refresh` | `Function` | 手动重新执行请求 |
-| `status` | `Ref<string>` | 请求状态：`'idle'` / `'pending'` / `'success'` / `'error'` |
+| 属性       | 类型                        | 说明                                  |
+| ---------- | --------------------------- | ------------------------------------- |
+| `data`     | `Ref<T>`                    | 请求返回的数据，初始为 `null`          |
+| `pending`  | `Ref<boolean>`              | 请求是否进行中                        |
+| `error`    | `Ref<Error \| null>`        | 请求错误对象                          |
+| `refresh`  | `Function`                  | 手动重新执行请求                      |
+| `status`   | `Ref<string>`               | `'idle'` / `'pending'` / `'success'` / `'error'` |
+| `execute`  | `Function`                  | 与 `refresh` 类似，但返回 Promise     |
+| `clear`    | `Function`                  | 清空当前 data 和 error                |
 
-### 1.3 带参数的请求
+### 2.3 带参数的请求
 
 ```vue
-<script setup>
-// 动态参数 — 页面路由变化时自动重新请求
+<script setup lang="ts">
 const route = useRoute()
-const { data } = await useFetch(`/api/posts/${route.params.id}`)
 
-// 查询参数 — 自动转为 URL query string
-const { data } = await useFetch('/api/posts', {
-  query: { page: 1, limit: 10 }
+// 动态 URL — 可以用 computed 或函数
+const { data } = await useFetch(() => `/api/posts/${route.params.id}`)
+
+// 查询参数
+const { data: posts } = await useFetch('/api/posts', {
+  query: { page: 1, limit: 10 },
 })
 
-// 请求头
-const { data } = await useFetch('/api/admin/posts', {
-  headers: {
-    Authorization: `Bearer ${token.value}`
-  }
-})
-</script>
-```
-
-**重要**：`useFetch` 的 URL 参数是**响应式**的 — 如果第一个参数用了 `ref` 或 `computed`，变化时会自动重新请求。
-
-### 1.4 POST / PUT / DELETE 请求
-
-```vue
-<script setup>
-// POST 请求
-const { data, error } = await useFetch('/api/posts', {
-  method: 'POST',
-  body: { title: '新文章', content: '正文...' }
-})
-
-// PUT 请求
-await useFetch(`/api/posts/${id}`, {
-  method: 'PUT',
-  body: { title: '修改后的标题' }
-})
-
-// DELETE 请求
-await useFetch(`/api/posts/${id}`, {
-  method: 'DELETE'
-})
-</script>
-```
-
-### 1.5 请求选项
-
-```vue
-<script setup>
-const { data, refresh } = await useFetch('/api/posts', {
-  // 服务端获取（默认），设为 false 则仅客户端获取
-  server: true,
-
-  // 懒加载 — 设为 true 时不立即请求，需手动 refresh
-  lazy: false,
-
-  // 立即执行（默认），设为 false 则不自动请求
-  immediate: true,
-
-  // 缓存 key — 同一 key 共享数据，避免重复请求
-  key: 'posts-list',
-
-  // 数据转换
-  transform: (response) => {
-    return response.posts.map(p => ({
-      ...p,
-      createdAt: new Date(p.createdAt)
-    }))
-  },
-
-  // 自定义 fetch 选项
-  retry: 3,          // 失败重试次数
-  retryDelay: 1000,  // 重试间隔（ms）
-  timeout: 5000,     // 超时时间（ms）
-  baseURL: 'https://api.example.com'
-})
-</script>
-```
-
-### 1.6 响应式刷新
-
-```vue
-<script setup>
-const page = ref(1)
+// 搜索 — Nuxt 4 自动追踪 query 中的响应式依赖
 const search = ref('')
-
-// URL 中的响应式数据变化时，自动重新请求
-const { data, pending, refresh } = await useFetch('/api/posts', {
-  query: computed(() => ({
-    page: page.value,
-    search: search.value
-  }))
+const page = ref(1)
+const { data: results } = await useFetch('/api/search', {
+  query: { q: search, page },
 })
+// search 或 page 变化时自动重新请求！
+</script>
+```
 
-// 手动刷新
-function loadMore() {
-  page.value++
-  // 或 refresh()
-}
+---
+
+## 三、Nuxt 4 智能共享数据
+
+### 3.1 跨组件共享（新特性）
+
+Nuxt 4 中，同一个 `key` 的 `useFetch` / `useAsyncData` 会自动共享数据，避免重复请求：
+
+```vue
+<!-- app/components/PostTitle.vue -->
+<script setup lang="ts">
+// 使用相同 key 的请求，数据自动共享
+const { data } = await useFetch('/api/post/1', {
+  key: 'post-1',
+})
 </script>
 
 <template>
-  <input v-model="search" placeholder="搜索..." />
-  <ul>
-    <li v-for="post in data" :key="post.id">{{ post.title }}</li>
-  </ul>
-  <button @click="refresh">刷新</button>
+  <h1>{{ data?.title }}</h1>
 </template>
 ```
 
----
+```vue
+<!-- app/components/PostBody.vue -->
+<script setup lang="ts">
+// 同一个 key，不会发起第二次请求！
+const { data } = await useFetch('/api/post/1', {
+  key: 'post-1',
+})
+</script>
 
-## 二、useAsyncData
+<template>
+  <div v-html="data?.content" />
+</template>
+```
 
-### 2.1 基本用法
+### 3.2 响应式 Key
 
-`useAsyncData` 是更底层的数据获取函数，适合获取非 URL 数据（数据库查询、本地文件等）：
+`key` 可以是函数，key 变化时自动重新获取：
 
 ```vue
-<script setup>
-const { data, pending, error, refresh } = await useAsyncData(
-  'posts',                // 唯一 key
-  () => queryDatabase()   // 异步获取函数
-)
+<script setup lang="ts">
+const route = useRoute()
+const id = computed(() => route.params.id)
+
+// Nuxt 4：key 变化 → 自动重新获取，旧数据自动清理
+const { data } = await useFetch(() => `/api/posts/${id.value}`, {
+  key: () => `post-${id.value}`,
+})
 </script>
 ```
 
-### 2.2 典型场景
+### 3.3 自动清理
+
+组件卸载时，如果该数据的 `key` 没有其他组件使用，Nuxt 4 自动清理缓存，释放内存。
+
+---
+
+## 四、useAsyncData
+
+### 4.1 基本用法
+
+`useAsyncData` 用于获取非 HTTP 数据（数据库查询、文件读取等）：
 
 ```vue
-<script setup>
-// 场景1：多个 API 聚合
-const { data } = await useAsyncData('dashboard', async () => {
-  const [posts, users, stats] = await Promise.all([
-    $fetch('/api/posts'),
-    $fetch('/api/users'),
-    $fetch('/api/stats')
+<script setup lang="ts">
+const { data } = await useAsyncData('stats', async () => {
+  const [users, posts, comments] = await Promise.all([
+    $fetch('/api/users/count'),
+    $fetch('/api/posts/count'),
+    $fetch('/api/comments/count'),
   ])
-  return { posts, users, stats }
-})
-
-// 场景2：服务端直接查数据库
-const { data } = await useAsyncData('db-posts', () => {
-  return db.query('SELECT * FROM posts ORDER BY created_at DESC')
-})
-
-// 场景3：读取本地文件
-const { data } = await useAsyncData('config', () => {
-  return import('~/config/app.json')
+  return { users, posts, comments }
 })
 </script>
 ```
 
-### 2.3 返回值（与 useFetch 一致）
-
-```vue
-<script setup>
-const { data, pending, error, refresh, status } = await useAsyncData(
-  'key',
-  () => fetchData()
-)
-</script>
-```
-
----
-
-## 三、useFetch 与 useAsyncData 对比
-
-| 维度 | `useFetch` | `useAsyncData` |
-|------|------------|----------------|
-| **用途** | HTTP 请求 | 任意异步数据 |
-| **语法糖** | 对 `$fetch` + `useAsyncData` 的封装 | 底层 API |
-| **URL 响应式** | 自动追踪 URL / params 变化 | 不追踪（需手动 watch） |
-| **请求去重** | 同一 URL 自动去重 | 基于 key 去重 |
-| **适用场景** | REST API 调用 | 数据库查询、文件读取、多源聚合 |
-
-**等效关系**：
+### 4.2 Nuxt 4 缓存新选项
 
 ```ts
-// useFetch 内部等价于：
-const { data } = await useAsyncData('key', () => $fetch('/api/posts'))
+const { data } = await useAsyncData('products', () => $fetch('/api/products'), {
+  // Nuxt 4 新增选项
+  staleTime: 60 * 1000,  // 1 分钟内使用缓存，不重新请求
+  shared: true,           // 跨组件共享（默认 true）
+})
 ```
 
-### 3.1 何时用哪个？
+### 4.3 条件请求
 
 ```vue
-<script setup>
-// ✅ 用 useFetch — 标准 HTTP 请求
-const { data: posts } = await useFetch('/api/posts')
+<script setup lang="ts">
+const shouldFetch = ref(false)
 
-// ✅ 用 useAsyncData — 非 HTTP 或需聚合
-const { data } = await useAsyncData('dashboard', async () => {
-  const [a, b] = await Promise.all([
-    $fetch('/api/a'),
-    $fetch('/api/b')
-  ])
-  return { a, b }
+const { data } = await useAsyncData('conditional', () => $fetch('/api/data'), {
+  immediate: false,  // 不立即执行
 })
 
-// ❌ 不推荐 — 用 useAsyncData 包 $fetch 单请求
-const { data } = await useAsyncData('posts', () => $fetch('/api/posts'))
-// 直接用 useFetch 更简洁
+// 手动触发
+function load() {
+  shouldFetch.value = true
+  // 使用 execute 而不是 refresh 来获取 Promise
+  await refresh()
+}
 </script>
 ```
 
 ---
 
-## 四、请求去重与缓存
+## 五、useFetch vs useAsyncData 选择指南
 
-### 4.1 自动去重
-
-同一页面或组件树中，相同 URL/key 的请求自动合并，只发一次：
-
-```vue
-<!-- 父组件 -->
-<script setup>
-await useFetch('/api/config') // ← 真正发出请求
-</script>
-
-<!-- 子组件 -->
-<script setup>
-await useFetch('/api/config') // ← 复用父组件的结果，不重复请求
-</script>
-```
-
-### 4.2 手动指定 key
-
-```vue
-<script setup>
-// 两个不同的请求需要不同的 key
-const { data: posts } = await useFetch('/api/posts', { key: 'all-posts' })
-const { data: pinned } = await useFetch('/api/posts', {
-  key: 'pinned-posts',
-  query: { pinned: true }
-})
-
-// useAsyncData 的 key 是第一个参数（必填）
-const { data } = await useAsyncData('unique-key', () => fetchData())
-</script>
-```
-
-### 4.3 `refreshNuxtData` — 批量刷新
-
-```vue
-<script setup>
-// 刷新所有指定 key 的数据
-await refreshNuxtData('posts')
-
-// 刷新多个
-await refreshNuxtData(['posts', 'comments', 'users'])
-
-// 刷新所有
-await refreshNuxtData()
-</script>
-```
-
-### 4.4 `clearNuxtData` — 清除缓存
-
-```vue
-<script setup>
-// 清除指定 key 的缓存
-clearNuxtData('posts')
-
-// 清除所有
-clearNuxtData()
-</script>
-```
+| 场景                               | 推荐方法       |
+| ---------------------------------- | -------------- |
+| 从 API 端点获取 JSON 数据          | `useFetch`     |
+| 获取非 HTTP 数据（数据库、文件等） | `useAsyncData` |
+| 需要多个请求组合                   | `useAsyncData` |
+| 简单的 GET/POST 请求               | `useFetch`     |
+| 需要自定义请求转换                 | `useAsyncData` + `$fetch` |
 
 ---
 
-## 五、刷新与缓存策略
+## 六、Nuxt 4 数据获取最佳实践
 
-### 5.1 手动刷新
+### 6.1 推荐模式
 
 ```vue
-<script setup>
-const { data, refresh } = await useFetch('/api/posts')
+<script setup lang="ts">
+const route = useRoute()
 
-function handleRefresh() {
-  // refresh 重新请求并更新 data
-  refresh()
+// ✅ 推荐：使用函数形式的 URL，依赖自动追踪
+const { data, refresh } = await useFetch(() => `/api/posts/${route.params.id}`)
+
+// ✅ 推荐：显式 key 以便跨组件共享
+const { data: post } = await useFetch(() => `/api/posts/${route.params.id}`, {
+  key: () => `post-${route.params.id}`,
+})
+
+// ❌ 避免：手动 watch
+// watch(id, () => refresh())  // Nuxt 4 不再需要
+</script>
+```
+
+### 6.2 错误处理
+
+```vue
+<script setup lang="ts">
+const { data, error, status } = await useFetch('/api/dangerous-endpoint')
+
+// Nuxt 4 的 status 提供更细粒度的状态
+if (status.value === 'error') {
+  console.error('请求失败:', error.value?.message)
 }
 </script>
-
-<template>
-  <button @click="handleRefresh">刷新列表</button>
-</template>
 ```
 
-### 5.2 自动定时刷新
+### 6.3 服务器端数据传递
 
 ```vue
-<script setup>
-const { data, refresh } = await useFetch('/api/realtime-stats')
-
-// 每 30 秒自动刷新
-let timer
-onMounted(() => {
-  timer = setInterval(refresh, 30000)
-})
-onUnmounted(() => {
-  clearInterval(timer)
-})
+<script setup lang="ts">
+// Nuxt 4 服务端预取的数据自动序列化到客户端
+const { data } = await useFetch('/api/init-data')
+// 服务端渲染时获取，客户端无需重新请求
 </script>
 ```
 
-### 5.3 懒加载 + 手动触发
+### 6.4 关键要点
 
-```vue
-<script setup>
-// lazy: true — 不自动请求
-const { data, pending, refresh } = await useFetch('/api/posts', {
-  lazy: true
-})
-
-// 点击按钮时才请求
-function loadData() {
-  refresh()
-}
-</script>
-
-<template>
-  <button @click="loadData" :disabled="pending">
-    {{ pending ? '加载中...' : '加载数据' }}
-  </button>
-</template>
-```
-
-### 5.4 SSR / Client 执行控制
-
-```vue
-<script setup>
-// 仅在服务端获取（SSR 时获取，客户端不重复请求）
-const { data } = await useFetch('/api/posts', {
-  server: true   // 服务端执行（默认）
-})
-
-// 仅在客户端获取（如需要浏览器 Cookie/Token）
-const { data } = await useFetch('/api/me', {
-  server: false  // 跳过服务端，只在客户端执行
-})
-</script>
-```
-
-| `server` 值 | 行为 |
-|-------------|------|
-| `true`（默认）| 服务端 SSR 时获取，客户端 hydration 时复用 |
-| `false` | 仅客户端执行，SSR 时不请求 |
+- **给每个 useFetch/useAsyncData 指定唯一 key**，享受自动共享
+- **key 用函数形式**以支持响应式 refetch
+- **Nuxt 4 不再需要手动 watch + refresh**，key 变化自动处理
+- **组件卸载自动清理**，不用担心内存泄漏

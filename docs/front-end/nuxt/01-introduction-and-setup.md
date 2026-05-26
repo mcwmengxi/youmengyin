@@ -1,31 +1,33 @@
-# Nuxt 简介与环境搭建
+# Nuxt 4 简介与环境搭建
 
-> 本章介绍 Nuxt 框架的基本概念、核心特性以及开发环境的搭建过程。
+> 本章介绍 Nuxt 4 框架的核心概念、相比 Nuxt 3 的重大变化以及开发环境的搭建过程。
 
-## 一、Nuxt 简介
+## 一、Nuxt 4 简介
 
-### 1.1 什么是 Nuxt？
+### 1.1 什么是 Nuxt 4？
 
-Nuxt 是一个基于 Vue.js 的开源**全栈框架**，由 NuxtLabs 团队维护。它在 Vue 3 的基础上提供了约定式路由、服务端渲染（SSR）、静态站点生成（SSG）、文件系统 API 路由、自动导入、代码分层等开箱即用的能力，让开发者专注于业务逻辑而非工程配置。
+Nuxt 4 是 2025 年 7 月正式发布的**全栈 Vue 框架**重大版本。它在 Nuxt 3 成熟生态的基础上，引入了全新的 `app/` 目录结构、智能数据获取层、项目级 TypeScript 隔离和更快的 CLI 开发体验。
 
-### 1.2 Nuxt 3 核心特性
+### 1.2 Nuxt 4 相比 Nuxt 3 的核心变化
 
-| 特性                  | 说明                                                      |
-| --------------------- | --------------------------------------------------------- |
-| **文件系统路由**      | `pages/` 目录下的文件自动生成路由，无需手动配置           |
-| **自动导入**          | `components/`、`composables/`、`utils/` 中的导出自动可用  |
-| **混合渲染**          | 同一应用内可按路由混合 SSR / SSG / SPA / ISR              |
-| **Nitro 引擎**        | 底层服务端引擎，支持 Node.js、Deno、Cloudflare Workers 等 |
-| **零配置 TypeScript** | 原生支持 TypeScript，无需额外配置                         |
-| **HMR 热更新**        | 极快的开发体验，修改即生效                                |
+| 特性                     | Nuxt 3                                      | Nuxt 4                                      |
+| ------------------------ | ------------------------------------------- | ------------------------------------------- |
+| **默认目录结构**         | 根目录直接放 `pages/`、`components/` 等     | 统一放在 `app/` 目录下                      |
+| **数据获取**             | `useFetch` / `useAsyncData` 基础功能        | 智能共享 key、自动清理、响应式 key 联动     |
+| **TypeScript**           | 单一 tsconfig，类型混杂                     | 项目级 TS 隔离（app / server / shared 各自独立） |
+| **CLI 性能**             | 标准启动速度                                | Socket 通信 + V8 compile cache，冷启动更快  |
+| **构建工具**             | Vite 5                                      | Vite 6（默认），可选 Rspack                 |
+| **服务端引擎**           | Nitro 2                                     | **Nitro 3**                                 |
+| **兼容性版本**           | 无                                          | `compatibilityVersion: 4` 显式声明          |
+| **共享代码**             | 无明确目录                                  | 新增 `shared/` 目录                         |
 
-### 1.3 Nuxt 2 vs Nuxt 3 主要变化
+### 1.3 Nuxt 4 核心特性一览
 
-- 底层框架：Vue 2 → Vue 3（Composition API）
-- 构建工具：Webpack → Vite（默认）
-- 服务端引擎：@nuxt/server → Nitro（跨平台）
-- 数据获取：`asyncData` + `fetch` → `useFetch` + `useAsyncData`
-- 状态共享：`@nuxtjs/composition-api` → 内置 `useState`
+- **`app/` 目录**：应用代码统一放在 `app/` 下，与 `node_modules`、`.git` 分离，文件监听更快（Windows/Linux 上尤其明显）
+- **智能数据层**：同一 key 的 `useAsyncData` / `useFetch` 自动跨组件共享，组件卸载自动清理，无需手动 `watch`
+- **更好的 TypeScript**：app 代码、server 代码、`shared/` 目录自动生成独立的 tsconfig，自动补全更精准
+- **更快的 CLI**：内部采用 Socket 通信替代网络端口，Node.js V8 compile cache 自动复用
+- **Nitro 3**：更强的边缘计算能力，更灵活的部署方案
 
 ---
 
@@ -33,26 +35,64 @@ Nuxt 是一个基于 Vue.js 的开源**全栈框架**，由 NuxtLabs 团队维�
 
 ### 2.1 环境要求
 
-- **Node.js**：18.x 或更高版本（推荐 20.x LTS）
-- **包管理器**：npm / pnpm / yarn
+- **Node.js**：20.x 或更高版本（推荐 22.x LTS）
+- **包管理器**：npm / pnpm / yarn / bun
 
 ```bash
 # 检查 Node 版本
 node -v
 ```
 
-### 2.2 创建项目
+### 2.2 创建 Nuxt 4 项目
 
 ```bash
-# 使用 npx 快速创建（推荐）
+# 使用 npx 创建
 npx nuxi@latest init my-app
 
-# 选择包管理器后自动安装依赖
+# 创建时直接指定 Nuxt 4 模板
+npx nuxi@latest init my-app --template v4
+
+# 进入项目
 cd my-app
+
+# 安装依赖
+npm install
+
+# 启动开发服务器
 npm run dev
 ```
 
-### 2.3 项目启动
+### 2.3 从 Nuxt 3 升级到 Nuxt 4
+
+如果你是 Nuxt 3 项目，升级步骤如下：
+
+```bash
+# 1. 升级依赖
+npx nuxi upgrade --force
+
+# 2. 在 nuxt.config.ts 中启用 compatibilityVersion
+```
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: {
+    compatibilityVersion: 4,
+  },
+})
+```
+
+```bash
+# 3. 重新生成类型
+npx nuxt prepare
+
+# 4. 将源码迁移到 app/ 目录（可选，但推荐）
+mkdir app
+mv pages components composables layouts middleware plugins utils app/
+# 注意：server/ 仍然留在根目录
+```
+
+### 2.4 项目启动
 
 ```bash
 # 开发模式（默认 http://localhost:3000）
@@ -63,9 +103,12 @@ npm run build
 
 # 预览生产构建
 npm run preview
+
+# TypeScript 类型检查
+npx nuxt typecheck
 ```
 
-### 2.4 开发工具推荐
+### 2.5 开发工具推荐
 
 - **VS Code** + 插件：
   - `Vue - Official`（Volar）：Vue 3 官方插件
@@ -75,69 +118,71 @@ npm run preview
 
 ---
 
-## 三、第一个 Nuxt 项目
+## 三、第一个 Nuxt 4 项目
 
 ### 3.1 最小页面示例
 
+Nuxt 4 默认使用 `app/` 目录。创建 `app/pages/index.vue`：
+
 ```vue
-<!-- app.vue -->
+<!-- app/pages/index.vue -->
+<script setup lang="ts">
+useHead({
+  title: 'Hello Nuxt 4!',
+})
+</script>
+
 <template>
   <div>
-    <h1>Hello Nuxt 3!</h1>
-    <NuxtWelcome />
+    <h1>Welcome to Nuxt 4 🚀</h1>
+    <p>app/ 目录结构 + 智能数据层 + Vite 6</p>
   </div>
 </template>
 ```
 
-启动 `npm run dev`，打开 `http://localhost:3000` 即可看到欢迎页。
+启动 `npm run dev`，打开 `http://localhost:3000` 即可看到页面。
 
-### 3.2 添加第一个页面
+### 3.2 Nuxt 4 项目初始化后的完整结构
 
-在 `pages/` 目录下创建文件即可自动注册路由：
-
-```vue
-<!-- pages/index.vue -->
-<template>
-  <div>
-    <h1>首页</h1>
-    <NuxtLink to="/about">关于</NuxtLink>
-  </div>
-</template>
+```
+my-app/
+├── app/                   # 🆕 应用源码（Nuxt 4 默认）
+│   ├── assets/
+│   ├── components/
+│   ├── composables/
+│   ├── layouts/
+│   ├── middleware/
+│   ├── pages/
+│   ├── plugins/
+│   ├── utils/
+│   ├── app.vue
+│   ├── app.config.ts
+│   └── error.vue
+├── public/                # 静态资源
+├── server/                # 服务端（仍在外层）
+│   ├── api/
+│   ├── routes/
+│   └── middleware/
+├── shared/                # 🆕 客户端/服务端共享代码
+├── nuxt.config.ts         # 配置文件
+├── tsconfig.json          # 🆕 只需要一个 tsconfig！
+├── package.json
+└── .gitignore
 ```
 
-```vue
-<!-- pages/about.vue -->
-<template>
-  <div>
-    <h1>关于页面</h1>
-    <NuxtLink to="/">返回首页</NuxtLink>
-  </div>
-</template>
-```
+### 3.3 Nuxt 4 的向下兼容
 
-### 3.3 关键文件说明
+Nuxt 4 完全兼容 Nuxt 3 的旧目录结构。如果你不想迁移：
 
-| 文件             | 作用                         |
-| ---------------- | ---------------------------- |
-| `app.vue`        | 应用根组件，所有页面的父组件 |
-| `pages/`         | 页面目录，自动生成路由       |
-| `components/`    | 组件目录，自动导入           |
-| `public/`        | 静态资源，直接映射到根路径   |
-| `nuxt.config.ts` | Nuxt 主配置文件              |
-| `package.json`   | 项目依赖配置                 |
+- 将 `future.compatibilityVersion` 设置为 `4` 但不移动目录
+- 或者保持 `srcDir: '.'` 即可沿用 Nuxt 3 的项目组织方式
 
-### 3.4 app.vue 与 pages/ 的关系
-
-- 如果只有 `app.vue` 而没有 `pages/`：`app.vue` 作为唯一页面渲染
-- 如果存在 `pages/` 目录：`app.vue` 中**必须**包含 `<NuxtPage />` 组件作为页面出口
-
-```vue
-<!-- app.vue（有 pages 目录时） -->
-<template>
-  <div>
-    <NuxtLayout>
-      <NuxtPage />
-    </NuxtLayout>
-  </div>
-</template>
+```ts
+// nuxt.config.ts — 继续使用 Nuxt 3 风格目录
+export default defineNuxtConfig({
+  future: {
+    compatibilityVersion: 4,
+  },
+  srcDir: '.',  // 沿用旧的根目录布局
+})
 ```

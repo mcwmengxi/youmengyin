@@ -1,15 +1,15 @@
 # 组件基础
 
-> 本章介绍 Nuxt 中组件的基本使用方式、组件通信及 `<ClientOnly>` 等特殊组件。
+> 本章介绍 Nuxt 4 中组件的基本使用方式、自动注册机制及 `<ClientOnly>` 等特殊组件。
 
 ## 一、组件创建与注册
 
 ### 1.1 自动注册
 
-`components/` 目录下的 `.vue` 文件**自动全局注册**，无需手动 import：
+在 Nuxt 4 中，`app/components/` 目录下的 `.vue` 文件**自动全局注册**，无需手动 import：
 
 ```
-components/
+app/components/
 ├── TheHeader.vue
 ├── AppFooter.vue
 ├── base/
@@ -38,10 +38,10 @@ components/
 
 | 文件路径 | 组件名 |
 |----------|--------|
-| `components/TheHeader.vue` | `<TheHeader />` |
-| `components/base/Button.vue` | `<BaseButton />` |
-| `components/card/ArticleCard.vue` | `<CardArticleCard />` |
-| `components/ui/Modal.vue` | `<UiModal />` |
+| `app/components/TheHeader.vue` | `<TheHeader />` |
+| `app/components/base/Button.vue` | `<BaseButton />` |
+| `app/components/card/ArticleCard.vue` | `<CardArticleCard />` |
+| `app/components/ui/Modal.vue` | `<UiModal />` |
 
 **规则**：目录名作为前缀，PascalCase 拼接，忽略重复部分。
 
@@ -50,289 +50,225 @@ components/
 如果需要禁用自动导入或想显式管理依赖：
 
 ```vue
-<script setup>
-import Btn from '~/components/base/Button.vue'
+<script setup lang="ts">
+import MyComponent from '~/components/MyComponent.vue'
 </script>
-
-<template>
-  <Btn>手动导入的按钮</Btn>
-</template>
 ```
 
-### 1.4 动态组件
-
-```vue
-<script setup>
-const comp = resolveComponent('BaseButton')
-// 或
-import { resolveComponent } from 'vue'
-</script>
-
-<template>
-  <component :is="comp">动态按钮</component>
-</template>
-```
+> Nuxt 4 中 `~/` 路径别名指向 `app/` 目录。
 
 ---
 
 ## 二、组件通信
 
-### 2.1 Props — 父传子
+### 2.1 Props（父传子）
+
+**父组件：**
 
 ```vue
-<!-- components/base/Card.vue -->
-<script setup>
-const props = defineProps({
-  title: { type: String, required: true },
-  image: { type: String, default: '' },
-  tags: { type: Array, default: () => [] }
-})
+<template>
+  <UserCard
+    :name="user.name"
+    :age="user.age"
+    :avatar="user.avatar"
+  />
+</template>
+```
 
-// TypeScript 写法
-// const props = defineProps<{
-//   title: string
-//   image?: string
-//   tags?: string[]
-// }>()
+**子组件：**
+
+```vue
+<script setup lang="ts">
+// 使用 TypeScript 泛型定义 Props（Nuxt 4 推荐方式）
+interface Props {
+  name: string
+  age?: number
+  avatar?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  age: 18,
+  avatar: '/default-avatar.png',
+})
 </script>
 
 <template>
   <div class="card">
-    <img v-if="image" :src="image" />
-    <h3>{{ title }}</h3>
-    <span v-for="tag in tags" :key="tag">{{ tag }}</span>
+    <img :src="props.avatar" :alt="props.name" />
+    <h3>{{ props.name }}</h3>
+    <p>{{ props.age }} 岁</p>
   </div>
 </template>
 ```
 
-使用：
+### 2.2 Emits（子传父）
 
 ```vue
-<Card title="文章标题" image="/cover.jpg" :tags="['vue', 'nuxt']" />
-```
+<!-- 子组件 -->
+<script setup lang="ts">
+const emit = defineEmits<{
+  submit: [data: FormData]
+  cancel: []
+}>()
 
-### 2.2 Emits — 子传父
-
-```vue
-<!-- components/ui/ConfirmDialog.vue -->
-<script setup>
-const emit = defineEmits(['confirm', 'cancel'])
-
-// 或 TypeScript 写法
-// const emit = defineEmits<{
-//   confirm: [id: number]
-//   cancel: []
-// }>()
-
-function handleConfirm() {
-  emit('confirm', 123)
+function handleSubmit() {
+  emit('submit', formData.value)
 }
 </script>
+```
 
+```vue
+<!-- 父组件 -->
 <template>
-  <div>
-    <button @click="handleConfirm">确认</button>
-    <button @click="emit('cancel')">取消</button>
-  </div>
+  <MyForm @submit="onFormSubmit" @cancel="onFormCancel" />
 </template>
 ```
 
-使用：
+### 2.3 `defineModel`（双向绑定）Nuxt 4 增强
 
 ```vue
-<ConfirmDialog @confirm="onConfirm" @cancel="onCancel" />
-```
-
-### 2.3 `defineModel` — 双向绑定 (v-model)
-
-Nuxt 3 / Vue 3.4+ 提供的简化写法：
-
-```vue
-<!-- components/ui/InputModal.vue -->
-<script setup>
-const model = defineModel()               // v-model 的默认值
-const visible = defineModel('visible')    // v-model:visible
+<!-- 子组件 -->
+<script setup lang="ts">
+// Nuxt 4 的 v-model 支持更好的类型推断
+const model = defineModel<string>({ required: true })
 </script>
 
 <template>
   <input v-model="model" />
-  <div v-if="visible">内容</div>
 </template>
 ```
-
-使用：
 
 ```vue
-<script setup>
-const name = ref('')
-const showModal = ref(false)
-</script>
-
+<!-- 父组件 -->
 <template>
-  <InputModal v-model="name" v-model:visible="showModal" />
+  <MyInput v-model="username" />
 </template>
 ```
 
-### 2.4 Slots — 内容分发
+### 2.4 Provide / Inject（跨层级通信）
 
-**默认插槽**：
+```ts
+// app/composables/useTheme.ts
+export function useTheme() {
+  const theme = ref<'light' | 'dark'>('light')
 
-```vue
-<!-- components/ui/Card.vue -->
-<template>
-  <div class="card">
-    <slot />
-  </div>
-</template>
+  const toggle = () => {
+    theme.value = theme.value === 'light' ? 'dark' : 'light'
+  }
 
-<!-- 使用 -->
-<Card>
-  <p>这是插槽内容</p>
-</Card>
+  return { theme, toggle }
+}
 ```
-
-**具名插槽**：
-
-```vue
-<!-- components/ui/Panel.vue -->
-<template>
-  <div class="panel">
-    <header><slot name="header" /></header>
-    <main><slot /></main>
-    <footer><slot name="footer" /></footer>
-  </div>
-</template>
-
-<!-- 使用 -->
-<Panel>
-  <template #header>
-    <h2>标题</h2>
-  </template>
-  <p>默认内容</p>
-  <template #footer>
-    <Button>确定</Button>
-  </template>
-</Panel>
-```
-
-**作用域插槽**：
-
-```vue
-<!-- components/ui/List.vue -->
-<script setup>
-defineProps({ items: Array })
-</script>
-
-<template>
-  <ul>
-    <li v-for="item in items" :key="item.id">
-      <slot name="item" :item="item" :index="index" />
-    </li>
-  </ul>
-</template>
-
-<!-- 使用 -->
-<List :items="users">
-  <template #item="{ item, index }">
-    {{ index + 1 }}. {{ item.name }}
-  </template>
-</List>
-```
-
-### 2.5 Provide / Inject — 跨层级通信
 
 ```vue
 <!-- 祖先组件 -->
-<script setup>
-const theme = ref('dark')
+<script setup lang="ts">
+const theme = useTheme()
 provide('theme', theme)
 </script>
+```
 
-<!-- 后代组件（可以跨多层级） -->
-<script setup>
-const theme = inject('theme')
+```vue
+<!-- 后代组件 -->
+<script setup lang="ts">
+const theme = inject('theme')!
 </script>
 ```
 
 ---
 
-## 三、ClientOnly 组件
+## 三、`<ClientOnly>` 与纯客户端组件
 
 ### 3.1 基本用法
 
-有些组件依赖浏览器 API（`window`、`document` 等），在 SSR 时会报错，用 `<ClientOnly>` 包裹即可：
-
-```vue
-<template>
-  <ClientOnly>
-    <ChartComponent :data="chartData" />
-    <template #fallback>
-      <!-- SSR 时展示的占位内容 -->
-      <div class="loading">图表加载中…</div>
-    </template>
-  </ClientOnly>
-</template>
-```
-
-### 3.2 常见使用场景
-
-- 图表库（ECharts、Chart.js）
-- 地图组件（高德、百度地图）
-- WebSocket 连接
-- 浏览器存储（localStorage、sessionStorage）
-- 第三方需要 DOM 的库
-
-### 3.3 `.client.vue` 后缀
-
-更简单的方式 — 直接在文件名标明：
-
-```
-components/
-└── RichEditor.client.vue    # 仅在客户端渲染
-```
-
-等同于用 `<ClientOnly>` 包裹，无需修改模板代码。
-
----
-
-## 四、动态组件与 Lazy 加载
-
-### 4.1 懒加载组件
-
-组件名加 `Lazy` 前缀即可实现按需加载：
+由于 Nuxt 是 SSR 框架，组件默认在服务端和客户端都会执行。但某些组件依赖 `window`、`document` 等浏览器 API，此时需要用 `<ClientOnly>` 包裹：
 
 ```vue
 <template>
   <div>
-    <!-- 普通加载：随页面加载 -->
-    <HeavyComponent />
+    <SiteHeader />
 
-    <!-- 懒加载：进入视口或条件渲染时才加载 -->
-    <LazyHeavyComponent v-if="show" />
+    <!-- 只在客户端渲染的消息组件 -->
+    <ClientOnly>
+      <ToastNotification />
+    </ClientOnly>
+
+    <SiteFooter />
   </div>
 </template>
 ```
 
-**注意**：
-- 原组件名为 `HeavyComponent`，使用 `LazyHeavyComponent` 即可
-- 被 `<NuxtLink>` 链接的页面也会自动预加载，这不受懒加载影响
-
-### 4.2 KeepAlive — 页面缓存
+### 3.2 `fallback` 插槽 — SSR 时的占位内容
 
 ```vue
-<!-- pages/ 中的页面组件 -->
-<script setup>
-definePageMeta({
-  keepalive: true  // 切换路由时缓存该页面，不被销毁
-})
-</script>
-```
-
-### 4.3 全局 KeepAlive 配置
-
-```vue
-<!-- app.vue -->
 <template>
-  <NuxtPage :keepalive="{ include: ['index', 'about'] }" />
+  <ClientOnly fallback-tag="div" fallback="Loading chart...">
+    <ChartComponent :data="data" />
+  </ClientOnly>
 </template>
 ```
+
+### 3.3 `.client` 后缀（自动 ClientOnly）
+
+将组件文件命名为 `*.client.vue`，Nuxt 自动识别为纯客户端组件：
+
+```
+app/components/
+└── ECharts.client.vue     # 自动只在客户端渲染
+```
+
+直接使用即可，无需 `<ClientOnly>` 包裹：
+
+```vue
+<template>
+  <ECharts :option="chartOption" />
+</template>
+```
+
+### 3.4 Nuxt 4 性能提示
+
+Nuxt 4 的 Vite 6 支持更好的 Tree Shaking，纯客户端组件在 SSR 构建时会被完全跳过，减小服务端包体积。
+
+---
+
+## 四、动态组件
+
+### 4.1 `<component :is="">` 经典方式
+
+```vue
+<script setup lang="ts">
+const currentTab = ref('Overview')
+const tabs = {
+  Overview: defineAsyncComponent(() => import('./tabs/Overview.vue')),
+  Details: defineAsyncComponent(() => import('./tabs/Details.vue')),
+  Settings: defineAsyncComponent(() => import('./tabs/Settings.vue')),
+}
+</script>
+
+<template>
+  <button v-for="name in Object.keys(tabs)" :key="name" @click="currentTab = name">
+    {{ name }}
+  </button>
+  <component :is="tabs[currentTab]" />
+</template>
+```
+
+### 4.2 `<NuxtIsland>`（实验性）
+
+Nuxt 4 实验性支持 `<NuxtIsland>`，将部分内容渲染为"岛屿"独立发送：
+
+```vue
+<template>
+  <NuxtIsland name="ProductRecommendations" :props="{ productId: 1 }" />
+</template>
+```
+
+---
+
+## 五、Nuxt 4 组件开发最佳实践
+
+- **组件放在 `app/components/`，利用自动导入**，不要手动 import
+- **用 TypeScript 泛型定义 Props 和 Emits**，Nuxt 4 的类型推断更精准
+- **纯客户端组件使用 `.client.vue` 后缀**，比 `<ClientOnly>` 更简洁
+- **复杂组件拆分为小的可复用单元**，充分利用自动导入
+- **跨层级通信优先用 provide/inject**，避免 prop drilling

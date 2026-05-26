@@ -1,309 +1,346 @@
 # 内置 Composables
 
-> 本章整理 Nuxt 3 内置的组合式函数，包括 `useRoute`、`useRouter`、`useHead`、`useCookie` 等常用 API。
+> 本章汇总 Nuxt 4 内置的组合式函数（Composables），包括路由、SEO、Cookie、请求头、应用配置等常用 API。
 
-## 一、useRoute / useRouter
+## 一、路由相关
 
-详见 [路由参数与导航守卫](./04-路由参数与导航守卫.md)。
+### 1.1 `useRoute` — 当前路由信息
 
 ```vue
-<script setup>
-const route = useRoute() // 当前路由信息（只读）
-const router = useRouter() // 路由实例（导航控制）
+<script setup lang="ts">
+const route = useRoute()
 
-// 路由参数
-route.params.id
-route.query.page
-
-// 编程式导航
-router.push('/about')
-router.replace({ path: '/login' })
-router.back()
+route.path       // '/posts/123'
+route.params     // { id: '123' }
+route.query      // { tab: 'comments' }
+route.name       // 'posts-id'
+route.fullPath   // '/posts/123?tab=comments#section'
+route.hash       // '#section'
+route.meta       // 页面元信息
 </script>
+```
+
+### 1.2 `useRouter` — 编程式导航
+
+```vue
+<script setup lang="ts">
+const router = useRouter()
+
+router.push('/about')
+router.push({ name: 'posts-id', params: { id: '1' } })
+router.replace('/new-path')
+router.back()
+router.forward()
+router.go(-1)
+</script>
+```
+
+### 1.3 `navigateTo` — 导航助手
+
+```ts
+// 在中间件、插件或 setup 中使用
+await navigateTo('/login')
+await navigateTo({ path: '/search', query: { q: 'vue' } })
+
+// 替换当前历史记录
+await navigateTo('/new-path', { replace: true })
+
+// 外部链接
+await navigateTo('https://example.com', { external: true })
 ```
 
 ---
 
-## 二、useHead / useSeoMeta
+## 二、SEO & Head 管理
 
-### 2.1 useHead — 动态设置页面 Head
+### 2.1 `useHead` — 页面 Head 标签
 
 ```vue
-<script setup>
+<script setup lang="ts">
 useHead({
-  title: '文章详情',
+  title: '我的页面',
+  titleTemplate: '%s | My App',
   meta: [
-    { name: 'description', content: '文章描述' },
-    { property: 'og:title', content: '分享标题' },
+    { name: 'description', content: '页面描述' },
+    { property: 'og:title', content: 'Open Graph 标题' },
+    { property: 'og:image', content: 'https://example.com/og.jpg' },
   ],
-  link: [{ rel: 'canonical', href: 'https://example.com/page' }],
-  script: [{ src: 'https://example.com/script.js', async: true }],
-  style: [{ children: 'body { color: red }' }],
+  link: [
+    { rel: 'canonical', href: 'https://example.com/page' },
+  ],
+  script: [
+    { src: 'https://example.com/external.js', defer: true },
+  ],
 })
 </script>
 ```
 
-### 2.2 响应式 Head
+### 2.2 `useSeoMeta` — 简化 SEO Meta
 
 ```vue
-<script setup>
-const title = ref('首页')
-
-useHead({
-  title, // 响应式 — title 变化时自动更新
-  meta: computed(() => [
-    { name: 'description', content: `关于 ${title.value} 的页面` },
-  ]),
-})
-</script>
-```
-
-### 2.3 useSeoMeta — SEO 专用快捷方式
-
-```vue
-<script setup>
+<script setup lang="ts">
 useSeoMeta({
-  title: '我的博客',
-  description: '分享前端技术的博客',
-  ogTitle: '我的博客',
-  ogDescription: '分享前端技术的博客',
-  ogImage: 'https://example.com/og.png',
+  title: '产品列表',
+  description: '浏览我们最新的产品系列',
+  ogTitle: '产品列表 | My Store',
+  ogDescription: '购物好去处',
+  ogImage: 'https://example.com/og-image.jpg',
   twitterCard: 'summary_large_image',
 })
 </script>
 ```
 
-### 2.4 全局 Head 默认值
+### 2.3 `useServerHead` / `useServerSeoMeta`
 
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  app: {
-    head: {
-      title: '我的网站',
-      meta: [
-        { charset: 'utf-8' },
-        { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      ],
-      link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }],
-    },
-  },
+服务端专用的 Head 设置，不会发送到客户端：
+
+```vue
+<script setup lang="ts">
+useServerHead({
+  title: '管理后台',
 })
+// 这个 title 不会出现在客户端 JS 中
+</script>
 ```
 
 ---
 
-## 三、useCookie
+## 三、Cookie 管理
 
-### 3.1 基本用法
+### 3.1 `useCookie` — 读写 Cookie
 
-```vue
-<script setup>
-// 读取/设置 Cookie（服务端和客户端通用）
-const token = useCookie('token')
-
-// 设置值
-token.value = 'abc123'
-
-// 带选项
+```ts
+// 创建/读取 Cookie
 const theme = useCookie('theme', {
-  default: () => 'light', // 默认值
-  maxAge: 60 * 60 * 24, // 过期时间（秒）
-  path: '/', // 作用路径
-  secure: true, // 仅 HTTPS
-  httpOnly: false, // JS 可读
-  sameSite: 'lax', // 跨站策略
-  watch: true, // 变化时自动同步（默认 true）
+  default: () => 'light',
+  maxAge: 60 * 60 * 24 * 365,  // 1 年
+  secure: true,
+  httpOnly: false,
+  sameSite: 'lax',
 })
 
-// 监听 Cookie 变化
-watch(theme, (newVal) => {
-  console.log('主题切换:', newVal)
+// 修改
+theme.value = 'dark'
+
+// 删除
+theme.value = null
+```
+
+### 3.2 Cookie 选项
+
+| 选项       | 类型      | 说明                       |
+| ---------- | --------- | -------------------------- |
+| `maxAge`   | `number`  | 过期时间（秒）             |
+| `expires`  | `Date`    | 过期日期                   |
+| `secure`   | `boolean` | 仅 HTTPS                   |
+| `httpOnly` | `boolean` | 禁止 JS 访问（服务端可用） |
+| `sameSite` | `string`  | `'lax'` / `'strict'` / `'none'` |
+| `domain`   | `string`  | Cookie 域                  |
+| `path`     | `string`  | Cookie 路径                |
+
+---
+
+## 四、应用上下文
+
+### 4.1 `useNuxtApp` — 获取 Nuxt 实例
+
+```vue
+<script setup lang="ts">
+const nuxtApp = useNuxtApp()
+
+// nuxtApp 提供的属性：
+nuxtApp.$router     // Vue Router
+nuxtApp.$i18n       // 国际化（如果使用）
+nuxtApp.$pinia      // Pinia 实例（如果使用）
+nuxtApp.ssrContext  // SSR 上下文（服务端）
+nuxtApp.payload     // 序列化数据
+</script>
+```
+
+### 4.2 `useRuntimeConfig` — 运行时配置
+
+```vue
+<script setup lang="ts">
+const config = useRuntimeConfig()
+
+// 公共配置（客户端和服务端都能访问）
+config.public.apiBaseUrl
+config.public.appEnv
+
+// 私有配置（仅服务端可访问）
+// config.databaseUrl  // 客户端拿不到
+</script>
+```
+
+### 4.3 `useAppConfig` — 应用配置
+
+```vue
+<script setup lang="ts">
+const appConfig = useAppConfig()
+
+appConfig.title    // 'My App'
+appConfig.theme    // { primary: '#00DC82' }
+</script>
+```
+
+---
+
+## 五、请求与响应
+
+### 5.1 `useRequestHeaders` — 读取请求头
+
+```vue
+<script setup lang="ts">
+// 仅在服务端可用
+const headers = useRequestHeaders(['user-agent', 'cookie'])
+// headers['user-agent'] // 'Mozilla/5.0...'
+</script>
+```
+
+### 5.2 `useRequestURL` — 获取请求 URL
+
+```vue
+<script setup lang="ts">
+const url = useRequestURL()
+// url.href    'https://example.com/page?q=test'
+// url.origin  'https://example.com'
+// url.pathname '/page'
+// url.searchParams
+</script>
+```
+
+### 5.3 `useRequestEvent` — 获取 Nitro 事件对象
+
+```ts
+// 仅在服务端可用
+const event = useRequestEvent()
+event.context  // 请求上下文
+```
+
+---
+
+## 六、错误处理
+
+### 6.1 `useError` — 获取当前错误
+
+```vue
+<!-- app/error.vue -->
+<script setup lang="ts">
+const error = useError()
+
+console.log(error.value?.statusCode)  // 404
+console.log(error.value?.message)     // 'Page not found'
+</script>
+```
+
+### 6.2 `createError` — 创建错误
+
+```vue
+<script setup lang="ts">
+throw createError({
+  statusCode: 404,
+  message: '页面未找到',
+  fatal: true,
 })
 </script>
 ```
 
-### 3.2 常用场景
+### 6.3 `showError` — 显示错误页面
 
 ```vue
-<script setup>
-// 用户 Token
-const token = useCookie('token', {
-  maxAge: 60 * 60 * 24 * 7, // 7 天过期
-  secure: true,
-})
-
-// 网站主题
-const theme = useCookie('theme', {
-  default: () => 'system',
-})
-
-// 语言偏好
-const locale = useCookie('locale', {
-  default: () => 'zh-CN',
-})
-
-// 删除 Cookie
-function clearToken() {
-  token.value = null // 设为 null 即可删除
+<script setup lang="ts">
+// 在事件处理中触发错误页面
+function handleNotFound() {
+  showError({
+    statusCode: 404,
+    message: '找不到该资源',
+  })
 }
 </script>
 ```
 
 ---
 
-## 四、useRuntimeConfig
+## 七、工具类
 
-### 4.1 配置定义
-
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  runtimeConfig: {
-    // private — 仅在服务端可用
-    apiSecret: 'sk-xxx',
-    databaseUrl: 'postgres://...',
-
-    // public — 客户端和服务端都可用
-    public: {
-      apiBase: 'https://api.example.com',
-      siteName: '我的博客',
-      version: '1.0.0',
-    },
-  },
-})
-```
-
-### 4.2 在应用中使用
+### 7.1 `useLoadingIndicator` — 加载进度条
 
 ```vue
-<script setup>
-const config = useRuntimeConfig()
+<script setup lang="ts">
+const { start, finish, isLoading } = useLoadingIndicator()
 
-// public 配置
-console.log(config.public.apiBase) // "https://api.example.com"
-
-// private 配置 — 仅服务端能访问
-// console.log(config.apiSecret)     // 客户端输出 undefined
+// 页面跳转时自动调用，也可以手动控制
+start()
+// ... 执行异步操作
+finish()
 </script>
 ```
 
-### 4.3 环境变量覆盖
+### 7.2 `preloadRouteComponents` — 预加载路由组件
 
-```bash
-# .env
-NUXT_API_SECRET=secret-xxx
-NUXT_PUBLIC_API_BASE=https://prod.example.com
+```ts
+// 预加载目标页面的组件，提升导航速度
+await preloadRouteComponents('/dashboard')
 ```
 
-环境变量会自动覆盖 `runtimeConfig` 中的同名配置。
+### 7.3 `prefetchComponents` / `preloadComponents`
+
+```vue
+<script setup lang="ts">
+// 预取/预加载指定组件
+await prefetchComponents('Modal', 'Chart')
+</script>
+```
+
+### 7.4 `onPrehydrate` — 水合前回调
+
+```vue
+<script setup lang="ts">
+onPrehydrate(() => {
+  // 在水合（客户端激活）之前执行
+  console.log('即将水合')
+})
+</script>
+```
 
 ---
 
-## 五、useAppConfig
+## 八、Nuxt 4 新增 Composable
 
-### 5.1 定义 app.config.ts
-
-```ts
-// app.config.ts
-export default defineAppConfig({
-  theme: {
-    primary: '#3B82F6',
-    secondary: '#10B981',
-  },
-  site: {
-    name: '我的博客',
-    description: '分享前端技术',
-  },
-})
-```
-
-### 5.2 在应用中使用
+### `refreshNuxtData` — 刷新数据缓存
 
 ```vue
-<script setup>
-const appConfig = useAppConfig()
+<script setup lang="ts">
+// 刷新所有缓存的数据获取
+await refreshNuxtData()
 
-console.log(appConfig.theme.primary) // "#3B82F6"
+// 刷新特定 key
+await refreshNuxtData('posts-list')
+
+// 刷新匹配 key 的数据
+await refreshNuxtData((key) => key.startsWith('posts-'))
 </script>
 ```
-
-### 5.3 runtimeConfig vs appConfig
-
-| 特性         | `runtimeConfig`    | `appConfig`              |
-| ------------ | ------------------ | ------------------------ |
-| 定义位置     | `nuxt.config.ts`   | `app.config.ts`          |
-| 环境变量覆盖 | 支持               | 不支持                   |
-| 热更新       | 需重启             | 开发时热更新             |
-| 敏感数据     | 支持（private）    | 不支持（应存放公开配置） |
-| 适用场景     | 环境相关配置、密钥 | 应用主题、网站信息       |
 
 ---
 
-## 六、useNuxtApp
+## 九、Composables 速查表
 
-### 6.1 获取 Nuxt 上下文
-
-```vue
-<script setup>
-const nuxtApp = useNuxtApp()
-
-// 访问插件注入的全局方法
-const { $hello, $echarts } = nuxtApp
-
-// 检查运行环境
-console.log(nuxtApp.isHydrating) // 是否正在 hydration
-console.log(nuxtApp.ssrContext) // SSR 上下文（仅服务端）
-
-// 访问 Vue 实例
-nuxtApp.vueApp.component('MyComponent')
-
-// 访问 Payload（SSR 序列化数据）
-const user = nuxtApp.payload.data.user
-</script>
-```
-
-### 6.2 钩子（Hooks）
-
-```ts
-// plugins/my-plugin.ts
-export default defineNuxtPlugin((nuxtApp) => {
-  // 应用挂载前
-  nuxtApp.hook('app:beforeMount', () => {
-    console.log('应用即将挂载')
-  })
-
-  // 应用挂载后
-  nuxtApp.hook('app:mounted', () => {
-    console.log('应用已挂载')
-  })
-
-  // 页面渲染前
-  nuxtApp.hook('page:start', () => {
-    NProgress.start()
-  })
-
-  // 页面渲染完成
-  nuxtApp.hook('page:finish', () => {
-    NProgress.done()
-  })
-
-  // 应用错误
-  nuxtApp.hook('app:error', (error) => {
-    console.error('应用错误:', error)
-  })
-})
-```
-
-### 6.3 常用 hook 列表
-
-| Hook              | 触发时机       |
-| ----------------- | -------------- |
-| `app:created`     | 应用实例创建后 |
-| `app:beforeMount` | 挂载前         |
-| `app:mounted`     | 挂载后         |
-| `app:error`       | 应用级错误     |
-| `page:start`      | 页面导航开始   |
-| `page:finish`     | 页面导航完成   |
-| `vuet:error`      | Vue 渲染错误   |
-| `link:prefetch`   | 链接预加载     |
+| Composable               | 用途               | 可用环境          |
+| ------------------------ | ------------------ | ----------------- |
+| `useRoute`               | 当前路由信息       | 客户端 + 服务端   |
+| `useRouter`              | 编程式导航         | 客户端            |
+| `navigateTo`             | 导航函数           | 客户端 + 服务端   |
+| `useHead`                | SEO Head 管理      | 客户端 + 服务端   |
+| `useSeoMeta`             | 简化 SEO Meta      | 客户端 + 服务端   |
+| `useCookie`              | Cookie 读写        | 客户端 + 服务端   |
+| `useNuxtApp`             | Nuxt 实例          | 客户端 + 服务端   |
+| `useRuntimeConfig`       | 运行时配置         | 客户端 + 服务端   |
+| `useAppConfig`           | 应用配置           | 客户端 + 服务端   |
+| `useRequestHeaders`      | 请求头             | 服务端            |
+| `useRequestEvent`        | Nitro 事件         | 服务端            |
+| `useError`               | 错误信息           | 客户端 + 服务端   |
+| `createError`            | 创建错误           | 客户端 + 服务端   |
+| `showError`              | 显示错误页         | 客户端            |
+| `refreshNuxtData`        | 刷新数据缓存       | 客户端            |
+| `useLoadingIndicator`    | 加载进度条         | 客户端 + 服务端   |

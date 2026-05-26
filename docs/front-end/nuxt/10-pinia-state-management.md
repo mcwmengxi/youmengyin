@@ -1,341 +1,280 @@
 # Pinia 状态管理
 
-> 本章介绍如何在 Nuxt 3 中集成和使用 Pinia 进行全局状态管理。
+> 本章介绍如何在 Nuxt 4 中集成和使用 Pinia 进行全局状态管理，包括 Store 定义、SSR 序列化和最佳实践。
 
 ## 一、Pinia 安装与配置
 
-### 1.1 安装 Pinia
+### 1.1 安装
 
 ```bash
 npm install pinia @pinia/nuxt
 ```
 
-### 1.2 配置 nuxt.config.ts
+### 1.2 配置
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
   modules: ['@pinia/nuxt'],
 })
 ```
 
 Pinia 模块会自动：
-
 - 注册 Pinia 插件
-- 将 store 目录加入自动导入
+- 将 `app/stores/` 目录加入自动导入
 - 处理 SSR 状态序列化
 
-### 1.3 创建 Store 目录
+### 1.3 Store 目录（Nuxt 4 新位置）
 
 ```
-stores/
-└── counter.ts       # Pinia store（会自动导入）
+app/stores/
+├── useAuthStore.ts
+├── useCartStore.ts
+└── usePostStore.ts
 ```
-
-`stores/` 目录不是必需的，但使用它可以享受自动导入。
 
 ---
 
-## 二、Store 定义
+## 二、创建 Store
 
-### 2.1 选项式 Store（Option Store）
+### 2.1 Setup Store（推荐方式）
+
+Nuxt 4 推荐使用 Setup Store 语法（类似 Composition API）：
 
 ```ts
-// stores/counter.ts
-import { defineStore } from 'pinia'
+// app/stores/useCounterStore.ts
+export const useCounterStore = defineStore('counter', () => {
+  // 状态
+  const count = ref(0)
+  const lastChanged = ref<Date | null>(null)
 
-export const useCounterStore = defineStore('counter', {
+  // 计算属性
+  const doubleCount = computed(() => count.value * 2)
+
+  // 操作
+  function increment() {
+    count.value++
+    lastChanged.value = new Date()
+  }
+
+  function decrement() {
+    count.value--
+    lastChanged.value = new Date()
+  }
+
+  return { count, lastChanged, doubleCount, increment, decrement }
+})
+```
+
+### 2.2 Options Store（传统方式）
+
+```ts
+// app/stores/useUserStore.ts
+export const useUserStore = defineStore('user', {
   state: () => ({
-    count: 0,
-    name: 'My Counter',
+    name: '',
+    email: '',
+    isLoggedIn: false,
   }),
 
   getters: {
-    doubleCount: (state) => state.count * 2,
-    // 使用 this 引用其他 getter
-    doublePlusOne(): number {
-      return this.doubleCount + 1
-    },
+    displayName: (state) => state.name || '未登录用户',
   },
 
   actions: {
-    increment() {
-      this.count++
+    async login(email: string, password: string) {
+      const { data } = await useFetch('/api/login', {
+        method: 'POST',
+        body: { email, password },
+      })
+      this.name = data.value?.name ?? ''
+      this.email = data.value?.email ?? ''
+      this.isLoggedIn = true
     },
-    async fetchAndSet() {
-      const data = await $fetch('/api/counter')
-      this.count = data.value
+
+    logout() {
+      this.name = ''
+      this.email = ''
+      this.isLoggedIn = false
+      navigateTo('/login')
     },
   },
-})
-```
-
-### 2.2 组合式 Store（Setup Store，推荐）
-
-```ts
-// stores/auth.ts
-import { defineStore } from 'pinia'
-
-export const useAuthStore = defineStore('auth', () => {
-  // state → ref / reactive
-  const user = ref<User | null>(null)
-  const token = useCookie('token') // 可配合 Nuxt 的 useCookie
-
-  // getters → computed
-  const isLoggedIn = computed(() => !!user.value)
-  const userName = computed(() => user.value?.name ?? '游客')
-
-  // actions → 普通函数
-  async function login(email: string, password: string) {
-    const res = await $fetch('/api/auth/login', {
-      method: 'POST',
-      body: { email, password },
-    })
-    user.value = res.user
-    token.value = res.token
-  }
-
-  async function logout() {
-    user.value = null
-    token.value = null
-    await navigateTo('/login')
-  }
-
-  return { user, token, isLoggedIn, userName, login, logout }
-})
-```
-
-组合式 Store 的优势：
-
-- 写法与 Vue Composition API 一致
-- 可以使用 `useCookie`、`useFetch` 等 Nuxt 专属 API
-- 无需区分 `state` / `getters` / `actions`
-
-### 2.3 TypeScript 类型安全
-
-```ts
-// types/user.ts
-export interface User {
-  id: number
-  name: string
-  email: string
-  role: 'admin' | 'user'
-}
-
-// stores/user.ts
-import { defineStore } from 'pinia'
-
-export const useUserStore = defineStore('user', () => {
-  const users = ref<User[]>([])
-  const currentUser = ref<User | null>(null)
-
-  async function fetchUsers() {
-    users.value = await $fetch<User[]>('/api/users')
-  }
-
-  return { users, currentUser, fetchUsers }
 })
 ```
 
 ---
 
-## 三、Store 使用
+## 三、在组件中使用 Pinia
 
-### 3.1 在组件中读取/修改
+### 3.1 基本使用
 
 ```vue
-<script setup>
-import { useCounterStore } from '~/stores/counter'
+<script setup lang="ts">
+import { useCounterStore } from '~/stores/useCounterStore'
 
+// 在 setup 中调用即可（无需在 setup 外部）
 const counter = useCounterStore()
 
-// 读取 state
-console.log(counter.count)
-
-// 读取 getter
-console.log(counter.doubleCount)
-
-// 直接修改（Pinia 支持）
-counter.count++
-
-// 批量修改 — $patch
-counter.$patch({
-  count: 100,
-  name: 'Updated',
-})
-
-// 或函数式 $patch
-counter.$patch((state) => {
-  state.count++
-  state.name = 'New Name'
-})
-
-// 调用 action
-counter.increment()
-
-// 重置为初始状态
-counter.$reset()
+// 注意：不要解构，会丢失响应式
+// const { count } = counter  // ❌ 会丢失响应式
 </script>
 
 <template>
-  <p>{{ counter.count }}</p>
-  <p>{{ counter.doubleCount }}</p>
-  <button @click="counter.increment()">+1</button>
+  <div>
+    <p>Count: {{ counter.count }}</p>
+    <p>Double: {{ counter.doubleCount }}</p>
+    <button @click="counter.increment">+1</button>
+  </div>
 </template>
 ```
 
-### 3.2 解构与响应式
+### 3.2 使用 `storeToRefs` 安全解构
 
 ```vue
-<script setup>
+<script setup lang="ts">
 import { storeToRefs } from 'pinia'
 
 const counter = useCounterStore()
 
-// ❌ 错误：解构会丢失响应式
-const { count, doubleCount } = counter
-
-// ✅ 正确：使用 storeToRefs 保持响应式
+// ✅ 安全的响应式解构
 const { count, doubleCount } = storeToRefs(counter)
-
-// actions 可以直接解构（不需要保持响应式）
+// actions 可以直接解构（它们是函数）
 const { increment } = counter
 </script>
-```
 
-### 3.3 Store 中互相引用
-
-```ts
-// stores/cart.ts
-export const useCartStore = defineStore('cart', () => {
-  const items = ref([])
-
-  async function checkout() {
-    // 直接在 store 中引用另一个 store
-    const userStore = useUserStore()
-    const orderStore = useOrderStore()
-
-    await orderStore.createOrder({
-      userId: userStore.currentUser?.id,
-      items: items.value,
-    })
-
-    items.value = []
-  }
-
-  return { items, checkout }
-})
-```
-
-### 3.4 监听 Store 变化
-
-```vue
-<script setup>
-const counter = useCounterStore()
-
-// 监听整个 store 的变化
-counter.$subscribe((mutation, state) => {
-  console.log('Store 变化:', mutation.type, state)
-})
-
-// watch 特定属性
-watch(
-  () => counter.count,
-  (newVal, oldVal) => {
-    console.log(`count 从 ${oldVal} 变为 ${newVal}`)
-  }
-)
-
-// 或使用 storeToRefs 后 watch
-const { count } = storeToRefs(counter)
-watch(count, (val) => {
-  localStorage.setItem('count', String(val))
-})
-</script>
+<template>
+  <p>{{ count }}</p>
+  <p>{{ doubleCount }}</p>
+  <button @click="increment">+1</button>
+</template>
 ```
 
 ---
 
-## 四、SSR 下的 Pinia 注意事项
+## 四、SSR 中的 Pinia（Nuxt 4）
 
-### 4.1 状态序列化
+### 4.1 自动序列化
 
-Pinia 会自动将 store 状态序列化，SSR 时服务端初始化的数据会传递到客户端：
+Nuxt 4 + `@pinia/nuxt` 自动处理 SSR 状态序列化，服务端初始化的 state 会被序列化到客户端的 `<script>` 标签中：
 
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  modules: ['@pinia/nuxt'],
-  pinia: {
-    storesDirs: ['./stores/**'], // 自动导入的 store 目录
-  },
-})
+```html
+<script>window.__NUXT__ = { /* 包含 pinia 序列化数据 */ }</script>
 ```
 
-### 4.2 服务端数据预取
+### 4.2 在服务器端初始化 Store
 
 ```vue
-<!-- pages/posts.vue -->
-<script setup>
-const postStore = usePostStore()
+<!-- app/pages/products.vue -->
+<script setup lang="ts">
+const productStore = useProductStore()
 
-// 在页面 setup 中获取数据，SSR 时会自动序列化到客户端
-await postStore.fetchPosts()
+// 服务端执行时获取的数据自动序列化到客户端
+await useAsyncData('products', async () => {
+  const { data } = await useFetch('/api/products', { key: 'products-list' })
+  productStore.setProducts(data.value ?? [])
+  return data.value
+})
 </script>
 ```
 
-### 4.3 仅在客户端初始化的 Store
+### 4.3 Store 中的服务端/客户端区分
 
 ```ts
-// stores/clientOnly.ts
-export const useClientStore = defineStore('client-only', () => {
-  const windowWidth = ref(0)
+// app/stores/useAppStore.ts
+export const useAppStore = defineStore('app', () => {
+  const platform = ref('')
 
-  // 仅在客户端执行
+  // 在客户端获取平台信息
   if (import.meta.client) {
-    windowWidth.value = window.innerWidth
-    window.addEventListener('resize', () => {
-      windowWidth.value = window.innerWidth
-    })
+    platform.value = navigator.platform
   }
 
-  return { windowWidth }
+  return { platform }
 })
 ```
 
-### 4.4 Store 持久化（插件方式）
+---
+
+## 五、复杂 Store 示例 — 购物车
 
 ```ts
-// plugins/pinia-persist.ts
-export default defineNuxtPlugin((nuxtApp) => {
-  const pinia = nuxtApp.$pinia
+// app/stores/useCartStore.ts
+interface CartItem {
+  id: number
+  name: string
+  price: number
+  quantity: number
+}
 
-  pinia.use(({ store }) => {
-    // 从 localStorage 恢复
-    if (import.meta.client) {
-      const saved = localStorage.getItem(`pinia-${store.$id}`)
-      if (saved) {
-        store.$patch(JSON.parse(saved))
-      }
+export const useCartStore = defineStore('cart', () => {
+  const items = ref<CartItem[]>([])
+  const coupon = ref<string | null>(null)
 
-      // 监听变化并保存
-      store.$subscribe(() => {
-        localStorage.setItem(`pinia-${store.$id}`, JSON.stringify(store.$state))
-      })
+  // 计算属性
+  const totalPrice = computed(() =>
+    items.value.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  )
+  const itemCount = computed(() =>
+    items.value.reduce((sum, item) => sum + item.quantity, 0)
+  )
+
+  // 操作
+  function addItem(product: Omit<CartItem, 'quantity'>) {
+    const existing = items.value.find(item => item.id === product.id)
+    if (existing) {
+      existing.quantity++
+    } else {
+      items.value.push({ ...product, quantity: 1 })
     }
-  })
+  }
+
+  function removeItem(productId: number) {
+    items.value = items.value.filter(item => item.id !== productId)
+  }
+
+  function updateQuantity(productId: number, quantity: number) {
+    const item = items.value.find(item => item.id === productId)
+    if (item) {
+      item.quantity = Math.max(0, quantity)
+      if (item.quantity === 0) removeItem(productId)
+    }
+  }
+
+  async function checkout() {
+    const { data } = await $fetch('/api/orders', {
+      method: 'POST',
+      body: { items: items.value, coupon: coupon.value },
+    })
+    items.value = []
+    coupon.value = null
+    return data
+  }
+
+  return { items, coupon, totalPrice, itemCount, addItem, removeItem, updateQuantity, checkout }
 })
 ```
 
-### 4.5 服务端请求中的 Store
+---
 
-```ts
-// server/api/user.ts
-export default defineEventHandler(async (event) => {
-  // 服务端 API 中不能用 Pinia Store！
-  // Pinia 是客户端状态管理，服务端 API 应直接操作数据库
+## 六、Pinia vs useState 选择指南
 
-  const db = useDatabase()
-  return await db.query('SELECT * FROM users')
-})
-```
+| 场景                 | 推荐方案      |
+| -------------------- | ------------- |
+| 简单计数器、开关     | `useState`    |
+| 需要计算属性和 actions | Pinia         |
+| 复杂业务逻辑         | Pinia         |
+| 跨页面共享简单值     | `useState`    |
+| 需要持久化存储       | Pinia + 插件  |
+| 需要 DevTools 调试   | Pinia         |
+| 临时、轻量级状态     | `useState`    |
+
+---
+
+## 七、Nuxt 4 Pinia 最佳实践
+
+- **Setup Store 优于 Options Store**，与 Composition API 风格一致
+- **不要直接解构 store**，使用 `storeToRefs()` 保持响应式
+- **将 store 放在 `app/stores/` 目录**，Nuxt 4 会自动导入
+- **服务端数据通过 `useAsyncData` → store 赋值**，利用 SSR 自动序列化
+- **区分服务端和客户端逻辑**，用 `import.meta.client` / `import.meta.server`

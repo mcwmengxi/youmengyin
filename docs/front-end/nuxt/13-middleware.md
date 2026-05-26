@@ -1,82 +1,77 @@
 # 中间件机制
 
-> 本章讲解 Nuxt 路由中间件的创建、分类及使用场景。
+> 本章讲解 Nuxt 4 的中间件系统，包括全局中间件、命名中间件和内联中间件的使用方式。
 
-## 一、中间件类型
+## 一、中间件概述
 
-Nuxt 3 的中间件是一个**路由导航守卫**，在页面渲染前执行。分为三种类型：
+中间件在页面渲染前执行，用于：
+- 身份验证与授权
+- 重定向
+- 日志记录
+- 路由守卫
 
-| 类型           | 文件命名        | 触发方式                           |
-| -------------- | --------------- | ---------------------------------- |
-| **全局中间件** | `xxx.global.ts` | 每次路由切换自动执行               |
-| **命名中间件** | `xxx.ts`        | 页面通过 `definePageMeta` 手动指定 |
-| **内联中间件** | 直接写在页面内  | 仅在该页面生效                     |
+Nuxt 4 的中间件文件放在 `app/middleware/` 目录。
 
 ---
 
-## 二、中间件创建与注册
+## 二、中间件类型
 
 ### 2.1 全局中间件
 
+文件名以 `.global.ts` 结尾，**所有路由跳转时自动执行**：
+
 ```ts
-// middleware/auth.global.ts
+// app/middleware/auth.global.ts
 export default defineNuxtRouteMiddleware((to, from) => {
   const token = useCookie('token')
 
-  // 未登录且不在登录页 → 重定向
-  if (!token.value && to.path !== '/login') {
-    return navigateTo('/login?redirect=' + to.fullPath)
+  // 公开页面白名单
+  const publicPages = ['/login', '/register', '/']
+
+  if (!token.value && !publicPages.includes(to.path)) {
+    return navigateTo('/login')
   }
 })
 ```
-
-全局中间件在 `middleware/` 目录下，文件名必须以 `.global.ts` 结尾。
 
 ### 2.2 命名中间件
 
-```ts
-// middleware/auth.ts
-export default defineNuxtRouteMiddleware((to, from) => {
-  const user = useState('user')
+在 `definePageMeta` 中按需引用：
 
-  if (!user.value?.isAdmin) {
-    // 中止导航并显示错误页面
-    throw createError({
-      statusCode: 403,
-      message: '无权限访问',
-    })
+```ts
+// app/middleware/admin.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+  const user = useState('auth-user')
+
+  if (!user.value || user.value.role !== 'admin') {
+    return navigateTo('/403')
   }
 })
 ```
 
-在页面中使用：
-
 ```vue
-<!-- pages/admin/dashboard.vue -->
-<script setup>
+<!-- app/pages/admin/dashboard.vue -->
+<script setup lang="ts">
 definePageMeta({
-  middleware: ['auth'], // 使用 middleware/auth.ts
-  // 或 middleware: 'auth'
+  middleware: ['admin'],
 })
 </script>
 ```
 
 ### 2.3 内联中间件
 
-```vue
-<!-- pages/editor/[id].vue -->
-<script setup>
-definePageMeta({
-  middleware: [
-    function (to, from) {
-      const draftId = to.params.id
-      const drafts = useState('drafts')
+直接在页面中定义，适用于简单的、只在一处使用的逻辑：
 
-      if (!drafts.value.find((d) => d.id === draftId)) {
-        return navigateTo('/')
-      }
-    },
-  ],
+```vue
+<!-- app/pages/settings.vue -->
+<script setup lang="ts">
+definePageMeta({
+  middleware: (to, from) => {
+    const settings = useCookie('settings-initialized')
+    if (!settings.value) {
+      return navigateTo('/setup-wizard')
+    }
+  },
 })
 </script>
 ```
@@ -85,151 +80,168 @@ definePageMeta({
 
 ## 三、中间件执行顺序
 
-### 3.1 执行流程
-
-```
-用户导航 → 全局中间件（按文件名排序） → 命名/内联中间件（按 definePageMeta 数组顺序） → 页面渲染
-```
-
-### 3.2 排序示例
-
-```
-middleware/
-├── 01.setup.global.ts    # ① 最先执行
-├── 02.analytics.global.ts # ② 第二个
-├── auth.ts               # ③ 在页面指定后才执行
-└── permission.ts         # ④ 在页面指定后才执行
-```
-
-```vue
-<script setup>
+```ts
+// app/pages/dashboard.vue
 definePageMeta({
-  middleware: ['auth', 'permission'], // ③ → ④
+  middleware: ['auth', 'log', 'track'],  // 从左到右依次执行
 })
-</script>
 ```
 
-最终执行顺序：① → ② → ③ → ④ → 页面渲染
+等效于链式调用：
+
+```
+auth → (通过) → log → (通过) → track → (通过) → 渲染页面
+auth → (拦截) → 停止执行，重定向到 /login
+```
+
+### 3.1 全局 + 命名 顺序
+
+```
+全局中间件 (.global.ts) → 命名中间件（按数组顺序）→ 渲染页面
+```
 
 ---
 
-## 四、实际应用场景
+## 四、中间件 API
 
-### 4.1 用户认证守卫
+### 4.1 `defineNuxtRouteMiddleware`
 
 ```ts
-// middleware/auth.global.ts
-export default defineNuxtRouteMiddleware((to) => {
-  const { user, refreshUser } = useAuth()
+export default defineNuxtRouteMiddleware((to, from) => {
+  // to: 目标路由
+  // from: 来源路由
 
-  // 公共页面无需登录
-  const publicPages = ['/', '/login', '/register', '/about']
-  if (publicPages.includes(to.path)) return
-
-  // 未登录且有 token — 尝试恢复会话
-  if (!user.value) {
-    await refreshUser()
+  // 返回 navigateTo 来重定向
+  if (!isAuthenticated()) {
+    return navigateTo('/login')
   }
 
-  // 仍然未登录 — 重定向
-  if (!user.value) {
+  // 返回 abortNavigation 来中止导航
+  if (!hasAccess(to)) {
+    return abortNavigation('没有访问权限')
+  }
+
+  // 不返回任何值 = 通过，继续执行
+})
+```
+
+### 4.2 常用模式
+
+**角色检查**：
+
+```ts
+// app/middleware/role.ts
+export default defineNuxtRouteMiddleware((to) => {
+  const user = useUserStore()
+
+  const requiredRole = to.meta.role as string | undefined
+  if (requiredRole && user.role !== requiredRole) {
+    return navigateTo('/unauthorized')
+  }
+})
+```
+
+**重定向已登录用户**：
+
+```ts
+// app/middleware/guest.ts
+export default defineNuxtRouteMiddleware((to) => {
+  const token = useCookie('token')
+
+  if (token.value) {
+    return navigateTo('/dashboard')
+  }
+})
+```
+
+**带查询参数的登录重定向**：
+
+```ts
+// app/middleware/auth.ts
+export default defineNuxtRouteMiddleware((to) => {
+  const token = useCookie('token')
+
+  if (!token.value) {
+    // 登录后重定向回原页面
+    return navigateTo({ path: '/login', query: { redirect: to.fullPath } })
+  }
+})
+```
+
+---
+
+## 五、Nuxt 4 中间件增强
+
+### 5.1 TypeScript 类型安全
+
+Nuxt 4 的 TypeScript 隔离让中间件中的 API 提示更准确：
+
+```ts
+// app/middleware/auth.ts
+export default defineNuxtRouteMiddleware((to, from) => {
+  // to.meta 类型根据 definePageMeta 自动推断
+  if (to.meta.requiresAuth) {
+    // ...
+  }
+})
+```
+
+### 5.2 异步中间件
+
+Nuxt 4 对异步中间件支持更好：
+
+```ts
+// app/middleware/verify.ts
+export default defineNuxtRouteMiddleware(async (to) => {
+  try {
+    const { valid } = await $fetch('/api/auth/verify')
+    if (!valid) {
+      return navigateTo('/login')
+    }
+  } catch {
+    return navigateTo('/error')
+  }
+})
+```
+
+### 5.3 共享中间件的 Nuxt 4 最佳实践
+
+中间件逻辑应尽量抽取为 Composable，中间件文件本身只做路由级判断：
+
+```ts
+// app/composables/useAuthGuard.ts
+export function useAuthGuard() {
+  const token = useCookie('token')
+  const user = useState('auth-user')
+
+  const isAuthenticated = computed(() => !!token.value && !!user.value)
+
+  function requireAuth() {
+    if (!isAuthenticated.value) {
+      throw createError({ statusCode: 401, message: '请先登录' })
+    }
+  }
+
+  return { isAuthenticated, requireAuth }
+}
+```
+
+```ts
+// app/middleware/auth.ts
+export default defineNuxtRouteMiddleware(() => {
+  const { isAuthenticated } = useAuthGuard()
+  if (!isAuthenticated.value) {
     return navigateTo('/login')
   }
 })
 ```
 
-### 4.2 路由日志记录
+---
 
-```ts
-// middleware/analytics.global.ts
-export default defineNuxtRouteMiddleware((to, from) => {
-  if (import.meta.client) {
-    console.log(`[路由] ${from.path} → ${to.path}`)
-  }
-})
-```
+## 六、中间件最佳实践
 
-### 4.3 权限控制
-
-```ts
-// middleware/role.ts
-export default defineNuxtRouteMiddleware((to) => {
-  const user = useState('user')
-
-  // 路由元信息中定义的所需角色
-  const requiredRole = to.meta.role
-  if (requiredRole && user.value?.role !== requiredRole) {
-    return navigateTo('/403')
-  }
-})
-```
-
-```vue
-<!-- pages/admin/users.vue -->
-<script setup>
-definePageMeta({
-  middleware: ['auth', 'role'],
-  role: 'admin', // 自定义元信息
-})
-</script>
-```
-
-### 4.4 移动端重定向
-
-```ts
-// middleware/mobile-redirect.global.ts
-export default defineNuxtRouteMiddleware((to) => {
-  if (import.meta.server) {
-    const userAgent = useRequestHeaders()['user-agent'] || ''
-    const isMobile = /Mobile|Android|iPhone/i.test(userAgent)
-
-    if (isMobile && !to.path.startsWith('/m')) {
-      return navigateTo('/m' + to.path)
-    }
-  }
-})
-```
-
-### 4.5 多中间件编排
-
-```ts
-// middleware/checkout.ts
-export default defineNuxtRouteMiddleware(() => {
-  const cart = useState('cart')
-
-  // 购物车为空不能进入结算页
-  if (!cart.value?.items?.length) {
-    return navigateTo('/cart')
-  }
-})
-```
-
-```vue
-<!-- pages/checkout.vue -->
-<script setup>
-definePageMeta({
-  // 按顺序执行的中间件链
-  middleware: [
-    'auth', // 1. 先检查登录
-    'checkout', // 2. 再检查购物车
-  ],
-})
-</script>
-```
-
-### 4.6 中间件返回值
-
-```ts
-export default defineNuxtRouteMiddleware((to, from) => {
-  // 无返回值 / return undefined → 放行，继续导航
-
-  // return navigateTo() → 重定向到指定页面
-  return navigateTo('/login')
-
-  // throw createError() → 触发错误页面
-  throw createError({ statusCode: 404, message: '页面不存在' })
-
-  // 返回 true / false → 放行 / 取消导航
-  return false // 取消当前导航
-})
-```
+- **全局中间件慎用**，只在确实需要全量拦截时使用 `.global.ts`
+- **业务逻辑放入 Composable**，中间件只做路由级决策
+- **命名中间件按功能拆分**：`auth`、`guest`、`role`、`log`
+- **中间件尽量轻量**，避免在中间件中做大量数据处理
+- **Nuxt 4 中中间件放在 `app/middleware/`** 目录下

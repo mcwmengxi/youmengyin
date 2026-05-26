@@ -1,197 +1,244 @@
-# 渲染模式
+# SSR / SSG / ISR / SWR 渲染模式
 
-> 本章对比讲解 Nuxt 中的 SSR、SSG、ISR、SWR 等渲染模式及其适用场景。
+> 本章讲解 Nuxt 4 支持的四种渲染模式及其适用场景。Nuxt 4 + Nitro 3 在渲染模式上提供了更好的性能和更灵活的配置。
 
-## 一、SSR 服务端渲染
+## 一、渲染模式概述
 
-### 1.1 什么是 SSR？
+| 模式       | 全称                          | 渲染时机     | SEO | 实时性   |
+| ---------- | ----------------------------- | ------------ | --- | -------- |
+| **SSR**    | Server-Side Rendering         | 每次请求时   | ✅  | ✅ 实时  |
+| **SSG**    | Static Site Generation        | 构建时       | ✅  | ❌ 静态  |
+| **ISR**    | Incremental Static Regeneration | 按需重新生成 | ✅  | ⚡ 准实时 |
+| **SWR**    | Stale-While-Revalidate        | 缓存 + 后台更新 | ✅  | ⚡ 准实时 |
 
-**SSR（Server-Side Rendering）**：每次请求在服务端渲染 HTML，返回给浏览器的是**完整页面内容**。
-
-```
-浏览器发起请求 → Nuxt 服务端渲染 Vue 组件 → 返回完整 HTML → 浏览器直接展示
-```
-
-Nuxt 3 **默认使用 SSR**，无需额外配置。
-
-### 1.2 SSR 的优势
-
-| 优势           | 说明                                    |
-| -------------- | --------------------------------------- |
-| **SEO 友好**   | 搜索引擎爬虫能直接抓取完整内容          |
-| **首屏速度快** | 浏览器直接渲染 HTML，无需等 JS 加载执行 |
-| **动态数据**   | 每次请求都能获取最新数据                |
-
-### 1.3 SSR 的工作流程
-
-1. 浏览器请求页面
-2. Nuxt 服务端执行组件 `setup`，调用 `useFetch` / `useAsyncData` 获取数据
-3. 渲染为 HTML 字符串，连同序列化的状态嵌入页面
-4. 浏览器接收 HTML，立即展示
-5. 客户端 JS 下载完成，**hydration**（激活）使页面可交互
-
-### 1.4 SSR 注意事项
-
-```vue
-<script setup>
-// ❌ 服务端没有 window、document
-// console.log(window.innerWidth)  // 报错！
-
-// ✅ 在 mounted 中访问浏览器 API
-onMounted(() => {
-  console.log(window.innerWidth)
-})
-
-// ✅ 使用 import.meta.client 判断环境
-if (import.meta.client) {
-  console.log(window.innerWidth)
-}
-</script>
-```
+Nuxt 4 默认使用 **SSR**，可通过 `routeRules` 按路由混合使用多种模式。
 
 ---
 
-## 二、SSG 静态站点生成
+## 二、SSR（服务端渲染）
 
-### 2.1 什么是 SSG？
+### 2.1 工作原理
 
-**SSG（Static Site Generation）**：构建时预渲染所有页面为静态 HTML，部署时直接提供静态文件，无需运行 Node 服务。
+```
+用户请求 → Nuxt 服务端执行 Vue 组件 → 生成完整 HTML → 返回给浏览器
+                ↓
+         浏览器水合（Hydration）→ 页面可交互
+```
 
-### 2.2 启用 SSG
+### 2.2 Nuxt 4 SSR 增强
+
+- **Nitro 3 引擎**：更快的服务端渲染速度
+- **Socket 通信**：开发模式下 HMR 更快
+- **智能数据层**：服务端预取数据自动序列化到客户端
+
+### 2.3 SSR 配置
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  ssr: true, // 保持 SSR 开启
+  future: { compatibilityVersion: 4 },
+  ssr: true, // 默认启用
+})
+```
+
+### 2.4 SSR 适用场景
+
+- 需要 SEO 的内容型网站（博客、商城、企业官网）
+- 首屏加载速度要求高的应用
+- 社交媒体分享需要正确预览的内容
+
+---
+
+## 三、SSG（静态站点生成）
+
+### 3.1 预渲染
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
   nitro: {
     prerender: {
-      routes: ['/', '/about', '/posts/1', '/posts/2'], // 预渲染的路由
-      crawlLinks: true, // 自动爬取内部链接并预渲染
+      routes: ['/', '/about', '/posts/1', '/posts/2'],
+      crawlLinks: true,  // 自动爬取页面中的链接
     },
   },
 })
 ```
 
-构建命令：
+### 3.2 动态路由预渲染
+
+```ts
+// server/api/generate-routes.ts 或在 nuxt.config.ts 中
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+  nitro: {
+    prerender: {
+      routes: async () => {
+        const posts = await $fetch('https://api.example.com/posts')
+        return posts.map((p: any) => `/posts/${p.slug}`)
+      },
+    },
+  },
+})
+```
+
+### 3.3 构建命令
 
 ```bash
 npx nuxi generate
+# 或
+npm run generate
 ```
 
-### 2.3 预渲染动态路由
-
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  nitro: {
-    prerender: {
-      routes: ['/'],
-      crawlLinks: true,
-    },
-  },
-  hooks: {
-    async 'nitro:config'(config) {
-      if (config.dev) return
-      // 构建时获取所有文章 ID，生成对应静态页面
-      const posts = await $fetch('https://api.example.com/posts')
-      const routes = posts.map((p) => `/posts/${p.id}`)
-      config.prerender.routes.push(...routes)
-    },
-  },
-})
-```
-
-### 2.4 SSG 适用场景
-
-- 博客、文档站、企业官网（内容不频繁变化）
-- 需要极快的首屏加载速度
-- 纯静态文件部署（CDN 友好）
+输出在 `.output/public/`，可直接部署到 CDN。
 
 ---
 
-## 三、ISR 增量静态再生
+## 四、ISR（增量静态再生成）
 
-### 3.1 什么是 ISR？
-
-**ISR（Incremental Static Regeneration）**：页面首次请求时按需生成静态 HTML 并缓存，过期后后台重新生成。
+### 4.1 routeRules 配置
 
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
   routeRules: {
-    '/blog/**': {
-      isr: 600, // 缓存 600 秒（10 分钟），过期后后台重新生成
+    // 10 分钟后重新生成
+    '/products/**': { isr: 600 },
+    // 1 小时后重新生成
+    '/blog/**': { isr: 3600 },
+  },
+})
+```
+
+### 4.2 ISR 工作流程
+
+```
+首次请求 → 服务端渲染 → 缓存页面 → 返回给用户
+10分钟后请求 → 仍返回缓存（旧版本）→ 后台触发重新生成 → 下次请求返回新版本
+```
+
+### 4.3 ISR 适用场景
+
+- 数据变化不频繁的页面（产品列表、文章页）
+- 需要 SEO 但不需要实时更新的内容
+- 高并发场景，需要缓存来分担服务器压力
+
+---
+
+## 五、SWR（Stale-While-Revalidate）
+
+### 5.1 routeRules 配置
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+  routeRules: {
+    // 30 秒内返回缓存，后台更新
+    '/search/**': { swr: 30 },
+    // 5 分钟内返回缓存，后台更新
+    '/trending/**': { swr: 300 },
+  },
+})
+```
+
+### 5.2 SWR vs ISR
+
+|       | SWR                          | ISR                          |
+| ----- | ---------------------------- | ---------------------------- |
+| 首次  | 渲染 + 缓存                  | 渲染 + 缓存                  |
+| 过期后 | 返回旧缓存 + 后台更新        | 等待新渲染完成再返回         |
+| 体验  | 始终快速响应，但可能看到旧数据 | 可能等待，但一定看到最新数据   |
+| 适用  | 实时性要求低的搜索/列表      | 内容型页面（CMS 驱动）       |
+
+---
+
+## 六、SPA（纯客户端渲染）
+
+### 6.1 routeRules 配置
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+  routeRules: {
+    '/admin/**': { ssr: false },  // 管理后台完全客户端渲染
+    '/dashboard/**': { ssr: false },
+  },
+})
+```
+
+### 6.2 SPA 的优缺点
+
+- **优点**：初次加载后跳转极快，无需服务器资源
+- **缺点**：首屏加载慢，SEO 差
+
+### 6.3 SPA 适用场景
+
+- 管理后台、Dashboard
+- 登录后的应用内部页面
+- 不需要 SEO 的交互密集型应用
+
+---
+
+## 七、Nuxt 4 渲染模式配置示例
+
+### 一个完整的 routeRules 配置：
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
+  future: { compatibilityVersion: 4 },
+
+  routeRules: {
+    // 首页 — SSR（SEO 优先）
+    '/': { ssr: true },
+
+    // 静态页面 — 预渲染为纯静态
+    '/about': { prerender: true },
+    '/contact': { prerender: true },
+
+    // 博客文章 — ISR 1 小时
+    '/blog/**': { isr: 3600 },
+
+    // 产品列表 — ISR 10 分钟
+    '/products/**': { isr: 600 },
+
+    // 搜索结果 — SWR 30 秒
+    '/search/**': { swr: 30 },
+
+    // 管理后台 — 纯 SPA
+    '/admin/**': { ssr: false },
+
+    // API 路由 — 添加 CORS
+    '/api/**': {
+      cors: true,
+      headers: { 'X-Custom': 'value' },
     },
   },
 })
 ```
 
-### 3.2 ISR 工作流程
+### 渲染模式选择决策树
 
-1. 首次访问 `/blog/1` → 服务端渲染并缓存（返回给用户）
-2. 10 分钟内再次访问 → 直接返回缓存
-3. 10 分钟后访问 → 返回旧缓存的同时，后台重新生成新缓存
-4. 再次访问 → 返回新缓存
-
-### 3.3 ISR vs SSG vs SSR 对比
-
-| 特性       | SSG                  | ISR                | SSR    |
-| ---------- | -------------------- | ------------------ | ------ |
-| 构建时间   | 慢（需生成所有页面） | 快（按需生成）     | 无构建 |
-| 响应速度   | 极快                 | 快                 | 较慢   |
-| 数据实时性 | 差（需重新构建）     | 延迟（按缓存过期） | 实时   |
-| 服务器压力 | 无                   | 低                 | 高     |
+```
+需要 SEO？
+├── 是 → 内容更新频率？
+│         ├── 几乎不变 → SSG（prerender）
+│         ├── 偶尔更新 → ISR（按时间重新生成）
+│         ├── 较频繁但可接受短暂延迟 → SWR
+│         └── 实时性要求高 → SSR
+└── 否 → SPA（ssr: false）
+```
 
 ---
 
-## 四、SWR 陈旧验证
+## 八、Nitro 3 渲染增强
 
-### 4.1 什么是 SWR？
-
-**SWR（Stale-While-Revalidate）**：始终返回缓存内容（即使已过期），同时后台更新缓存。用户永远不会等待页面生成。
-
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  routeRules: {
-    '/trending/**': {
-      swr: 300, // 缓存 5 分钟，过期后返回旧内容 + 后台更新
-    },
-  },
-})
-```
-
-### 4.2 SWR vs ISR
-
-| 特性           | ISR                  | SWR            |
-| -------------- | -------------------- | -------------- |
-| 过期后首个请求 | 等待重新生成，可能慢 | 立即返回旧内容 |
-| 用户等待时间   | 可能等待             | 零等待         |
-| 数据时效要求   | 可接受延迟           | 可接受旧数据   |
-
----
-
-## 五、四种模式对比与选择
-
-| 渲染模式 | 配置方式        | 适用场景                                     |
-| -------- | --------------- | -------------------------------------------- |
-| **SSR**  | 默认            | 需要实时数据的页面、管理后台                 |
-| **SSG**  | `nuxi generate` | 博客、文档、营销页面                         |
-| **ISR**  | `isr: 秒数`     | 内容更新不频繁的页面（商城商品页）           |
-| **SWR**  | `swr: 秒数`     | 不要求数据强实时性的页面（排行榜、推荐列表） |
-| **SPA**  | `ssr: false`    | 不需要 SEO 的后台管理、仪表盘                |
-
-### 5.1 同一站点混合使用
-
-```ts
-// nuxt.config.ts
-export default defineNuxtConfig({
-  routeRules: {
-    '/': { ssr: true }, // 首页 SSR
-    '/blog/**': { swr: 3600 }, // 博客 SWR
-    '/products/**': { isr: 600 }, // 商品页 ISR
-    '/admin/**': { ssr: false }, // 后台 SPA
-    '/about': { prerender: true }, // 关于页 预渲染
-  },
-})
-```
+Nuxt 4 内置 Nitro 3，渲染层面有显著提升：
+- **更快的 SSR**：优化的 HTML 序列化和流式传输
+- **更强的边缘计算支持**：Cloudflare Workers、Deno Deploy 等
+- **智能缓存**：ISR/SWR 缓存策略更高效
+- **实验性：Partial Prerendering**：混合 SSG + SSR 同一页面

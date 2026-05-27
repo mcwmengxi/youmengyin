@@ -98,6 +98,24 @@ React 各版本核心差异对比，帮助你理解版本升级带来的变化�
 
 ---
 
+## 八、源码解析篇
+
+深入 React 18/19 源码，理解核心机制实现原理。
+
+| 序号 | 内容                    | 文档                                                       | 状态   |
+| ---- | ----------------------- | ---------------------------------------------------------- | ------ |
+| 1    | 源码架构概览            | [overview.md](./source-code/overview.md)                   | 待完成 |
+| 2    | Fiber 架构深度解析      | [fiber.md](./source-code/fiber.md)                         | 待完成 |
+| 3    | 协调与 Diff 算法        | [reconciliation.md](./source-code/reconciliation.md)       | 待完成 |
+| 4    | Hooks 源码实现          | [hooks-source.md](./source-code/hooks-source.md)           | 待完成 |
+| 5    | 调度器原理（Scheduler） | [scheduler.md](./source-code/scheduler.md)                 | 待完成 |
+| 6    | 并发模式源码解析        | [concurrent-source.md](./source-code/concurrent-source.md) | 待完成 |
+| 7    | 事件系统源码            | [event-system.md](./source-code/event-system.md)           | 待完成 |
+| 8    | React 19 新特性源码     | [react-19-source.md](./source-code/react-19-source.md)     | 待完成 |
+| 9    | React Compiler 原理     | [react-compiler.md](./source-code/react-compiler.md)       | 待完成 |
+
+---
+
 ## 学习建议
 
 1. **按顺序学习**：建议从基础篇开始，逐章深入，不要跳跃。

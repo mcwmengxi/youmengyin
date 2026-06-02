@@ -20,3 +20,4 @@ outline: [2, 3, 4]
 | 框架篇 | [LangChain/LangGraph](./ai-agents/frameworks/langchain-agent.md) · [AutoGen](./ai-agents/frameworks/autogen.md) · [CrewAI](./ai-agents/frameworks/crewai.md) |
 | 实战篇 | [简单Agent](./ai-agents/practice/simple-agent.md) · [完整Agent系统](./ai-agents/practice/full-agent-system.md) |
 | 高级篇 | [评估测试](./ai-agents/advanced/evaluation.md) · [安全对齐](./ai-agents/advanced/safety-alignment.md) · [MCP协议](./ai-agents/advanced/mcp-protocol.md) |
+| 前端篇 | [前端开发实践](./ai-agents/frontend/index.md) |

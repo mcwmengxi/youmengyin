@@ -55,6 +55,30 @@
 
 ---
 
+## 五、前端篇
+
+从前端工程师视角掌握 AI Agent 开发。
+
+| 序号 | 内容                       | 文档                                                          | 状态   |
+| ---- | -------------------------- | ------------------------------------------------------------- | ------ |
+| 1    | 前端角色与核心挑战          | [overview.md](./frontend/overview.md)                         | 已完成 |
+| 2    | 流式通信协议               | [streaming-communication.md](./frontend/streaming-communication.md) | 已完成 |
+| 3    | Vercel AI SDK              | [vercel-ai-sdk.md](./frontend/vercel-ai-sdk.md)               | 已完成 |
+| 4    | Vue 生态支持               | [vue-ecosystem.md](./frontend/vue-ecosystem.md)               | 已完成 |
+| 5    | Agent UI/UX 设计模式       | [agent-ui-patterns.md](./frontend/agent-ui-patterns.md)       | 已完成 |
+| 6    | 多 Agent 协作可视化        | [multi-agent-visualization.md](./frontend/multi-agent-visualization.md) | 已完成 |
+| 7    | 前端状态管理               | [state-management.md](./frontend/state-management.md)         | 已完成 |
+| 8    | 浏览器端 AI                | [browser-ai.md](./frontend/browser-ai.md)                     | 已完成 |
+| 9    | 前端 Function Calling 流程 | [function-calling.md](./frontend/function-calling.md)         | 已完成 |
+| 10   | 对话历史管理               | [history-management.md](./frontend/history-management.md)     | 已完成 |
+| 11   | 性能优化                   | [performance.md](./frontend/performance.md)                   | 已完成 |
+| 12   | 错误处理与重试机制         | [error-handling.md](./frontend/error-handling.md)             | 已完成 |
+| 13   | 前端 Agent 安全            | [security.md](./frontend/security.md)                         | 已完成 |
+| 14   | 测试策略                   | [testing.md](./frontend/testing.md)                           | 已完成 |
+| 15   | 构建前端 Agent 应用        | [practice-agent-app.md](./frontend/practice-agent-app.md)     | 已完成 |
+
+---
+
 ## 学习建议
 
 1. **先理解核心概念**：Agent 架构、工具调用、记忆系统是基础，务必先掌握

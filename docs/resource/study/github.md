@@ -8,6 +8,13 @@
 <https://github.com/pengzhanbo/pengzhanbo.cn/>
 ![sufuwang/blog threejs](https://github.com/sufuwang/blog)
 [ Vue 3 admin dashboard template](https://github.com/Daymychen/art-design-pro)
+[QianKun 微前端搭建从 0 到 1，父子应用从开发到部署](https://github.com/tangjiahui-cn/frontend-engineering-share)
+[基于 vue3、vite、Echart 框架的大数据可视化（大屏展示）模板](https://github.com/daidaibg/IofTV-Screen-Vue3)
+[区域卫星瓦片底图下载工具](https://github.com/knight-L/sat-hunter)
+[Three.js 可视化大屏，地理轮廓精确呈现 3D 地图](https://github.com/knight-L/sc-datav)
+[智能旅游规划系统的前端应用，基于 Vue 3、Vite、Leaflet、高德地图等技术栈构建](https://github.com/1937983507/ai-tourism-frontend)
+[CompetifyAI 前端 — React + Vite + ReactFlow 可视化](https://github.com/auberginewly/competify-frontend)
+[DK AgileBI Web 版是一套基于 Vue 3 + Vite 的 BI 可视化与数据资产管理平台](https://github.com/DKAgileBI/AgileBI_web)
 
 ## flutter
 

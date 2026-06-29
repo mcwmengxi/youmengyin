@@ -16,6 +16,7 @@
 [CompetifyAI 前端 — React + Vite + ReactFlow 可视化](https://github.com/auberginewly/competify-frontend)
 [DK AgileBI Web 版是一套基于 Vue 3 + Vite 的 BI 可视化与数据资产管理平台](https://github.com/DKAgileBI/AgileBI_web)
 
+[面向企业级应用与 AI 场景的 Vue 3 组件库yh-ui](https://github.com/1079161148/yh-ui)
 ## flutter
 
 [flutter 个人模板项目](https://github.com/shang1219178163/flutter_templet_project)

@@ -16,7 +16,8 @@
 [CompetifyAI 前端 — React + Vite + ReactFlow 可视化](https://github.com/auberginewly/competify-frontend)
 [DK AgileBI Web 版是一套基于 Vue 3 + Vite 的 BI 可视化与数据资产管理平台](https://github.com/DKAgileBI/AgileBI_web)
 
-[面向企业级应用与 AI 场景的 Vue 3 组件库yh-ui](https://github.com/1079161148/yh-ui)
+[面向企业级应用与 AI 场景的 Vue 3 组件库 yh-ui](https://github.com/1079161148/yh-ui)
+
 ## flutter
 
 [flutter 个人模板项目](https://github.com/shang1219178163/flutter_templet_project)
@@ -54,6 +55,10 @@
 
 [AI 智能体实战](https://github.com/didilili/ai-agents-from-zero)
 [AI 智能体实战速成指南](https://didilili.github.io/ai-agents-from-zero/)
+
+[AI 驱动的智能图像生成与编辑平台](https://github.com/xinqingaa/aivista_agent)
+[多 Agent 编排平台](https://github.com/peng-yin/nest-agent)
+[基于 Node.js + React 开箱即用的 RAG（检索增强生成）智能问答系统](https://github.com/jinghaonode/rag-knowledge-assistant)
 
 ## python
 

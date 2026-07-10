@@ -18,6 +18,8 @@
 
 [面向企业级应用与 AI 场景的 Vue 3 组件库 yh-ui](https://github.com/1079161148/yh-ui)
 
+[前端智能化场景解决方案 UI 库](https://github.com/DevCloudFE/MateChat)
+
 ## flutter
 
 [flutter 个人模板项目](https://github.com/shang1219178163/flutter_templet_project)
@@ -25,6 +27,9 @@
 (https://github.com/Danielqiuf/ink_flutter)
 
 ## react-native
+
+[基于 IOT 实现的模拟物联网操作家具的系统](https://github.com/wanghao137115/IOT-rn)
+[react native expo 的模板应用(地图、拍照)](https://github.com/xiaohuangji2020/hooji_rn_expo_template)
 
 ## electron
 
@@ -59,6 +64,8 @@
 [AI 驱动的智能图像生成与编辑平台](https://github.com/xinqingaa/aivista_agent)
 [多 Agent 编排平台](https://github.com/peng-yin/nest-agent)
 [基于 Node.js + React 开箱即用的 RAG（检索增强生成）智能问答系统](https://github.com/jinghaonode/rag-knowledge-assistant)
+
+[利用 Harness Engineering 开发方法论打造的一款名为 GoferBot 的云端优先的 AI Workspace / Agent OS Web 应用](https://github.com/Mutoumiao/goferBot)
 
 ## python
 
